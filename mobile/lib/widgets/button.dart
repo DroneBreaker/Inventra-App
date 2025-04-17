@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:invoicify/widgets/app_text.dart';
+import 'package:inventra/widgets/app_text.dart';
 
 class Button extends StatelessWidget {
   final String buttonText;

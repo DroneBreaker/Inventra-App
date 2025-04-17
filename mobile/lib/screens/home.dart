@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:invoicify/constants/app_colors.dart';
-import 'package:invoicify/constants/app_titles.dart';
-import 'package:invoicify/screens/auth/login.dart';
-import 'package:invoicify/screens/auth/register.dart';
-import 'package:invoicify/widgets/app_text.dart';
-import 'package:invoicify/widgets/button.dart';
+import 'package:inventra/constants/app_colors.dart';
+import 'package:inventra/constants/app_titles.dart';
+import 'package:inventra/screens/auth/login.dart';
+import 'package:inventra/screens/auth/register.dart';
+import 'package:inventra/widgets/app_text.dart';
+import 'package:inventra/widgets/button.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});

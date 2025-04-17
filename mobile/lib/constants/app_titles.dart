@@ -7,7 +7,7 @@ class AppTitle {
   static const String registerButton = "Click to Register";
 
   //LOGIN
-  static const String loginTitle = "Droners Invoicify";
+  static const String loginTitle = "Droners Inventra";
   static const String loginDescription = "Please sign-in to your account";
   static const String logInButton = "Log In";
 
