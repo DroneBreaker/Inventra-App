@@ -10,6 +10,7 @@ import (
 )
 
 type UserService interface {
+	GetAll() ([]models.User, error)
 	Register(user *models.User) error
 	Login(username, email, businessTIN, password string) (*models.User, error)
 	Delete(id int) error
@@ -21,6 +22,10 @@ type userService struct {
 
 func NewUserService(repo repository.UserRepository) UserService {
 	return &userService{repo: repo}
+}
+
+func (s *userService) GetAll() ([]models.User, error) {
+	return s.repo.GetAll()
 }
 
 func (s *userService) Register(user *models.User) error {

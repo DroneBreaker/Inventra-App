@@ -19,6 +19,14 @@ func NewUserHandler(service services.UserService) *UserHandler {
 	return &UserHandler{service: service}
 }
 
+func (h *UserHandler) GetAll(c echo.Context) error {
+	users, err := h.service.GetAll()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, users)
+}
+
 func (h *UserHandler) Register(c echo.Context) error {
 	var user models.User
 	if err := c.Bind(&user); err != nil {

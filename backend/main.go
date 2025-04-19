@@ -30,6 +30,7 @@ func main() {
 	userHandler := handlers.NewUserHandler(userService)
 
 	// Routes
+	e.GET("/users", userHandler.GetAll)
 	e.POST("/register", userHandler.Register)
 	e.POST("/login", userHandler.Login)
 	e.DELETE("/users/:id", userHandler.Delete)
