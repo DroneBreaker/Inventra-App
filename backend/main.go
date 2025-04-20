@@ -25,15 +25,25 @@ func main() {
 	// Initiate the app
 	e := echo.New()
 
+	// User Routes
 	userRepo := repository.NewUserRepository(db)
 	userService := services.NewUserService(userRepo)
 	userHandler := handlers.NewUserHandler(userService)
 
-	// Routes
 	e.GET("/users", userHandler.GetAll)
 	e.POST("/register", userHandler.Register)
 	e.POST("/login", userHandler.Login)
 	e.DELETE("/users/:id", userHandler.Delete)
+
+	// Item Routes
+	itemRepo := repository.NewItemRepository(db)
+	itemService := services.NewItemService(itemRepo)
+	itemHandler := handlers.NewitemHandler(&itemService)
+
+	e.GET("/items", itemHandler.GetAll)
+	e.POST("/items", itemHandler.Create)
+	e.GET("/items/:id", itemHandler.GetByID)
+	// e.DELETE("/users/:id", userHandler.Delete)
 
 	e.GET("/welcome", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{

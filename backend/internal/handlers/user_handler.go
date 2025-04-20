@@ -11,15 +11,15 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type UserHandler struct {
+type userHandler struct {
 	service services.UserService
 }
 
-func NewUserHandler(service services.UserService) *UserHandler {
-	return &UserHandler{service: service}
+func NewUserHandler(service services.UserService) *userHandler {
+	return &userHandler{service: service}
 }
 
-func (h *UserHandler) GetAll(c echo.Context) error {
+func (h *userHandler) GetAll(c echo.Context) error {
 	users, err := h.service.GetAll()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -27,7 +27,7 @@ func (h *UserHandler) GetAll(c echo.Context) error {
 	return c.JSON(http.StatusOK, users)
 }
 
-func (h *UserHandler) Register(c echo.Context) error {
+func (h *userHandler) Register(c echo.Context) error {
 	var user models.User
 	if err := c.Bind(&user); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid input"})
@@ -43,7 +43,7 @@ func (h *UserHandler) Register(c echo.Context) error {
 	})
 }
 
-func (h *UserHandler) Login(c echo.Context) error {
+func (h *userHandler) Login(c echo.Context) error {
 	var input struct {
 		Username    string `json:"username"`
 		Email       string `json:"email"`
@@ -63,7 +63,7 @@ func (h *UserHandler) Login(c echo.Context) error {
 	return c.JSON(http.StatusOK, user)
 }
 
-func (h *UserHandler) Delete(c echo.Context) error {
+func (h *userHandler) Delete(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
