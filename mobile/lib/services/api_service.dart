@@ -13,7 +13,7 @@ class APIService {
     required String email,
     required String username,
     required String password,
-    // required String userType,
+    required String userType,
   }) async {
     final url = Uri.parse("$baseUrl/register");
 
@@ -28,7 +28,7 @@ class APIService {
           'email': email,
           'username': username,
           'password': password,
-          // 'user_type': userType.toLowerCase(), // or as required by your API
+          'user_type': userType.toLowerCase(), // or as required by your API
         }),
       );
 

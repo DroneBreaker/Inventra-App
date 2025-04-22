@@ -47,15 +47,15 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    // if(selected == "Select User Type") {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(
-    //       content: AppText(title: "Please select a user type!"),
-    //       backgroundColor: AppColors.error,
-    //     )
-    //   );
-    //   return;
-    // }
+    if(selected == "Select User Type") {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: AppText(title: "Please select a user type!"),
+          backgroundColor: AppColors.error,
+        )
+      );
+      return;
+    }
 
     setState(() {
       isLoading = true;
@@ -68,8 +68,8 @@ class _RegisterPageState extends State<RegisterPage> {
         businessPartnerTIN: businessPartnerTINController.text, 
         email: emailController.text, 
         username: usernameController.text, 
-        password: passwordController.text
-        // userType: selected
+        password: passwordController.text,
+        userType: selected
       );
 
       final responseData = jsonDecode(response.body);
