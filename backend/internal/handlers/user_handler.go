@@ -5,6 +5,7 @@ import (
 
 	"github.com/DroneBreaker/Inventra-App/internal/models"
 	"github.com/DroneBreaker/Inventra-App/internal/services"
+	"github.com/DroneBreaker/Inventra-App/utils"
 
 	"net/http"
 
@@ -45,22 +46,32 @@ func (h *userHandler) Register(c echo.Context) error {
 
 func (h *userHandler) Login(c echo.Context) error {
 	var input struct {
-		Username    string `json:"username"`
-		Email       string `json:"email"`
-		BusinessTIN string `json:"businessTIN"`
-		Password    string `json:"password"`
+		Username           string `json:"username"`
+		Email              string `json:"email"`
+		BusinessPartnerTIN string `json:"businessPartnerTIN"`
+		Password           string `json:"password"`
 	}
 
 	if err := c.Bind(&input); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid input"})
 	}
 
-	user, err := h.service.Login(input.Username, input.Email, input.BusinessTIN, input.Password)
+	user, err := h.service.Login(input.Username, input.Email, input.BusinessPartnerTIN, input.Password)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, echo.Map{"error": err.Error()})
 	}
 
-	return c.JSON(http.StatusOK, user)
+	token, err := utils.GenerateJWT(user.ID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"error": "token generation failed",
+		})
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"user":  user,
+		"token": token,
+	})
 }
 
 func (h *userHandler) Delete(c echo.Context) error {

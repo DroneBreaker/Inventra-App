@@ -27,7 +27,7 @@ func (r *itemRepo) GetAll(businessTIN string) ([]models.Item, error) {
 	items := []models.Item{}
 	query := `SELECT id, itemCode, itemName, price, isTaxInclusive, itemDescription, isTaxable, 
 		tourismCSTOption, itemCategory, isDiscountable, createdAt FROM items`
-	rows, err := r.db.Query(query)
+	rows, err := r.db.Query(query, businessTIN)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (r *itemRepo) Create(item *models.Item, businessTIN string) error {
 	}
 
 	item.ID = int(id) // Set the ID in the item object
-	item.BusinessTIN = businessTIN
+	item.BusinessPartnerTIN = businessTIN
 	return nil
 }
 
@@ -72,9 +72,9 @@ func (r *itemRepo) GetByID(id int, businessTIN string) (*models.Item, error) {
 	query := `SELECT id, itemCode, itemName, price, isTaxInclusive, itemDescription, isTaxable, 
 		tourismCSTOption, itemCategory, isDiscountable, businessTIN, createdAt FROM items WHERE 
 		id = ? and businessTIN = ?`
-	err := r.db.QueryRow(query, id).Scan(&item.ID, &item.ItemCode, &item.ItemName, &item.Price,
+	err := r.db.QueryRow(query, id, businessTIN).Scan(&item.ID, &item.ItemCode, &item.ItemName, &item.Price,
 		&item.IsTaxInclusive, &item.ItemDescription, &item.IsTaxable, &item.TourismCstOption,
-		&item.ItemCategory, &item.IsDiscountable, &item.BusinessTIN, &item.CreatedAt)
+		&item.ItemCategory, &item.IsDiscountable, &item.BusinessPartnerTIN, &item.CreatedAt)
 	return item, err
 }
 
@@ -83,14 +83,14 @@ func (r *itemRepo) GetByItemName(itemName string, businessTIN string) (*models.I
 	query := `SELECT id, itemCode, itemName, price, isTaxInclusive, itemDescription, isTaxable, 
 		tourismCSTOption, itemCategory, isDiscountable, businessTIN, createdAt FROM items WHERE 
 		id = ? and businessTIN = ?`
-	err := r.db.QueryRow(query, itemName).Scan(&item.ID, &item.ItemCode, &item.ItemName, &item.Price,
+	err := r.db.QueryRow(query, itemName, businessTIN).Scan(&item.ID, &item.ItemCode, &item.ItemName, &item.Price,
 		&item.IsTaxInclusive, &item.ItemDescription, &item.IsTaxable, &item.TourismCstOption,
-		&item.ItemCategory, &item.IsDiscountable, &item.BusinessTIN, &item.CreatedAt)
+		&item.ItemCategory, &item.IsDiscountable, &item.BusinessPartnerTIN, &item.CreatedAt)
 	return item, err
 }
 
 func (r *itemRepo) Update(item *models.Item, businessTIN string) error {
-	query := `UPDATE items SET itemCode = ?, itemName = ? price = ?, itemCategory = ? WHERE id = ?`
+	query := `UPDATE items SET itemCode = ?, itemName = ? price = ?, itemCategory = ? WHERE id = ? and businessTIN = ?`
 	_, err := r.db.Exec(query, &item.ItemCode, &item.ItemName, &item.Price, &item.ItemCategory, &item.ID)
 	return err
 }

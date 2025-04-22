@@ -45,6 +45,14 @@ func main() {
 	e.GET("/items/:id", itemHandler.GetByID)
 	// e.DELETE("/users/:id", userHandler.Delete)
 
+	// Business Partners Routes
+	businessPartnerRepo := repository.NewBusinessPartnerRepository(db)
+	businessPartnerService := services.NewBusinessPartnerService(businessPartnerRepo)
+	businessPartnerHandler := handlers.NewBusinessPartnerService(&businessPartnerService)
+
+	e.GET("/business_partners", businessPartnerHandler.GetAll)
+	e.POST("/business_partners", businessPartnerHandler.Create)
+
 	e.GET("/welcome", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{
 			"message": "Welcome to Inventra servers",

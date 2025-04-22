@@ -59,7 +59,7 @@ func (r *userRepo) Create(user *models.User) error {
 		return err
 	}
 
-	user.ID = int(id) // Set the ID in the user object
+	user.ID = uint(id) // Set the ID in the user object
 	return nil
 }
 

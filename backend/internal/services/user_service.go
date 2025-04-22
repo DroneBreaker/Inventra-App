@@ -32,7 +32,7 @@ func (s *userService) Register(user *models.User) error {
 	// Check if user exists
 	existing, _ := s.repo.GetByEmail(user.Email)
 	if existing != nil {
-		return errors.New("email already registered")
+		return errors.New("email already exist")
 	}
 
 	hashed, err := utils.HashPassword(user.Password)
@@ -45,7 +45,7 @@ func (s *userService) Register(user *models.User) error {
 	return s.repo.Create(user)
 }
 
-func (s *userService) Login(username, email, businessTIN, password string) (*models.User, error) {
+func (s *userService) Login(username, email, businessPartnerTIN, password string) (*models.User, error) {
 	user, err := s.repo.GetByEmail(email)
 	if err != nil {
 		return nil, fmt.Errorf("database error: %w", err)
