@@ -27,7 +27,7 @@ func NewUserRepository(db *sql.DB) UserRepository {
 
 func (r *userRepo) GetAll() ([]models.User, error) {
 	users := []models.User{}
-	query := `SELECT id, name, username, email, businessTIN FROM users`
+	query := `SELECT id, firstName, lastName, username, email, businessPartnerTIN FROM users`
 	rows, err := r.db.Query(query)
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func (r *userRepo) GetAll() ([]models.User, error) {
 
 	for rows.Next() {
 		var user models.User
-		if err := rows.Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.BusinessTIN); err != nil {
+		if err := rows.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Email, &user.BusinessPartnerTIN); err != nil {
 			return nil, err
 		}
 		users = append(users, user)
@@ -45,9 +45,9 @@ func (r *userRepo) GetAll() ([]models.User, error) {
 }
 
 func (r *userRepo) Create(user *models.User) error {
-	query := `INSERT INTO users(name, username, email, businessTIN, password) 
+	query := `INSERT INTO users(firstName, lastName, username, email, businessPartnerTIN) 
 		VALUES (?, ?, ?, ?, ?)`
-	result, err := r.db.Exec(query, user.Name, user.Username, user.Email, user.BusinessTIN, user.Password)
+	result, err := r.db.Exec(query, user.FirstName, user.LastName, user.Username, user.Email, user.BusinessPartnerTIN)
 
 	if err != nil {
 		return err
@@ -65,26 +65,26 @@ func (r *userRepo) Create(user *models.User) error {
 
 func (r *userRepo) GetByID(id int) (*models.User, error) {
 	user := &models.User{}
-	query := `SELECT id, name, username, email, businessTIN, createdAt 
+	query := `SELECT id, firstName, lastName, username, email, businessPartnerTIN, createdAt 
 		FROM users WHERE email = ?`
 
-	err := r.db.QueryRow(query, id).Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.BusinessTIN, &user.CreatedAt)
+	err := r.db.QueryRow(query, id).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Email, &user.BusinessPartnerTIN, &user.CreatedAt)
 	return user, err
 }
 
 func (r *userRepo) GetByUsername(username string) (*models.User, error) {
 	user := &models.User{}
-	query := `SELECT id, name, username, email, businessTIN, createdAt 
+	query := `SELECT id, firstName, lastName, username, email, businessPartnerTIN, createdAt 
 		FROM users WHERE username = ?`
-	err := r.db.QueryRow(query, username).Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.BusinessTIN, &user.CreatedAt)
+	err := r.db.QueryRow(query, username).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Email, &user.BusinessPartnerTIN, &user.CreatedAt)
 	return user, err
 }
 
 func (r *userRepo) GetByEmail(email string) (*models.User, error) {
 	user := &models.User{}
-	query := `SELECT id, name, username, email, businessTIN, password, createdAt 
+	query := `SELECT id, firstName, lastName, username, email, businessPartnerTIN, password, createdAt 
 		FROM users WHERE email = ?`
-	err := r.db.QueryRow(query, email).Scan(&user.ID, &user.Name, &user.Username, &user.Email, &user.BusinessTIN, &user.Password, &user.CreatedAt)
+	err := r.db.QueryRow(query, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Email, &user.BusinessPartnerTIN, &user.Password, &user.CreatedAt)
 
 	if err == sql.ErrNoRows {
 		return nil, nil // Return nil user when no user is found
@@ -97,17 +97,17 @@ func (r *userRepo) GetByEmail(email string) (*models.User, error) {
 	return user, err
 }
 
-func (r *userRepo) GetByBusinessTIN(businessTIN string) (*models.User, error) {
+func (r *userRepo) GetByBusinessTIN(businessPartnerTIN string) (*models.User, error) {
 	user := &models.User{}
-	query := `SELECT id, name, username, email, businessTIN, createdAt 
+	query := `SELECT id, firstName, lastName, username, email, businessPartnerTIN, createdAt 
 		FROM users WHERE businessTIN = ?`
-	err := r.db.QueryRow(query, businessTIN).Scan(&user.ID, &user.Name, &user.Email, &user.BusinessTIN, &user.CreatedAt)
+	err := r.db.QueryRow(query, businessPartnerTIN).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.BusinessPartnerTIN, &user.CreatedAt)
 	return user, err
 }
 
 func (r *userRepo) Update(user *models.User) error {
-	query := `UPDATE users SET name = ?, username = ?, email = ?, businessTIN = ? WHERE id = ?`
-	_, err := r.db.Exec(query, user.Name, user.Username, user.Email, user.BusinessTIN, user.ID)
+	query := `UPDATE users SET firstName = ?, lastName = ?, username = ?, email = ?, businessPartnerTIN = ? WHERE id = ?`
+	_, err := r.db.Exec(query, user.FirstName, user.LastName, user.Username, user.Email, user.BusinessPartnerTIN, user.ID)
 	return err
 }
 

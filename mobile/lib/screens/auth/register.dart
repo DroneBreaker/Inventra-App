@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:inventra/constants/app_colors.dart';
 import 'package:inventra/screens/taxpayer.dart';
+import 'package:inventra/services/api_service.dart';
 import 'package:inventra/widgets/app_text.dart';
 import 'package:inventra/widgets/button.dart';
 
@@ -12,9 +15,12 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final _formKey = GlobalKey<FormState>();
+
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController businessTINController = TextEditingController();
+  final TextEditingController businessPartnerTINController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
@@ -26,6 +32,89 @@ class _RegisterPageState extends State<RegisterPage> {
     'Taxpayer',
     'Authority',
   ];
+
+  bool isLoading = false;
+
+  Future<void> handleRegister() async {
+    // Validate inputs
+    if(passwordController.text != confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: AppText(title: "Passwords do not match!"),
+          backgroundColor: AppColors.error,
+        )
+      );
+      return;
+    }
+
+    // if(selected == "Select User Type") {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       content: AppText(title: "Please select a user type!"),
+    //       backgroundColor: AppColors.error,
+    //     )
+    //   );
+    //   return;
+    // }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await APIService.registerUser(
+        firstName: firstNameController.text, 
+        lastName: lastNameController.text,
+        businessPartnerTIN: businessPartnerTINController.text, 
+        email: emailController.text, 
+        username: usernameController.text, 
+        password: passwordController.text
+        // userType: selected
+      );
+
+      final responseData = jsonDecode(response.body);
+
+      if(response.statusCode == 200 || response.statusCode == 201) {
+        // Registration successful
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: AppText(title: responseData['message'] ?? 'Registration succcessful'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+
+        // Navigate based on user type
+        if(selected == "Taxpayer") {
+          Navigator.pushReplacement(
+            context, 
+            MaterialPageRoute(builder: (context) => const TaxpayerPage()),
+          );
+        } else {
+          Navigator.pop(context);
+        }
+      } else {
+        // Registration failed
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: AppText(title: responseData['error'] ?? "Registration failed"),
+          backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: AppText(title: "Error: ${e.toString()}"),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    } finally {
+      if(mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +137,11 @@ class _RegisterPageState extends State<RegisterPage> {
           )),
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.only(top: 80, left: 20.0, right: 20),
+              padding: const EdgeInsets.only(top: 60, left: 20.0, right: 20),
               child: Form(
                 child: Column(
                   children: [
-                    const SizedBox(height: 38),
+                    const SizedBox(height: 24),
                     const AppText(
                       title: "Droners Invoicify",
                       fontSize: 32,
@@ -67,126 +156,31 @@ class _RegisterPageState extends State<RegisterPage> {
                     const SizedBox(
                       height: 20,
                     ),
-                    Form(
-                      child: TextFormField(
-                        controller: firstNameController,
-                        // onChanged: (value) => setState(() => firstNameController = value),
-                        decoration: InputDecoration(
-                            enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white)),
-                            // labelStyle: const TextStyle(color: Colors.white),
-                            labelText: 'First Name',
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10))),
-                      ),
+                    // Dropdown field
+                  DropdownButtonFormField<String>(
+                    value: selected,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white)),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      labelText: 'User Type',
                     ),
+                    items: dropdownOptions.map((String option) {
+                      return DropdownMenuItem<String>(
+                        value: option,
+                        child: Text(option),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selected = newValue!;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 20,),
 
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    // Last name text field
-                    Form(
-                      child: TextFormField(
-                        controller: lastNameController,
-                        // onChanged: (value) => setState(() => firstNameController = value),
-                        decoration: InputDecoration(
-                            enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white)),
-                            // labelStyle: const TextStyle(color: Colors.white),
-                            labelText: 'Last Name',
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10))),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    // Business TIN text field
-                    Form(
-                      child: TextFormField(
-                        controller: businessTINController,
-                        // onChanged: (value) => setState(() => firstNameController = value),
-                        decoration: InputDecoration(
-                            enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white)),
-                            // labelStyle: const TextStyle(color: Colors.white),
-                            labelText: 'Business TIN',
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10))),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    // Username controller
-                    Form(
-                      child: TextFormField(
-                        controller: usernameController,
-                        // onChanged: (value) => setState(() => firstNameController = value),
-                        decoration: InputDecoration(
-                            enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white)),
-                            // labelStyle: const TextStyle(color: Colors.white),
-                            labelText: 'Username',
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10))),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    // Password controller
-                    Form(
-                      child: TextFormField(
-                        obscureText: true,
-                        controller: passwordController,
-                        // onChanged: (value) => setState(() => firstNameController = value),
-                        decoration: InputDecoration(
-                            enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white)),
-                            // labelStyle: const TextStyle(color: Colors.white),
-                            labelText: 'Password',
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10))),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-
-                    // Confirm password controller
-                    Form(
-                      child: TextFormField(
-                        obscureText: true,
-                        controller: confirmPasswordController,
-                        // onChanged: (value) => setState(() => firstNameController = value),
-                        decoration: InputDecoration(
-                            enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white)),
-                            // labelStyle: const TextStyle(color: Colors.white),
-                            labelText: 'Confirm Password',
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10))),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 15,
-                    ),
-                    Button(
-                      buttonText: "Register",
-                      // size: const Size(160, 55),
-                      colors: AppColors.buttonPrimary,
-                      fontSize: 20,
-                      onTap: () => {
-                        // TODO: Implement registration logic here
-                        handleRegister()
-                      },
-                      // setState(() {});
-                    ),
+                  _buildDynamicFields(), 
                   ],
                 ),
               ),
@@ -197,32 +191,279 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+
+  Widget _buildDynamicFields() {
+    switch (selected) {
+      case 'Select User Type':
+        return const SizedBox();
+      case 'Taxpayer':
+        return Form(
+          key: _formKey,
+          child: Column(
+          children: [
+            // First Name Text field
+            TextFormField(
+              controller: firstNameController,
+              // onChanged: (value) => setState(() => firstNameController = value),
+              decoration: InputDecoration(
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  // labelStyle: const TextStyle(color: Colors.white),
+                  labelText: 'First Name',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+            ),
+            const SizedBox(height: 20,),
+            // Last Name Textfield
+            TextFormField(
+              controller: lastNameController,
+              // onChanged: (value) => setState(() => firstNameController = value),
+              decoration: InputDecoration(
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  // labelStyle: const TextStyle(color: Colors.white),
+                  labelText: 'Last Name',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+            ),
+            const SizedBox(height: 20),
+            //Business Partner TIN Textform field
+            TextFormField(
+              controller: businessPartnerTINController,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your TIN';
+                }
+                if (value.length < 6 && value.length <= 11) {
+                  return 'Business TIN must be between 6 and 11 characters long';
+                }
+                return null;
+              },
+              // onChanged: (value) => setState(() => firstNameController = value),
+              decoration: InputDecoration(
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  // labelStyle: const TextStyle(color: Colors.white),
+                  labelText: 'Business TIN',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+            ),
+            const SizedBox(height: 20,),
+            // Email Textform field
+            TextFormField(
+              controller: emailController,
+              // onChanged: (value) => setState(() => firstNameController = value),
+              decoration: InputDecoration(
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  // labelStyle: const TextStyle(color: Colors.white),
+                  labelText: 'Email',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+            ),
+            const SizedBox(height: 20,),
+            // Username Textform field
+            TextFormField(
+              controller: usernameController,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your username';
+                }
+                if (value.length < 6) {
+                  return 'Username must be 6 characters long';
+                }
+                return null;
+              },
+              // onChanged: (value) => setState(() => firstNameController = value),
+              decoration: InputDecoration(
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  // labelStyle: const TextStyle(color: Colors.white),
+                  labelText: 'Username',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+            ),
+            const SizedBox(height: 20,),
+            // Password Textform field
+            TextFormField(
+              obscureText: true,
+              controller: passwordController,
+              // onChanged: (value) => setState(() => firstNameController = value),
+              decoration: InputDecoration(
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  // labelStyle: const TextStyle(color: Colors.white),
+                  labelText: 'Password',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+            ),
+            const SizedBox(height: 20,),
+            // Confirm Password Textform field
+            TextFormField(
+              obscureText: true,
+              controller: confirmPasswordController,
+              // onChanged: (value) => setState(() => firstNameController = value),
+              decoration: InputDecoration(
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  // labelStyle: const TextStyle(color: Colors.white),
+                  labelText: 'Confirm Password',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+            ),
+            const SizedBox(height: 20,),
+            Button(
+              buttonText: "Register",
+              // size: const Size(160, 55),
+              colors: AppColors.buttonPrimary,
+              fontSize: 20,
+              onTap: () => {
+                // TODO: Implement registration logic here
+                handleRegister()
+              },
+              // setState(() {});
+            ),
+          ],
+        ));
+
+      case 'Authority':
+        return Form(
+          child: Column(
+            children: [
+              // Authority First Name Textform field
+              TextFormField(
+              controller: firstNameController,
+              // onChanged: (value) => setState(() => firstNameController = value),
+              decoration: InputDecoration(
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  // labelStyle: const TextStyle(color: Colors.white),
+                  labelText: 'First Name',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+            ),
+            const SizedBox(height: 20,),
+            // Authority Last NAme Textform field
+            TextFormField(
+              controller: lastNameController,
+              // onChanged: (value) => setState(() => firstNameController = value),
+              decoration: InputDecoration(
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  // labelStyle: const TextStyle(color: Colors.white),
+                  labelText: 'Last Name',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+            ),
+            const SizedBox(height: 20,),
+            // Authority Username Textform field
+            TextFormField(
+              controller: usernameController,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your username';
+                }
+                if (value.length < 6) {
+                  return 'Username must be 6 characters long';
+                }
+                return null;
+              },
+              // onChanged: (value) => setState(() => firstNameController = value),
+              decoration: InputDecoration(
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  // labelStyle: const TextStyle(color: Colors.white),
+                  labelText: 'Username',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+            ),
+            const SizedBox(height: 20,),
+            // Authority Email Textform field
+            TextFormField(
+              controller: emailController,
+              // onChanged: (value) => setState(() => firstNameController = value),
+              decoration: InputDecoration(
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  // labelStyle: const TextStyle(color: Colors.white),
+                  labelText: 'Email',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+            ),
+            const SizedBox(height: 20,),
+            // Authority Password Textform field
+            TextFormField(
+              obscureText: true,
+              controller: passwordController,
+              // onChanged: (value) => setState(() => firstNameController = value),
+              decoration: InputDecoration(
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  // labelStyle: const TextStyle(color: Colors.white),
+                  labelText: 'Password',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+            ),
+            const SizedBox(height: 20,),
+            // Authority Confirm Password Textform field
+            TextFormField(
+              obscureText: true,
+              controller: confirmPasswordController,
+              // onChanged: (value) => setState(() => firstNameController = value),
+              decoration: InputDecoration(
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white)),
+                  // labelStyle: const TextStyle(color: Colors.white),
+                  labelText: 'Confirm Password',
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10))),
+            ),
+            const SizedBox(height: 20,),
+            // Authority Button
+            Button(
+              buttonText: "Register",
+              // size: const Size(160, 55),
+              colors: AppColors.buttonPrimary,
+              fontSize: 20,
+              onTap: () => {
+                // TODO: Implement registration logic here
+                handleRegister()
+              },
+              // setState(() {});
+            ),
+        ],),);
+
+      default:
+        return const SizedBox.shrink();
+    }
+  }
+
   @override
   void dispose() {
-    businessTINController.dispose();
+    businessPartnerTINController.dispose();
     usernameController.dispose();
     passwordController.dispose();
     super.dispose();
   }
 
-  void handleRegister() {
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pop(context); // Remove loading indicator
+  // void handleRegister() {
+  //   Future.delayed(const Duration(seconds: 2), () {
+  //     Navigator.pop(context); // Remove loading indicator
 
-      // Here you would typically make your actual API call
-      // For now, we'll just show a success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Login Successful!'),
-          backgroundColor: Colors.green,
-        ),
-      );
+  //     // Here you would typically make your actual API call
+  //     // For now, we'll just show a success message
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('Login Successful!'),
+  //         backgroundColor: Colors.green,
+  //       ),
+  //     );
 
-      // Add your navigation logic here
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const TaxpayerPage()),
-      );
-    });
-  }
+  //     // Add your navigation logic here
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => const TaxpayerPage()),
+  //     );
+  //   });
+  // }
 }

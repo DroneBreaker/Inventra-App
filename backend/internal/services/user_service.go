@@ -12,7 +12,7 @@ import (
 type UserService interface {
 	GetAll() ([]models.User, error)
 	Register(user *models.User) error
-	Login(username, email, businessTIN, password string) (*models.User, error)
+	Login(username, businessTIN, password string) (*models.User, error)
 	Delete(id int) error
 }
 
@@ -45,8 +45,8 @@ func (s *userService) Register(user *models.User) error {
 	return s.repo.Create(user)
 }
 
-func (s *userService) Login(username, email, businessPartnerTIN, password string) (*models.User, error) {
-	user, err := s.repo.GetByEmail(email)
+func (s *userService) Login(username, businessPartnerTIN, password string) (*models.User, error) {
+	user, err := s.repo.GetByUsername(username)
 	if err != nil {
 		return nil, fmt.Errorf("database error: %w", err)
 	}

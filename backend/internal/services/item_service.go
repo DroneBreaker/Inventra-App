@@ -22,26 +22,26 @@ func NewItemService(repo repository.ItemRepository) itemService {
 	return itemService{repo: repo}
 }
 
-func (s *itemService) GetAll(businessTIN string) ([]models.Item, error) {
-	return s.repo.GetAll(businessTIN)
+func (s *itemService) GetAll(businessPartnerTIN string) ([]models.Item, error) {
+	return s.repo.GetAll(businessPartnerTIN)
 }
 
-func (s *itemService) Create(item *models.Item, businessTIN string) error {
-	return s.repo.Create(item, businessTIN)
+func (s *itemService) Create(item *models.Item, businessPartnerTIN string) error {
+	return s.repo.Create(item, businessPartnerTIN)
 }
 
-func (s *itemService) GetByID(id int, businessTIN string) (*models.Item, error) {
-	return s.repo.GetByID(id, businessTIN)
+func (s *itemService) GetByID(id int, businessPartnerTIN string) (*models.Item, error) {
+	return s.repo.GetByID(id, businessPartnerTIN)
 }
 
-func (s *itemService) GetByItemName(itemName string, businessTIN string) (*models.Item, error) {
-	return s.repo.GetByItemName(itemName, businessTIN)
+func (s *itemService) GetByItemName(itemName string, businessPartnerTIN string) (*models.Item, error) {
+	return s.repo.GetByItemName(itemName, businessPartnerTIN)
 }
 
-func (s *itemService) Update(item *models.Item, businessTIN string) error {
-	return s.repo.Update(item, businessTIN)
+func (s *itemService) Update(item *models.Item, businessPartnerTIN string) error {
+	return s.repo.Update(item, businessPartnerTIN)
 }
 
-func (s *itemService) Delete(id int, businessTIN string) error {
-	return s.repo.Delete(id, businessTIN)
+func (s *itemService) Delete(id int, businessPartnerTIN string) error {
+	return s.repo.Delete(id, businessPartnerTIN)
 }

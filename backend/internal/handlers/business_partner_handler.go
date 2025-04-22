@@ -36,7 +36,7 @@ func (h *businessPartnerHandler) GetAll(c echo.Context) error {
 	// Get businessTIN from authenticated user
 	// businessTIN := c.Get("user").(models.User).BusinessTIN
 
-	businessPartners, err := h.service.GetAll(user.BusinessTIN)
+	businessPartners, err := h.service.GetAll(user.BusinessPartnerTIN)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

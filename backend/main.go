@@ -59,7 +59,20 @@ func main() {
 		})
 	})
 
-	fmt.Println("INVENTRA API listening on https://localhost:1323")
+	// CORS
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Response().Header().Set("Access-Control-Allow-Origin", "*")
+			c.Response().Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
+			c.Response().Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+			if c.Request().Method == "OPTIONS" {
+				return c.NoContent(http.StatusOK)
+			}
+			return next(c)
+		}
+	})
+
+	fmt.Println("INVENTRA API listening on https://127.0.0.1:1323")
 	if err := e.Start(":1323"); err != nil && err != http.ErrServerClosed {
 		fmt.Println("Echo error:", err)
 	}

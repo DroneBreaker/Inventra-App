@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:inventra/constants/app_colors.dart';
 import 'package:inventra/constants/app_titles.dart';
 import 'package:inventra/screens/taxpayer.dart';
+import 'package:inventra/services/api_service.dart';
 import 'package:inventra/widgets/app_text.dart';
 import 'package:inventra/widgets/button.dart';
 
@@ -18,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _isPasswordVisible = false;
 
   // Controllers for different form fields
-  final TextEditingController businessTINController = TextEditingController();
+  final TextEditingController businessPartnerTINController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
@@ -111,7 +114,7 @@ class _LoginPageState extends State<LoginPage> {
                         //   }
                         // }
 
-                        _handleLogin();
+                        handleLogin();
                       },
                       child: const Text(
                         AppTitle.logInButton,
@@ -139,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               // business TIN for TP
               TextFormField(
-                controller: businessTINController,
+                controller: businessPartnerTINController,
                 decoration: InputDecoration(
                   enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
@@ -275,7 +278,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    businessTINController.dispose();
+    businessPartnerTINController.dispose();
     usernameController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
@@ -289,73 +292,78 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // Login functionality
-  void _handleLogin() {
+  void handleLogin() async {
+    // Validate form
+    if(!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    // Validate user type selection
+    if(selected == "Select User Type") {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: AppText(title: "Please select a user type"),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
     // Show loading indicator
     showDialog(
-      context: context,
+      context: context, 
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      },
+        return const Center(child: CircularProgressIndicator(),);
+      }
     );
 
-    // Simulate API call
-    Future.delayed(const Duration(seconds: 2), () {
-      if (selected == dropdownOptions[0]) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const SingleChildScrollView(
-                child: Column(
-                  children: [
-                    AppText(
-                      title: "Please select a user type before proceeding!",
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                Button(
-                  buttonText: "Close",
-                  fontSize: 17,
-                  onTap: () {
-                    Navigator.pop(context);
+    try {
+      final response = await APIService.loginUser(
+        userType: selected, 
+        username: usernameController.text, 
+        password: passwordController.text,
+        businessPartnerTIN: selected == "Taxpayer" ? businessPartnerTINController.text : null,
+      );
 
-                    // Navigate to taxpayer page
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginPage()),
-                    );
-                  },
-                  colors: AppColors.buttonPrimary,
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        Navigator.pop(context); // Remove loading indicator
+      // Hide loading indicator
+      Navigator.pop(context);
 
-        // Show success message
+      final responseData = jsonDecode(response.body);
+
+      if(response.statusCode == 200) {
+        // Login successful
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login Successful!'),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: AppText(title: responseData['message'] ?? 'Login successful!'),
+            backgroundColor: AppColors.success,
           ),
         );
 
-        // Navigate to taxpayer page
+        // Navigate based on user type
         Navigator.pushReplacement(
-          context,
+          context, 
           MaterialPageRoute(builder: (context) => const TaxpayerPage()),
         );
+      } else {
+        // Login failed
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: AppText(title: responseData['error'] ?? 'Login failed'),
+            backgroundColor: AppColors.error,
+          ),
+        );
       }
-    });
+    } catch (e) {
+      // Hide loading indicator
+      Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error: ${e.toString()}"),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 }
