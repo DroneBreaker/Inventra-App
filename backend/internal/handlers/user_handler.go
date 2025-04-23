@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/DroneBreaker/Inventra-App/internal/models"
@@ -34,7 +35,7 @@ func (h *userHandler) Register(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid input"})
 	}
 
-	if err := h.service.Register(&user); err != nil {
+	if err := h.service.Create(&user); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
 	}
 
@@ -50,6 +51,7 @@ func (h *userHandler) Login(c echo.Context) error {
 		Username           string `json:"username"`
 		Password           string `json:"password"`
 	}
+	// var dbUser models.User
 
 	if err := c.Bind(&input); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid input"})
@@ -57,10 +59,15 @@ func (h *userHandler) Login(c echo.Context) error {
 
 	user, err := h.service.Login(input.Username, input.BusinessPartnerTIN, input.Password)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, echo.Map{"error": err.Error()})
+		return c.JSON(http.StatusUnauthorized, map[string]string{
+			"error": err.Error(),
+		})
 	}
 
-	token, err := utils.GenerateJWT(user.ID)
+	// Debug print the stored hash
+	fmt.Printf("Comparing with stored hash: %s\n", input.Password)
+
+	token, err := utils.GenerateJWT(uint(user.ID))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"error": "token generation failed",

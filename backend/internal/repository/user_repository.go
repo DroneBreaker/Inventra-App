@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/DroneBreaker/Inventra-App/internal/models"
 )
@@ -9,10 +10,10 @@ import (
 type UserRepository interface {
 	GetAll() ([]models.User, error)
 	Create(user *models.User) error
-	GetByID(id int) (*models.User, error)
+	GetByID(id uint) (*models.User, error)
 	GetByUsername(username string) (*models.User, error)
 	GetByEmail(email string) (*models.User, error)
-	GetByBusinessTIN(businessTIN string) (*models.User, error)
+	GetByBusinessPartnerTIN(businessPartnerTIN string) (*models.User, error)
 	Update(user *models.User) error
 	Delete(id int) error
 }
@@ -45,9 +46,10 @@ func (r *userRepo) GetAll() ([]models.User, error) {
 }
 
 func (r *userRepo) Create(user *models.User) error {
-	query := `INSERT INTO users(firstName, lastName, username, email, businessPartnerTIN) 
-		VALUES (?, ?, ?, ?, ?)`
-	result, err := r.db.Exec(query, user.FirstName, user.LastName, user.Username, user.Email, user.BusinessPartnerTIN)
+	query := `INSERT INTO users(firstName, lastName, username, email, businessPartnerTIN, password) 
+		VALUES (?, ?, ?, ?, ?, ?)`
+	result, err := r.db.Exec(query, user.FirstName, user.LastName, user.Username, user.Email, user.BusinessPartnerTIN,
+		user.Password)
 
 	if err != nil {
 		return err
@@ -63,20 +65,22 @@ func (r *userRepo) Create(user *models.User) error {
 	return nil
 }
 
-func (r *userRepo) GetByID(id int) (*models.User, error) {
+func (r *userRepo) GetByID(id uint) (*models.User, error) {
 	user := &models.User{}
-	query := `SELECT id, firstName, lastName, username, email, businessPartnerTIN, createdAt 
+	query := `SELECT id, firstName, lastName, username, email, businessPartnerTIN, password, createdAt 
 		FROM users WHERE email = ?`
 
-	err := r.db.QueryRow(query, id).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Email, &user.BusinessPartnerTIN, &user.CreatedAt)
+	err := r.db.QueryRow(query, id).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Email,
+		&user.BusinessPartnerTIN, &user.Password, &user.CreatedAt)
 	return user, err
 }
 
 func (r *userRepo) GetByUsername(username string) (*models.User, error) {
 	user := &models.User{}
-	query := `SELECT id, firstName, lastName, username, email, businessPartnerTIN, createdAt 
+	query := `SELECT id, firstName, lastName, username, email, businessPartnerTIN, password, createdAt 
 		FROM users WHERE username = ?`
-	err := r.db.QueryRow(query, username).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Email, &user.BusinessPartnerTIN, &user.CreatedAt)
+	err := r.db.QueryRow(query, username).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Email,
+		&user.BusinessPartnerTIN, &user.Password, &user.CreatedAt)
 	return user, err
 }
 
@@ -84,23 +88,24 @@ func (r *userRepo) GetByEmail(email string) (*models.User, error) {
 	user := &models.User{}
 	query := `SELECT id, firstName, lastName, username, email, businessPartnerTIN, password, createdAt 
 		FROM users WHERE email = ?`
-	err := r.db.QueryRow(query, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Email, &user.BusinessPartnerTIN, &user.Password, &user.CreatedAt)
+	err := r.db.QueryRow(query, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Username, &user.Email,
+		&user.BusinessPartnerTIN, &user.Password, &user.CreatedAt)
 
 	if err == sql.ErrNoRows {
-		return nil, nil // Return nil user when no user is found
+		return nil, errors.New("user not found") // Return nil user when no user is found
 	}
 
-	if err != nil {
-		return nil, err // Return any other database errors
-	}
+	// if err != nil {
+	// 	return nil, err // Return any other database errors
+	// }
 
 	return user, err
 }
 
-func (r *userRepo) GetByBusinessTIN(businessPartnerTIN string) (*models.User, error) {
+func (r *userRepo) GetByBusinessPartnerTIN(businessPartnerTIN string) (*models.User, error) {
 	user := &models.User{}
 	query := `SELECT id, firstName, lastName, username, email, businessPartnerTIN, createdAt 
-		FROM users WHERE businessTIN = ?`
+		FROM users WHERE businessPartnerTIN = ?`
 	err := r.db.QueryRow(query, businessPartnerTIN).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.BusinessPartnerTIN, &user.CreatedAt)
 	return user, err
 }

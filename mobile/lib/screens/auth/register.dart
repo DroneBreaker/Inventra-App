@@ -210,6 +210,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       borderSide: BorderSide(color: Colors.white)),
                   // labelStyle: const TextStyle(color: Colors.white),
                   labelText: 'First Name',
+                  labelStyle: TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10))),
             ),
@@ -221,8 +222,8 @@ class _RegisterPageState extends State<RegisterPage> {
               decoration: InputDecoration(
                   enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
-                  // labelStyle: const TextStyle(color: Colors.white),
                   labelText: 'Last Name',
+                  labelStyle: TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10))),
             ),
@@ -243,8 +244,8 @@ class _RegisterPageState extends State<RegisterPage> {
               decoration: InputDecoration(
                   enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
-                  // labelStyle: const TextStyle(color: Colors.white),
                   labelText: 'Business TIN',
+                  labelStyle: const TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10))),
             ),
@@ -256,8 +257,8 @@ class _RegisterPageState extends State<RegisterPage> {
               decoration: InputDecoration(
                   enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
-                  // labelStyle: const TextStyle(color: Colors.white),
                   labelText: 'Email',
+                  labelStyle: const TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10))),
             ),
@@ -278,8 +279,8 @@ class _RegisterPageState extends State<RegisterPage> {
               decoration: InputDecoration(
                   enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
-                  // labelStyle: const TextStyle(color: Colors.white),
                   labelText: 'Username',
+                  labelStyle: const TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10))),
             ),
@@ -292,8 +293,8 @@ class _RegisterPageState extends State<RegisterPage> {
               decoration: InputDecoration(
                   enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
-                  // labelStyle: const TextStyle(color: Colors.white),
                   labelText: 'Password',
+                  labelStyle: const TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10))),
             ),
@@ -306,8 +307,8 @@ class _RegisterPageState extends State<RegisterPage> {
               decoration: InputDecoration(
                   enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
-                  // labelStyle: const TextStyle(color: Colors.white),
                   labelText: 'Confirm Password',
+                  labelStyle: const TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10))),
             ),
@@ -337,8 +338,8 @@ class _RegisterPageState extends State<RegisterPage> {
               decoration: InputDecoration(
                   enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
-                  // labelStyle: const TextStyle(color: Colors.white),
                   labelText: 'First Name',
+                  labelStyle: const TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10))),
             ),
@@ -350,8 +351,8 @@ class _RegisterPageState extends State<RegisterPage> {
               decoration: InputDecoration(
                   enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
-                  // labelStyle: const TextStyle(color: Colors.white),
                   labelText: 'Last Name',
+                  labelStyle: const TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10))),
             ),
@@ -372,8 +373,8 @@ class _RegisterPageState extends State<RegisterPage> {
               decoration: InputDecoration(
                   enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
-                  // labelStyle: const TextStyle(color: Colors.white),
                   labelText: 'Username',
+                  labelStyle: const TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10))),
             ),
@@ -385,8 +386,8 @@ class _RegisterPageState extends State<RegisterPage> {
               decoration: InputDecoration(
                   enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
-                  // labelStyle: const TextStyle(color: Colors.white),
                   labelText: 'Email',
+                  labelStyle: const TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10))),
             ),
@@ -399,8 +400,8 @@ class _RegisterPageState extends State<RegisterPage> {
               decoration: InputDecoration(
                   enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
-                  // labelStyle: const TextStyle(color: Colors.white),
                   labelText: 'Password',
+                  labelStyle: const TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10))),
             ),
@@ -413,8 +414,8 @@ class _RegisterPageState extends State<RegisterPage> {
               decoration: InputDecoration(
                   enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white)),
-                  // labelStyle: const TextStyle(color: Colors.white),
                   labelText: 'Confirm Password',
+                  labelStyle: const TextStyle(color: Colors.black),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10))),
             ),

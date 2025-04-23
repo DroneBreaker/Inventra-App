@@ -194,7 +194,7 @@ class _LoginPageState extends State<LoginPage> {
                   }
                   return null;
                 },
-                obscureText: true,
+                obscureText: !_isPasswordVisible,
                 controller: passwordController,
                 decoration: InputDecoration(
                   enabledBorder: const OutlineInputBorder(
