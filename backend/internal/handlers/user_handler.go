@@ -47,9 +47,9 @@ func (h *userHandler) Register(c echo.Context) error {
 
 func (h *userHandler) Login(c echo.Context) error {
 	var input struct {
-		BusinessPartnerTIN string `json:"businessPartnerTIN"`
-		Username           string `json:"username"`
-		Password           string `json:"password"`
+		CompanyTIN string `json:"companyTIN"`
+		Username   string `json:"username"`
+		Password   string `json:"password"`
 	}
 	// var dbUser models.User
 
@@ -57,7 +57,7 @@ func (h *userHandler) Login(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid input"})
 	}
 
-	user, err := h.service.Login(input.Username, input.BusinessPartnerTIN, input.Password)
+	user, err := h.service.Login(input.Username, input.CompanyTIN, input.Password)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, map[string]string{
 			"error": err.Error(),
@@ -67,7 +67,7 @@ func (h *userHandler) Login(c echo.Context) error {
 	// Debug print the stored hash
 	// fmt.Printf("Comparing with stored hash: %s\n", input.Password)
 
-	token, err := utils.GenerateJWT(user.CompanyID, user.BusinessPartnerTIN)
+	token, err := utils.GenerateJWT(user.CompanyID, user.Company.TIN)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"error": "token generation failed",

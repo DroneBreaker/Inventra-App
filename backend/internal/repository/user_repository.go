@@ -13,7 +13,7 @@ type UserRepository interface {
 	GetByID(companyID string) (*models.User, error)
 	GetByUsername(username string) (*models.User, error)
 	GetByEmail(email string) (*models.User, error)
-	GetByBusinessPartnerTIN(businessPartnerTIN string) (*models.User, error)
+	GetByCompanyTIN(companyTIN string) (*models.User, error)
 	Update(user *models.User) error
 	Delete(id int) error
 }
@@ -124,7 +124,7 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 
 func (r *userRepo) GetAll() ([]models.User, error) {
 	var users []models.User
-	result := r.db.Select("id", "first_name", "last_name", "username", "email", "business_partner_tin").Find(&users)
+	result := r.db.Select("id", "first_name", "last_name", "username", "email", "password", "company_id", "company", "createdAt", "updatedAt").Find(&users)
 	return users, result.Error
 }
 
@@ -135,7 +135,7 @@ func (r *userRepo) Create(user *models.User) error {
 
 func (r *userRepo) GetByID(companyID string) (*models.User, error) {
 	var user models.User
-	result := r.db.Select("id", "first_name", "last_name", "username", "email", "business_partner_tin", "password", "created_at").
+	result := r.db.Select("id", "first_name", "last_name", "username", "email", "password", "company_id", "company", "created_at", "updated_at").
 		First(&user, companyID)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, errors.New("user not found")
@@ -146,7 +146,7 @@ func (r *userRepo) GetByID(companyID string) (*models.User, error) {
 func (r *userRepo) GetByUsername(username string) (*models.User, error) {
 	var user models.User
 	result := r.db.Where("username = ?", username).
-		Select("id", "first_name", "last_name", "username", "email", "business_partner_tin", "password", "created_at").
+		Select("id", "first_name", "last_name", "username", "email", "password", "company_id", "company", "created_at", "updated_at").
 		First(&user)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, errors.New("user not found")
@@ -157,7 +157,7 @@ func (r *userRepo) GetByUsername(username string) (*models.User, error) {
 func (r *userRepo) GetByEmail(email string) (*models.User, error) {
 	var user models.User
 	result := r.db.Where("email = ?", email).
-		Select("id", "first_name", "last_name", "username", "email", "business_partner_tin", "password", "created_at").
+		Select("id", "first_name", "last_name", "username", "email", "password", "company_id", "company", "created_at", "updated_at").
 		First(&user)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, errors.New("user not found")
@@ -165,10 +165,10 @@ func (r *userRepo) GetByEmail(email string) (*models.User, error) {
 	return &user, result.Error
 }
 
-func (r *userRepo) GetByBusinessPartnerTIN(businessPartnerTIN string) (*models.User, error) {
+func (r *userRepo) GetByCompanyTIN(companyTIN string) (*models.User, error) {
 	var user models.User
-	result := r.db.Where("business_partner_tin = ?", businessPartnerTIN).
-		Select("id", "first_name", "last_name", "email", "business_partner_tin", "created_at").
+	result := r.db.Where("companyTIN = ?", companyTIN).
+		Select("id", "first_name", "last_name", "username", "email", "password", "company_id", "company", "created_at", "updated_at").
 		First(&user)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, errors.New("user not found")
@@ -178,11 +178,14 @@ func (r *userRepo) GetByBusinessPartnerTIN(businessPartnerTIN string) (*models.U
 
 func (r *userRepo) Update(user *models.User) error {
 	result := r.db.Model(user).Updates(models.User{
-		FirstName:          user.FirstName,
-		LastName:           user.LastName,
-		Username:           user.Username,
-		Email:              user.Email,
-		BusinessPartnerTIN: user.BusinessPartnerTIN,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Username:  user.Username,
+		Email:     user.Email,
+		// Company: user.Company.TIN,
+		CompanyID: user.CompanyID,
+		Company:   user.Company,
+		UpdatedAt: user.UpdatedAt,
 	})
 	return result.Error
 }

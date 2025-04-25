@@ -22,8 +22,8 @@ import (
 type Invoice struct {
 	ID            uint   `gorm:"primaryKey"`
 	InvoiceNumber string `gorm:"unigue;not null" json:"invoiceNumber" xml:"invoiceNumber"`
-	// CompanyID   uint
-	// Company     Company   `gorm:"foreignKey:CompanyID"`
+	ClientID      string `gorm:"type:char(6);not null" json:"clientID" xml:"clientID"`
+	Client        Client `gorm:"foreignKey:ClientID;references:ID"`
 	// ClientName  string
 	// ClientEmail string
 	Status      string  // pending, paid, cancelled, etc.

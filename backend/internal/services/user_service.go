@@ -12,7 +12,7 @@ import (
 type UserService interface {
 	GetAll() ([]models.User, error)
 	Create(user *models.User) error
-	Login(username, businessTIN, password string) (*models.User, error)
+	Login(username, companyID, password string) (*models.User, error)
 	Delete(id int) error
 }
 
@@ -30,15 +30,15 @@ func (s *userService) GetAll() ([]models.User, error) {
 
 func (s *userService) Create(user *models.User) error {
 	// Check if username already exists
-	existingUser, err := s.repo.GetByID(user.CompanyID)
+	existingUser, err := s.repo.GetByUsername(user.Username)
 	if err == nil && existingUser != nil {
 		return errors.New("username already exists")
 	}
 
 	// Check if BusinessTIN already exists
-	existingUser, err = s.repo.GetByBusinessPartnerTIN(user.BusinessPartnerTIN)
+	existingUser, err = s.repo.GetByCompanyTIN(user.Company.TIN)
 	if err == nil && existingUser != nil {
-		return errors.New("business TIN already exists")
+		return errors.New("company TIN already exists")
 	}
 
 	// Set default role if not provided
@@ -55,10 +55,10 @@ func (s *userService) Create(user *models.User) error {
 	return s.repo.Create(user)
 }
 
-func (s *userService) Login(username, businessPartnerTIN, password string) (*models.User, error) {
+func (s *userService) Login(username, CompanyTIN, password string) (*models.User, error) {
 	// Input validation
-	if username == "" && businessPartnerTIN == "" {
-		return nil, errors.New("username or business TIN is required")
+	if username == "" && CompanyTIN == "" {
+		return nil, errors.New("username or company TIN is required")
 	}
 	if password == "" {
 		return nil, errors.New("password is required")
@@ -71,7 +71,7 @@ func (s *userService) Login(username, businessPartnerTIN, password string) (*mod
 	if username != "" {
 		user, err = s.repo.GetByUsername(username)
 	} else {
-		user, err = s.repo.GetByBusinessPartnerTIN(businessPartnerTIN)
+		user, err = s.repo.GetByCompanyTIN(user.Company.TIN)
 	}
 
 	if err != nil {

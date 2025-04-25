@@ -32,27 +32,27 @@ func main() {
 		&models.Company{},
 		&models.User{},
 		&models.Item{},
-		&models.BusinessPartner{},
+		&models.Client{},
 		&models.Invoice{},
 	)
 	if err != nil {
 		log.Fatal("Database migration failed:", err)
 	}
 
-	// 2. Then add the foreign key columns if they don't exist
-	if !db.Migrator().HasConstraint(&models.User{}, "Company") {
-		err = db.Migrator().CreateConstraint(&models.User{}, "Company")
-		if err != nil {
-			log.Println("Warning: Couldn't create user-company constraint:", err)
-		}
-	}
+	// // 2. Then add the foreign key columns if they don't exist
+	// if !db.Migrator().HasConstraint(&models.User{}, "Company") {
+	// 	err = db.Migrator().CreateConstraint(&models.User{}, "Company")
+	// 	if err != nil {
+	// 		log.Println("Warning: Couldn't create user-company constraint:", err)
+	// 	}
+	// }
 
-	if !db.Migrator().HasConstraint(&models.Item{}, "Company") {
-		err = db.Migrator().CreateConstraint(&models.Item{}, "Company")
-		if err != nil {
-			log.Println("Warning: Couldn't create item-company constraint:", err)
-		}
-	}
+	// if !db.Migrator().HasConstraint(&models.Item{}, "Company") {
+	// 	err = db.Migrator().CreateConstraint(&models.Item{}, "Company")
+	// 	if err != nil {
+	// 		log.Println("Warning: Couldn't create item-company constraint:", err)
+	// 	}
+	// }
 
 	// Echo instance
 	e := echo.New()
@@ -68,12 +68,12 @@ func main() {
 	// Initialize services
 	userService := services.NewUserService(userRepo)
 	itemService := services.NewItemService(itemRepo)
-	businessPartnerService := services.NewBusinessPartnerService(businessPartnerRepo)
+	clientService := services.NewBusinessPartnerService(businessPartnerRepo)
 
 	// Initialize handlers
 	userHandler := handlers.NewUserHandler(userService)
-	itemHandler := handlers.NewItemHandler(itemService)                                  // Fixed typo (was itemHandler)
-	businessPartnerHandler := handlers.NewBusinessPartnerHandler(businessPartnerService) // Fixed naming
+	itemHandler := handlers.NewItemHandler(itemService)       // Fixed typo (was itemHandler)
+	clientHandler := handlers.NewClientHandler(clientService) // Fixed naming
 
 	// Routes
 	api := e.Group("/api/v1")
@@ -90,8 +90,8 @@ func main() {
 	api.GET("/items/:id", itemHandler.GetByID)
 
 	// Business Partner routes
-	api.GET("/business_partners", businessPartnerHandler.GetAll)
-	api.POST("/business_partners", businessPartnerHandler.Create)
+	api.GET("/business_partners", clientHandler.GetAll)
+	api.POST("/business_partners", clientHandler.Create)
 
 	// Welcome endpoint
 	e.GET("/", func(c echo.Context) error {

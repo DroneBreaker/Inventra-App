@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:inventra/screens/auth/register.dart';
-import 'package:inventra/screens/auth/tp_login.dart';
-import 'package:inventra/screens/home.dart';
+import 'package:inventra/screens/auth/login.dart';
+// import 'package:inventra/screens/home.dart';
+import 'package:inventra/screens/intro.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,14 +19,14 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/login': (context) => const LoginPage(),
-        // '/register': (context) => const RegisterPage(),
+        '/register': (context) => const RegisterPage(),
         // '/taxpayer': (context) => const TaxpayerPage(),
       },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const HomePage(),
+      home: const IntroPage(),
     );
   }
 }

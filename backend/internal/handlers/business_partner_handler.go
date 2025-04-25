@@ -8,15 +8,15 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type businessPartnerHandler struct {
+type clientHandler struct {
 	service services.BusinessPartnerService
 }
 
-func NewBusinessPartnerHandler(service services.BusinessPartnerService) *businessPartnerHandler {
-	return &businessPartnerHandler{service: service}
+func NewClientHandler(service services.BusinessPartnerService) *clientHandler {
+	return &clientHandler{service: service}
 }
 
-func (h *businessPartnerHandler) GetAll(c echo.Context) error {
+func (h *clientHandler) GetAll(c echo.Context) error {
 	// Safely check if user exists in context
 	userInterface := c.Get("user")
 	if userInterface == nil {
@@ -36,23 +36,23 @@ func (h *businessPartnerHandler) GetAll(c echo.Context) error {
 	// Get businessTIN from authenticated user
 	// businessTIN := c.Get("user").(models.User).BusinessTIN
 
-	businessPartners, err := h.service.GetAll(user.BusinessPartnerTIN)
+	businessPartners, err := h.service.GetAll(user.CompanyID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, businessPartners)
 }
 
-func (h *businessPartnerHandler) Create(c echo.Context) error {
-	businessPartner := new(models.BusinessPartner)
-	if err := c.Bind(businessPartner); err != nil {
+func (h *clientHandler) Create(c echo.Context) error {
+	client := new(models.Client)
+	if err := c.Bind(client); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	if err := h.service.Create(businessPartner, businessPartner.BusinessPartnerTIN); err != nil {
+	if err := h.service.Create(client, client.ClienTIN); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusCreated, businessPartner)
+	return c.JSON(http.StatusCreated, client)
 }
 
 // func (h *businessPartnerHandler) GetByID(c echo.Context) error {

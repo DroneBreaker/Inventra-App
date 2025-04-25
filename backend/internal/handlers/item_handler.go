@@ -19,18 +19,18 @@ func NewItemHandler(service services.ItemService) *itemHandler {
 
 func (h *itemHandler) GetAll(c echo.Context) error {
 	// Get businessPartnerTIN from ctx
-	businessPartnerTINInterface := c.Get("businessPartnerTIN")
+	clientTINInterface := c.Get("clientTIN")
 
 	// Safely check if user exists in context
 	// businessPartnerTINInterface := c.Get("businessPartnerTIN")
-	if businessPartnerTINInterface == nil {
+	if clientTINInterface == nil {
 		return c.JSON(http.StatusUnauthorized, map[string]string{
 			"error": "user not authenticated - missing business partner TIN",
 		})
 	}
 
 	// Safely perform type assertion
-	businessPartnerTIN, ok := businessPartnerTINInterface.(string)
+	clientTIN, ok := clientTINInterface.(string)
 	if !ok {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": "invalid business partner TIN type in context",
@@ -40,7 +40,7 @@ func (h *itemHandler) GetAll(c echo.Context) error {
 	// Get businessTIN from authenticated user
 	// businessTIN := c.Get("user").(models.User).BusinessTIN
 
-	items, err := h.service.GetAll(businessPartnerTIN)
+	items, err := h.service.GetAll(clientTIN)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -49,16 +49,16 @@ func (h *itemHandler) GetAll(c echo.Context) error {
 
 func (h *itemHandler) Create(c echo.Context) error {
 	// Get businessPartnerTIN from ctx
-	businessPartnerTIN := c.Get("businessPartnerTIN").(string)
+	clientTIN := c.Get("clientTIN").(string)
 
 	item := new(models.Item)
 	if err := c.Bind(item); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	item.BusinessPartnerTIN = businessPartnerTIN
+	item.Company.TIN = clientTIN
 
-	if err := h.service.Create(item, businessPartnerTIN); err != nil {
+	if err := h.service.Create(item, clientTIN); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusCreated, item)
@@ -72,7 +72,7 @@ func (h *itemHandler) GetByID(c echo.Context) error {
 
 	// businessTIN := c.Get("user").(models.User).BusinessTIN
 
-	item, err := h.service.GetByID(string(id), c.Param("businessTIN"))
+	item, err := h.service.GetByID(string(id))
 	if err != nil {
 		return c.JSON(http.StatusNotFound, err.Error())
 	}

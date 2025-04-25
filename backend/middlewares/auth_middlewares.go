@@ -32,15 +32,15 @@ func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusUnauthorized, "user not authenticated")
 		}
 
-		// Extract businessPartnerTIN and store it in ctx
+		// Extract companyTIN and store it in ctx
 		claims := token.Claims.(jwt.MapClaims)
-		businessPartnerTIN, ok := claims["businessPartnerTIN"].(string)
-		if !ok || businessPartnerTIN == "" {
+		companyTIN, ok := claims["companyTIN"].(string)
+		if !ok || companyTIN == "" {
 			return echo.NewHTTPError(http.StatusUnauthorized, "invalid token")
 		}
 
 		//  Stroe in ctx for handlers to use
-		c.Set("businessPartnerTIN", businessPartnerTIN)
+		c.Set("companyTIN", companyTIN)
 
 		return next(c)
 	}

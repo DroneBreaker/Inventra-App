@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inventra/constants/app_colors.dart';
 import 'package:inventra/widgets/app_text.dart';
 
 class Button extends StatelessWidget {
@@ -24,8 +25,10 @@ class Button extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
+      elevation: 2,
+      hoverColor: AppColors.grey900,
       height: 50,
-      textColor: Colors.white,
+      textColor: Colors.black54,
       onPressed: onTap,
       color: colors,
       // materialTapTargetSize: size,
@@ -41,7 +44,7 @@ class Button extends StatelessWidget {
           ],
           AppText(
             title: buttonText,
-            // colors: Colors.white,
+            colors: colors,
             fontSize: fontSize,
             fontWeight: FontWeight.bold,
           ),

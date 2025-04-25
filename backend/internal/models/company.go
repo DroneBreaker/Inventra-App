@@ -9,7 +9,7 @@ import "time"
 // 	TIN       string `gorm:"unique;not null" json:"companyTIN" xml:"companyTIN"`
 // 	Phone     string `gorm:"not null" json:"phone" xml:"phone"`
 // 	Email     string `gorm:"not null" json:"email" xml:"email"`
-// 	// Users     []User    `gorm:"foreignKey:CompanyID;references:CompanyID"`
+// Users     []User    `gorm:"foreignKey:CompanyID;references:CompanyID"`
 // 	// Items     []Item    `gorm:"foreignKey:CompanyID;references:CompanyID"`
 // 	// Invoices  []Invoice `gorm:"foreignKey:CompanyID;references:CompanyID"`
 // 	// LogoURL     string // Optional
@@ -28,6 +28,9 @@ type Company struct {
 	Email     string
 	Address   string
 	Phone     string
+	Users     []User   `gorm:"foreignKey:CompanyID;references:ID" json:"users" xml:"user"`
+	Items     []Item   `gorm:"foreignKey:CompanyID;references:ID" josn:"items" xml:"items"`
+	Clients   []Client `gorm:"foreignKey:CompanyID;references:ID"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

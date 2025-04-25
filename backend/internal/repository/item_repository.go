@@ -12,7 +12,7 @@ type ItemRepository interface {
 	Create(item *models.Item, companyID string) error
 	GetByID(companyID string) (*models.Item, error)
 	GetByItemName(itemName string, companyID string) (*models.Item, error)
-	Update(item *models.Item, businessPartnerTIN string) error
+	Update(item *models.Item, clientTIN string) error
 	Delete(id int, companyID string) error
 }
 
@@ -91,16 +91,16 @@ func (r *itemRepo) Update(item *models.Item, companyID string) error {
 	result := r.db.Model(item).Updates(models.Item{
 		ItemCode:         item.ItemCode,
 		ItemName:         item.ItemName,
-		Price:            item.Price,
+		UnitPrice:        item.UnitPrice,
 		IsTaxInclusive:   item.IsTaxInclusive,
 		ItemDescription:  item.ItemDescription,
 		IsTaxable:        item.IsTaxable,
 		TourismCstOption: item.TourismCstOption,
 		ItemCategory:     item.ItemCategory,
 		IsDiscountable:   item.IsDiscountable,
-		CompanyID:        item.CompanyID,
-		CreatedAt:        item.CreatedAt,
-		UpdatedAt:        item.UpdatedAt,
+		// CompanyID:        item.CompanyID,
+		CreatedAt: item.CreatedAt,
+		UpdatedAt: item.UpdatedAt,
 	})
 	return result.Error
 }
