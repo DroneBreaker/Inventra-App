@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inventra/constants/app_colors.dart';
 import 'package:inventra/constants/app_titles.dart';
+import 'package:inventra/services/item_service.dart';
 import 'package:inventra/widgets/app_text.dart';
 import 'package:inventra/widgets/button.dart';
 import 'package:intl/intl.dart';
@@ -696,6 +697,8 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return AppTitle.noItemCodeError;
+                          } if(int.tryParse(value) == null) {
+                            return AppTitle.itemCodeDescription;
                           }
                           return null;
                         },
@@ -860,40 +863,46 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
   }
 
   // Adds new items to the items list
-  void _addItems() {
-    if (_formKey.currentState!.validate()) {
-      print('Adding items...');
+  Future<bool> _addItems() async {
+    try {
+      // Get the businessPartnerTIN from auth
+      final businessPartnerTIN = await ItemService.getBusinessPartnerTIN();
+
+      // Create the item object
+      final item = Item(
+        itemCode: int.parse(itemCodeController.text),
+        itemName: itemNameController.text,
+        price: int.parse(priceController.text),
+        isTaxInclusive: isTaxInclusive,
+        itemDescription: itemDescriptionController.text,
+        isTaxable: isTaxable,
+        tourismCstOption: selectedTourismOrCST,
+        itemCategory: selectedItemCategory,
+        isDiscountable: isDiscount,
+        businessPartnerTIN: businessPartnerTIN,
+      );
+
+      final result = await ItemService.createItem(item);
+      if(result) {
+        _clearForm();
+      }
+      return result;
+    } catch(e) {
+      print("Error adding items: $e");
+      return false;
     }
+  }
 
-    if (itemNameController.text.isNotEmpty && priceController.text.isNotEmpty) {
-      Map<String, dynamic> newItem = {
-        'id': items.length + 1,
-        'itemCode': itemCodeController.text,
-        'name': itemNameController.text,
-        'price': double.tryParse(priceController.text) ?? 0.0,
-        'currency': selectedCurrency,
-        'isTaxInclusive': isTaxInclusive,
-        'description': itemDescriptionController.text,
-        'isTaxable': isTaxable,
-        'tourismOrCST': selectedTourismOrCST,
-        'category': selectedItemCategory,
-        'isDiscount': isDiscount
-      };
-
-      items.add(newItem);
-      filteredItems = items;
-
-      // // Clear form fields
-      itemCodeController.clear();
-      itemNameController.clear();
-      priceController.clear();
-      quantityController.clear();
-      itemDescriptionController.clear();
-      setState(() {});
-    } else {
-      // Debugging: Print a message if the conditions are not met
-      print('Item name or price is empty');
-    }
+  void _clearForm() {
+    itemCodeController.clear();
+    itemNameController.clear();
+    priceController.clear();
+    itemDescriptionController.clear();
+    isTaxInclusive = false;
+    isTaxable = false;
+    selectedTourismOrCST = 'None';
+    selectedItemCategory = 'General';
+    isDiscount = false;
   }
 
   // Filter items based on the search text

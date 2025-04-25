@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inventra/constants/app_colors.dart';
 import 'package:inventra/constants/app_titles.dart';
-import 'package:inventra/screens/auth/login.dart';
+import 'package:inventra/screens/auth/tp_login.dart';
 import 'package:inventra/screens/auth/register.dart';
 import 'package:inventra/widgets/app_text.dart';
 import 'package:inventra/widgets/button.dart';

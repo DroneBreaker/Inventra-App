@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/DroneBreaker/Inventra-App/internal/models"
@@ -35,6 +34,7 @@ func (h *userHandler) Register(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid input"})
 	}
 
+	// Save to DB
 	if err := h.service.Create(&user); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
 	}
@@ -65,9 +65,9 @@ func (h *userHandler) Login(c echo.Context) error {
 	}
 
 	// Debug print the stored hash
-	fmt.Printf("Comparing with stored hash: %s\n", input.Password)
+	// fmt.Printf("Comparing with stored hash: %s\n", input.Password)
 
-	token, err := utils.GenerateJWT(uint(user.ID))
+	token, err := utils.GenerateJWT(user.CompanyID, user.BusinessPartnerTIN)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"error": "token generation failed",

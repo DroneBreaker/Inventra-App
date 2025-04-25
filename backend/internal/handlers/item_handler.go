@@ -13,31 +13,34 @@ type itemHandler struct {
 	service services.ItemService
 }
 
-func NewitemHandler(service services.ItemService) *itemHandler {
+func NewItemHandler(service services.ItemService) *itemHandler {
 	return &itemHandler{service: service}
 }
 
 func (h *itemHandler) GetAll(c echo.Context) error {
+	// Get businessPartnerTIN from ctx
+	businessPartnerTINInterface := c.Get("businessPartnerTIN")
+
 	// Safely check if user exists in context
-	userInterface := c.Get("user")
-	if userInterface == nil {
+	// businessPartnerTINInterface := c.Get("businessPartnerTIN")
+	if businessPartnerTINInterface == nil {
 		return c.JSON(http.StatusUnauthorized, map[string]string{
-			"error": "user not authenticated",
+			"error": "user not authenticated - missing business partner TIN",
 		})
 	}
 
 	// Safely perform type assertion
-	user, ok := userInterface.(models.User)
+	businessPartnerTIN, ok := businessPartnerTINInterface.(string)
 	if !ok {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": "invalid user type in context",
+			"error": "invalid business partner TIN type in context",
 		})
 	}
 
 	// Get businessTIN from authenticated user
 	// businessTIN := c.Get("user").(models.User).BusinessTIN
 
-	items, err := h.service.GetAll(user.BusinessPartnerTIN)
+	items, err := h.service.GetAll(businessPartnerTIN)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -45,14 +48,17 @@ func (h *itemHandler) GetAll(c echo.Context) error {
 }
 
 func (h *itemHandler) Create(c echo.Context) error {
+	// Get businessPartnerTIN from ctx
+	businessPartnerTIN := c.Get("businessPartnerTIN").(string)
+
 	item := new(models.Item)
 	if err := c.Bind(item); err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	// businessTIN := c.Get("user").(models.User).BusinessTIN
+	item.BusinessPartnerTIN = businessPartnerTIN
 
-	if err := h.service.Create(item, c.Param("businessTIN")); err != nil {
+	if err := h.service.Create(item, businessPartnerTIN); err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusCreated, item)
@@ -66,12 +72,47 @@ func (h *itemHandler) GetByID(c echo.Context) error {
 
 	// businessTIN := c.Get("user").(models.User).BusinessTIN
 
-	item, err := h.service.GetByID(id, c.Param("businessTIN"))
+	item, err := h.service.GetByID(string(id), c.Param("businessTIN"))
 	if err != nil {
 		return c.JSON(http.StatusNotFound, err.Error())
 	}
 	return c.JSON(http.StatusOK, item)
 }
+
+// func (h *itemHandler) Update(c echo.Context) error {
+// 	// Get businessPartnerTIN from ctx
+// 	businessPartnerTIN := c.Get("businessPartnerTIN").(string)
+
+// 	id, err := strconv.Atoi(c.Param("id"))
+// 	if err != nil {
+// 		return c.JSON(http.StatusBadRequest, err.Error())
+// 	}
+
+// 	existingItem, err := h.service.GetByID(id, businessPartnerTIN)
+// 	if err != nil {
+// 		return echo.NewHTTPError(http.StatusNotFound, "item not found")
+// 	}
+
+// 	if existingItem.BusinessPartnerTIN != businessPartnerTIN {
+// 		return echo.NewHTTPError(http.StatusForbidden, "you don't have permission to update the item")
+// 	}
+
+// 	updatedItem.ID = id
+// 	updatedItem.BusinessPartnerTIN = businessPartnerTIN
+
+// 	// Update the item
+// 	if err := h.service.Update(updatedItem.ID, uo); err != nil {
+// 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to update item")
+// 	}
+
+// 	// businessTIN := c.Get("user").(models.User).BusinessTIN
+
+// 	// item, err := h.service.GetByID(id, c.Param("businessTIN"))
+// 	// if err != nil {
+// 	// 	return c.JSON(http.StatusNotFound, err.Error())
+// 	// }
+// 	return c.JSON(http.StatusOK, updatedItem)
+// }
 
 // func (h *itemHandler) GetByItemName(c echo.Context) error {
 // 	itemName, err := strconv.Atoi(c.Param("itemName"))

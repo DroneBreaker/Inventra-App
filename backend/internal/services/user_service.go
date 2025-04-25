@@ -29,25 +29,8 @@ func (s *userService) GetAll() ([]models.User, error) {
 }
 
 func (s *userService) Create(user *models.User) error {
-	// // Check if user exists
-	// existing, _ := s.repo.GetByEmail(user.Email)
-	// if existing != nil {
-	// 	return errors.New("email already exist")
-	// }
-
-	// hashed, err := utils.HashPassword(user.Password)
-	// log.Printf("Successfully hashed password for user: %s", hashed)
-
-	// if err != nil {
-	// 	return err
-	// }
-	// user.Password = hashed
-
-	// // TODO: hash password
-	// return s.repo.Create(user)
-
 	// Check if username already exists
-	existingUser, err := s.repo.GetByID(uint(user.ID))
+	existingUser, err := s.repo.GetByID(user.CompanyID)
 	if err == nil && existingUser != nil {
 		return errors.New("username already exists")
 	}
@@ -67,6 +50,7 @@ func (s *userService) Create(user *models.User) error {
 	if err != nil {
 		return err
 	}
+	// fmt.Printf("Hashed password is: %s", hashedPassword)
 	user.Password = string(hashedPassword)
 	return s.repo.Create(user)
 }
@@ -105,46 +89,6 @@ func (s *userService) Login(username, businessPartnerTIN, password string) (*mod
 
 	return user, nil
 }
-
-// func (s *userService) Login(username, businessPartnerTIN, password string) (*models.User, error) {
-// 	// Input validation
-// 	if strings.TrimSpace(username) == "" {
-// 		return nil, errors.New("username cannot be empty")
-// 	}
-// 	if strings.TrimSpace(password) == "" {
-// 		return nil, errors.New("password cannot be empty")
-// 	}
-
-// 	// Get user from repo
-// 	user, err := s.repo.GetByUsername(username)
-// 	if err != nil {
-// 		log.Printf("Database error looking up user %s: %v", username, err)
-// 		return nil, fmt.Errorf("authentication error")
-// 	}
-
-// 	if user == nil {
-// 		log.Printf("Login attempt for non-existent user: %s", username)
-// 		return nil, errors.New("invalid credentials")
-// 	}
-
-// 	// Verify business TIN if required (for taxpayers)
-// 	if businessPartnerTIN != "" && user.BusinessPartnerTIN != businessPartnerTIN {
-// 		log.Printf("Business TIN mismatch for user %s", username)
-// 		return nil, errors.New("invalid credentials")
-// 	}
-
-// 	// Verify password
-// 	if err := utils.CheckPasswordHash(password, user.Password); err != nil {
-// 		log.Printf("Invalid password for user %s: %v", username, err)
-// 		return nil, errors.New("invalid credentials")
-// 	}
-
-// 	// // TODO: check hashed password
-// 	// if !utils.CheckPasswordHash(password, user.Password) {
-// 	// 	return nil, errors.New("invalid credentials")
-// 	// }
-// 	return user, nil
-// }
 
 func (s *userService) Delete(id int) error {
 	return s.repo.Delete(id)

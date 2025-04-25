@@ -33,6 +33,7 @@ class AppTitle {
       "Please enter a valid 11 character TIN";
   static const String invoiceNumberError = "Please enter your invoice number";
   static const String noItemCodeError = "Please enter your item code";
+  static const String itemCodeDescription = "Item code must be a number";
   static const String invalidItemNameError = "Please enter your item name";
   static const String priceIsEmptyError = "Please enter your price";
 }

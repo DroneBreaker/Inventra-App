@@ -1,102 +1,111 @@
 package repository
 
 import (
-	"database/sql"
+	"errors"
 
 	"github.com/DroneBreaker/Inventra-App/internal/models"
+	"gorm.io/gorm"
 )
 
 type ItemRepository interface {
-	GetAll(businessTIN string) ([]models.Item, error)
-	Create(item *models.Item, businessTIN string) error
-	GetByID(id int, businessTIN string) (*models.Item, error)
-	GetByItemName(itemName string, businessTIN string) (*models.Item, error)
-	Update(item *models.Item, businessTIN string) error
-	Delete(id int, businessTIN string) error
+	GetAll(companyID string) ([]models.Item, error)
+	Create(item *models.Item, companyID string) error
+	GetByID(companyID string) (*models.Item, error)
+	GetByItemName(itemName string, companyID string) (*models.Item, error)
+	Update(item *models.Item, businessPartnerTIN string) error
+	Delete(id int, companyID string) error
 }
 
 type itemRepo struct {
-	db *sql.DB
+	db *gorm.DB
 }
 
-func NewItemRepository(db *sql.DB) ItemRepository {
+func NewItemRepository(db *gorm.DB) ItemRepository {
 	return &itemRepo{db: db}
 }
 
-func (r *itemRepo) GetAll(businessPartnerTIN string) ([]models.Item, error) {
+func (r *itemRepo) GetAll(companyID string) ([]models.Item, error) {
 	items := []models.Item{}
-	query := `SELECT id, itemCode, itemName, price, isTaxInclusive, itemDescription, isTaxable, 
-		tourismCSTOption, itemCategory, isDiscountable, createdAt FROM items`
-	rows, err := r.db.Query(query, businessPartnerTIN)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
 
-	for rows.Next() {
-		var item models.Item
-		if err := rows.Scan(&item.ID, &item.ItemCode, &item.ItemName, &item.Price, &item.IsTaxInclusive,
-			&item.ItemDescription, &item.IsTaxable, &item.TourismCstOption, &item.ItemCategory,
-			&item.IsDiscountable, &item.CreatedAt); err != nil {
-			return nil, err
-		}
-		items = append(items, item)
-	}
-	return items, nil
+	result := r.db.Select("id", "itemCode", "itemName", "price", "isTaxInclusive", "itemDescription", "isTaxable",
+		"tourismCSTOption", "itemCategory", "isDiscountable", "companyID").Find(&items)
+	return items, result.Error
 }
 
-func (r *itemRepo) Create(item *models.Item, businessPartnerTIN string) error {
-	query := `INSERT INTO items (itemCode, itemName, price, isTaxInclusive, itemDescription, 
-		isTaxable, tourismCSTOption) VALUES (?,?,?,?,?,?,?)`
-	result, err := r.db.Exec(query, item.ItemCode, item.ItemName, item.Price, item.IsTaxInclusive,
-		item.ItemDescription, item.IsTaxable, item.TourismCstOption,
-	)
+func (r *itemRepo) Create(item *models.Item, companyID string) error {
+	result := r.db.Create(item)
+	return result.Error
+}
 
-	if err != nil {
-		return err
+func (r *itemRepo) GetByID(companyID string) (*models.Item, error) {
+	var item models.Item
+	result := r.db.Select("id", "itemCode", "itemName", "price", "isTaxInclusive", "itemDescription", "isTaxable",
+		"tourismCSTOption", "itemCategory", "isDiscountable", "companyID", "createdAt").
+		First(&item, companyID)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, errors.New("user not found")
 	}
+	return &item, result.Error
 
-	// Retrieve the last inserted ID
-	id, err := result.LastInsertId()
-	if err != nil {
-		return err
+}
+
+func (r *itemRepo) GetByItemName(itemName string, companyID string) (*models.Item, error) {
+	var item models.Item
+	result := r.db.Select("id", "itemCode", "itemName", "price", "isTaxInclusive", "itemDescription", "isTaxable",
+		"tourismCSTOption", "itemCategory", "isDiscountable", "companyID", "createdAt").
+		First(&item, itemName, companyID)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, errors.New("user not found")
 	}
-
-	item.ID = int(id) // Set the ID in the item object
-	item.BusinessPartnerTIN = businessPartnerTIN
-	return nil
+	return &item, result.Error
 }
 
-func (r *itemRepo) GetByID(id int, businessPartnerTIN string) (*models.Item, error) {
-	item := &models.Item{}
-	query := `SELECT id, itemCode, itemName, price, isTaxInclusive, itemDescription, isTaxable, 
-		tourismCSTOption, itemCategory, isDiscountable, businessTIN, createdAt FROM items WHERE 
-		id = ? and businessPartnerTIN = ?`
-	err := r.db.QueryRow(query, id, businessPartnerTIN).Scan(&item.ID, &item.ItemCode, &item.ItemName, &item.Price,
-		&item.IsTaxInclusive, &item.ItemDescription, &item.IsTaxable, &item.TourismCstOption,
-		&item.ItemCategory, &item.IsDiscountable, &item.BusinessPartnerTIN, &item.CreatedAt)
-	return item, err
-}
+// func (r *itemRepo) GetByBusinessPartnerTIN(businessPartnerTIN string) ([]models.Item, error) {
+// 	query := `SELECT id, itemCode, itemName, price, isTaxInclusive, itemDescription, isTaxable,
+// 		tourismCSTOption, itemCategory, isDiscountable, businessTIN, createdAt FROM items WHERE and businessPartnerTIN = ?`
+// 	rows, err := r.db.Query(query, businessPartnerTIN)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer rows.Close()
 
-func (r *itemRepo) GetByItemName(itemName string, businessPartnerTIN string) (*models.Item, error) {
-	item := &models.Item{}
-	query := `SELECT id, itemCode, itemName, price, isTaxInclusive, itemDescription, isTaxable, 
-		tourismCSTOption, itemCategory, isDiscountable, businessTIN, createdAt FROM items WHERE 
-		id = ? and businessPartnerTIN = ?`
-	err := r.db.QueryRow(query, itemName, businessPartnerTIN).Scan(&item.ID, &item.ItemCode, &item.ItemName, &item.Price,
-		&item.IsTaxInclusive, &item.ItemDescription, &item.IsTaxable, &item.TourismCstOption,
-		&item.ItemCategory, &item.IsDiscountable, &item.BusinessPartnerTIN, &item.CreatedAt)
-	return item, err
-}
+// 	for rows.Next() {
+// 		var item models.Item
+// 		if err := rows.Scan(&item.ID, &item.ItemCode, &item.ItemName, &item.Price, &item.IsTaxInclusive,
+// 			&item.ItemDescription, &item.IsTaxable, &item.TourismCstOption, &item.ItemCategory,
+// 			&item.IsDiscountable, &item.CreatedAt); err != nil {
+// 			return nil, err
+// 		}
+// 		items = append(items, item)
+// 	}
+// 	return items, nil
+// }
 
-func (r *itemRepo) Update(item *models.Item, businessPartnerTIN string) error {
-	query := `UPDATE items SET itemCode = ?, itemName = ? price = ?, itemCategory = ? WHERE id = ? and businessPartnerTIN = ?`
-	_, err := r.db.Exec(query, &item.ItemCode, &item.ItemName, &item.Price, &item.ItemCategory, &item.ID)
-	return err
+// func (r *itemRepo) Update(item *models.Item, businessPartnerTIN string) error {
+// 	query := `UPDATE items SET itemCode = ?, itemName = ? price = ?, itemCategory = ? WHERE id = ? and businessPartnerTIN = ?`
+// 	_, err := r.db.Exec(query, &item.ItemCode, &item.ItemName, &item.Price, &item.ItemCategory, &item.ID)
+// 	return err
+// }
+
+func (r *itemRepo) Update(item *models.Item, companyID string) error {
+	result := r.db.Model(item).Updates(models.Item{
+		ItemCode:         item.ItemCode,
+		ItemName:         item.ItemName,
+		Price:            item.Price,
+		IsTaxInclusive:   item.IsTaxInclusive,
+		ItemDescription:  item.ItemDescription,
+		IsTaxable:        item.IsTaxable,
+		TourismCstOption: item.TourismCstOption,
+		ItemCategory:     item.ItemCategory,
+		IsDiscountable:   item.IsDiscountable,
+		CompanyID:        item.CompanyID,
+		CreatedAt:        item.CreatedAt,
+		UpdatedAt:        item.UpdatedAt,
+	})
+	return result.Error
 }
 
 func (r *itemRepo) Delete(id int, businessTIN string) error {
-	query := `DELETE FROM items WHERE id = ? and businessTIN = ?`
-	_, err := r.db.Exec(query, id, businessTIN)
-	return err
+	result := r.db.Delete(&models.User{}, id)
+	return result.Error
 }

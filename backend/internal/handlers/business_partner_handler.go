@@ -12,7 +12,7 @@ type businessPartnerHandler struct {
 	service services.BusinessPartnerService
 }
 
-func NewBusinessPartnerService(service services.BusinessPartnerService) *businessPartnerHandler {
+func NewBusinessPartnerHandler(service services.BusinessPartnerService) *businessPartnerHandler {
 	return &businessPartnerHandler{service: service}
 }
 
