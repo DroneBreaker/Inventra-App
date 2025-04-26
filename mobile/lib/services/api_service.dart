@@ -9,11 +9,10 @@ class APIService {
   static Future<http.Response> registerUser ({
     required String firstName,
     required String lastName,
-    required String businessPartnerTIN,
-    required String email,
+    required String companyTIN,
+    // required String email,
     required String username,
     required String password,
-    required String userType,
   }) async {
     final url = Uri.parse("$baseUrl/register");
 
@@ -24,11 +23,10 @@ class APIService {
         body: jsonEncode({
           'firstName': firstName,
           'lastName': lastName,
-          'businessPartnerTIN': businessPartnerTIN,
-          'email': email,
+          'companyTIN': companyTIN,
+          // 'email': email,
           'username': username,
           'password': password,
-          'user_type': userType.toLowerCase(), // or as required by your API
         }),
       );
 
@@ -46,9 +44,8 @@ class APIService {
 
 
   static Future<http.Response> loginUser({
-  required String userType,
-  String? businessPartnerTIN, // Optional for taxpayer
   required String username,
+  required String companyTIN, 
   required String password,
 }) async {
   final url = Uri.parse("$baseUrl/login");
@@ -58,10 +55,10 @@ class APIService {
       url,
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
-        if (businessPartnerTIN != null) 'businessTIN': businessPartnerTIN,
+        if (companyTIN != null) 'companyTIN': companyTIN,
         'username': username,
+        'companyTIN': companyTIN,
         'password': password,
-        'userType': userType.toLowerCase(),
       }),
     );
 

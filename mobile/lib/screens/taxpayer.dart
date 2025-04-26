@@ -357,10 +357,10 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                             TextFormField(
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return AppTitle.businessTINError;
+                                  return AppTitle.companyTINError;
                                 }
                                 if (value.length < 11) {
-                                  return AppTitle.validBusinessTINError;
+                                  return AppTitle.validCompanyTINError;
                                 }
                                 return null;
                               },

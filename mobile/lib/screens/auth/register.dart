@@ -19,7 +19,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController businessPartnerTINController = TextEditingController();
+  final TextEditingController companyTINController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -65,11 +65,10 @@ class _RegisterPageState extends State<RegisterPage> {
       final response = await APIService.registerUser(
         firstName: firstNameController.text, 
         lastName: lastNameController.text,
-        businessPartnerTIN: businessPartnerTINController.text, 
-        email: emailController.text, 
+        companyTIN: companyTINController.text, 
+        // email: emailController.text, 
         username: usernameController.text, 
         password: passwordController.text,
-        userType: selected
       );
 
       final responseData = jsonDecode(response.body);
@@ -230,7 +229,7 @@ class _RegisterPageState extends State<RegisterPage> {
             const SizedBox(height: 20),
             //Business Partner TIN Textform field
             TextFormField(
-              controller: businessPartnerTINController,
+              controller: companyTINController,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your TIN';
@@ -441,7 +440,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   void dispose() {
-    businessPartnerTINController.dispose();
+    companyTINController.dispose();
     usernameController.dispose();
     passwordController.dispose();
     super.dispose();

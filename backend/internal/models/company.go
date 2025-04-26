@@ -29,7 +29,7 @@ type Company struct {
 	Address   string
 	Phone     string
 	Users     []User   `gorm:"foreignKey:CompanyID;references:ID" json:"users" xml:"user"`
-	Items     []Item   `gorm:"foreignKey:CompanyID;references:ID" josn:"items" xml:"items"`
+	Items     []Item   `gorm:"foreignKey:CompanyID;references:ID" json:"items" xml:"items"`
 	Clients   []Client `gorm:"foreignKey:CompanyID;references:ID"`
 	CreatedAt time.Time
 	UpdatedAt time.Time

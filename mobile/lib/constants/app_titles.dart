@@ -3,11 +3,13 @@ class AppTitle {
   static const String intro = "EVAT SUITE";
   static const String description =
       "E_VAT Suite enhances efficiency and compliance with VAT regulations, making VAT transactions easier and more efficient.";
-  static const String loginButton = "Click to Login";
-  static const String registerButton = "Click to Register";
+  static const String loginButton = "Login";
+  static const String noAccount = "Don't have an Account?";
+  static const String registerButton = "Register";
+  static const String createAccount = "Click here.";
 
   //LOGIN
-  static const String loginTitle = "Droners Inventra";
+  static const String loginTitle = "SIGN INTO INVENTRA";
   static const String loginDescription = "Please sign-in to your account";
   static const String logInButton = "Log In";
 
@@ -28,8 +30,12 @@ class AppTitle {
   static const String itemCodeField = "Item Code";
 
   // ERRORS
-  static const String businessTINError = "Please enter your business TIN";
-  static const String validBusinessTINError =
+  static const String noUsernameError = "Please enter your username";
+  static const String noPasswordError = "Please enter your password";
+  static const String usernameLengthError = "Username should not be less than 6 characters";
+  static const String passwordLengthError = "Password should not be less than 6 characters";
+  static const String companyTINError = "Please enter your business TIN";
+  static const String validCompanyTINError =
       "Please enter a valid 11 character TIN";
   static const String invoiceNumberError = "Please enter your invoice number";
   static const String noItemCodeError = "Please enter your item code";
