@@ -11,7 +11,7 @@ import (
 func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		// Skip auth for login and register routes
-		if c.Path() == "/login" || c.Path() == "/register" {
+		if c.Path() == "/api/v1/login" || c.Path() == "/api/v1/register" {
 			return next(c)
 		}
 
@@ -34,13 +34,13 @@ func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 		// Extract companyTIN and store it in ctx
 		claims := token.Claims.(jwt.MapClaims)
-		companyTIN, ok := claims["companyTIN"].(string)
+		companyTIN, ok := claims["company_tin"].(string)
 		if !ok || companyTIN == "" {
 			return echo.NewHTTPError(http.StatusUnauthorized, "invalid token")
 		}
 
 		//  Stroe in ctx for handlers to use
-		c.Set("companyTIN", companyTIN)
+		c.Set("company_tin", companyTIN)
 
 		return next(c)
 	}

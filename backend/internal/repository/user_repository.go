@@ -2,6 +2,8 @@ package repository
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
 
 	"github.com/DroneBreaker/Inventra-App/internal/models"
 	"gorm.io/gorm"
@@ -124,7 +126,7 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 
 func (r *userRepo) GetAll() ([]models.User, error) {
 	var users []models.User
-	result := r.db.Select("id", "first_name", "last_name", "username", "email", "password", "company_id", "company", "createdAt", "updatedAt").Find(&users)
+	result := r.db.Select("id", "first_name", "last_name", "username", "email", "password", "company_id", "company", "password", "createdAt", "updatedAt").Find(&users)
 	return users, result.Error
 }
 
@@ -135,8 +137,15 @@ func (r *userRepo) Create(user *models.User) error {
 
 func (r *userRepo) GetByID(companyID string) (*models.User, error) {
 	var user models.User
-	result := r.db.Select("id", "first_name", "last_name", "username", "email", "password", "company_id", "company", "created_at", "updated_at").
-		First(&user, companyID)
+
+	// Convert string ID to uint if your ID is numeric
+	id, err := strconv.ParseUint(companyID, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("invalid ID format: %v", err)
+	}
+
+	result := r.db.Select("id", "first_name", "last_name", "username", "email", "company_id", "company", "password", "created_at", "updated_at").
+		Where("id = ?", id).First(&user)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, errors.New("user not found")
 	}
@@ -146,7 +155,7 @@ func (r *userRepo) GetByID(companyID string) (*models.User, error) {
 func (r *userRepo) GetByUsername(username string) (*models.User, error) {
 	var user models.User
 	result := r.db.Where("username = ?", username).
-		Select("id", "first_name", "last_name", "username", "email", "password", "company_id", "company", "created_at", "updated_at").
+		// Select("id", "first_name", "last_name", "username", "email", "password", "company_id", "company", "password", "created_at", "updated_at").
 		First(&user)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, errors.New("user not found")
@@ -157,7 +166,7 @@ func (r *userRepo) GetByUsername(username string) (*models.User, error) {
 func (r *userRepo) GetByEmail(email string) (*models.User, error) {
 	var user models.User
 	result := r.db.Where("email = ?", email).
-		Select("id", "first_name", "last_name", "username", "email", "password", "company_id", "company", "created_at", "updated_at").
+		Select("id", "first_name", "last_name", "username", "email", "password", "company_id", "company", "password", "created_at", "updated_at").
 		First(&user)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, errors.New("user not found")
@@ -168,7 +177,7 @@ func (r *userRepo) GetByEmail(email string) (*models.User, error) {
 func (r *userRepo) GetByCompanyTIN(companyTIN string) (*models.User, error) {
 	var user models.User
 	result := r.db.Where("companyTIN = ?", companyTIN).
-		Select("id", "first_name", "last_name", "username", "email", "password", "company_id", "company", "created_at", "updated_at").
+		Select("id", "first_name", "last_name", "username", "email", "password", "company_id", "company", "password", "created_at", "updated_at").
 		First(&user)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, errors.New("user not found")

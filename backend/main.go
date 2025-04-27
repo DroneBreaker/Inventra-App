@@ -57,8 +57,12 @@ func main() {
 	// Echo instance
 	e := echo.New()
 
-	// Middlewares
-	e.Use(middlewares.AuthMiddleware) // Your custom auth middleware
+	// CORS Configuration (improved)
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
+		AllowHeaders: []string{echo.HeaderContentType, echo.HeaderAuthorization},
+	}))
 
 	// Initialize repositories
 	userRepo := repository.NewUserRepository(db)
@@ -75,23 +79,32 @@ func main() {
 	itemHandler := handlers.NewItemHandler(itemService)       // Fixed typo (was itemHandler)
 	clientHandler := handlers.NewClientHandler(clientService) // Fixed naming
 
-	// Routes
-	api := e.Group("/api/v1")
+	// Middlewares
+	// e.Use(middlewares.AuthMiddleware) // Your custom auth middleware
 
-	// User routes
+	// Routes
+	api := e.Group("/api/v1") //Apply middleware to all routes except login and register
+
+	// Public Routes
 	api.POST("/register", userHandler.Register)
 	api.POST("/login", userHandler.Login)
-	api.GET("/users", userHandler.GetAll)
-	api.DELETE("/users/:id", userHandler.Delete)
+
+	// Protected routes with middleware
+	protected := api.Group("")
+	protected.Use(middlewares.AuthMiddleware)
+
+	// User routes
+	protected.GET("/users", userHandler.GetAll)
+	protected.DELETE("/users/:id", userHandler.Delete)
 
 	// Item routes
-	api.GET("/items", itemHandler.GetAll)
-	api.POST("/items", itemHandler.Create)
-	api.GET("/items/:id", itemHandler.GetByID)
+	protected.GET("/items", itemHandler.GetAll)
+	protected.POST("/items", itemHandler.Create)
+	protected.GET("/items/:id", itemHandler.GetByID)
 
-	// Business Partner routes
-	api.GET("/business_partners", clientHandler.GetAll)
-	api.POST("/business_partners", clientHandler.Create)
+	// Client routes
+	protected.GET("/clients", clientHandler.GetAll)
+	protected.POST("/clients", clientHandler.Create)
 
 	// Welcome endpoint
 	e.GET("/", func(c echo.Context) error {
@@ -100,13 +113,6 @@ func main() {
 			"version": "1.0",
 		})
 	})
-
-	// CORS Configuration (improved)
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"},
-		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
-		AllowHeaders: []string{echo.HeaderContentType, echo.HeaderAuthorization},
-	}))
 
 	// Start server
 	fmt.Println("INVENTRA API listening on https://127.0.0.1:1323")

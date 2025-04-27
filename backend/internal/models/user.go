@@ -23,10 +23,10 @@ import (
 
 type User struct {
 	ID        uint           `gorm:"primaryKey;autoIncrement" json:"id" xml:"id"`
-	FirstName string         `gorm:"size:100;not null" json:"firstName" xml:"firstName"`
+	FirstName string         `gorm:"size:100;not null"`
 	LastName  string         `gorm:"size:100;not null" json:"lastName" xml:"lastName"`
-	Username  string         `gorm:"size:100;unique" json:"username" xml:"username"`
 	Email     string         `gorm:"unique;not null;index" json:"email" xml:"email"`
+	Username  string         `gorm:"size:100;unique" json:"username" xml:"username"`
 	Password  string         `gorm:"not null" json:"-" xml:"-"`
 	Role      string         `gorm:"size:50;default:'user'" json:"role" xml:"role"`
 	CompanyID string         `gorm:"type:char(6);not null" json:"companyID" xml:"companyID"`

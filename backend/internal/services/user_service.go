@@ -12,7 +12,7 @@ import (
 type UserService interface {
 	GetAll() ([]models.User, error)
 	Create(user *models.User) error
-	Login(username, companyID, password string) (*models.User, error)
+	Login(username, companyID, companyTIN, password string) (*models.User, error)
 	Delete(id int) error
 }
 
@@ -35,11 +35,21 @@ func (s *userService) Create(user *models.User) error {
 		return errors.New("username already exists")
 	}
 
-	// Check if BusinessTIN already exists
-	existingUser, err = s.repo.GetByCompanyTIN(user.Company.TIN)
-	if err == nil && existingUser != nil {
+	// // Check if CompanyID already exists
+	// existingUser, err = s.repo.GetByID(fmt.Sprintf("%d", user.ID))
+	// if err == nil && existingUser != nil {
+	// 	return errors.New("company ID already exists")
+	// }
+
+	// Check if CompanyTIN already exists
+	company, err := s.repo.GetByCompanyTIN(user.Company.TIN)
+	if err != nil {
 		return errors.New("company TIN already exists")
 	}
+
+	// && existingUser != nil
+
+	user.CompanyID = fmt.Sprintf("%d", company.ID)
 
 	// Set default role if not provided
 	// if user.Role == "" {
@@ -50,12 +60,12 @@ func (s *userService) Create(user *models.User) error {
 	if err != nil {
 		return err
 	}
-	// fmt.Printf("Hashed password is: %s", hashedPassword)
+	fmt.Printf("Hashed password is: %s", hashedPassword)
 	user.Password = string(hashedPassword)
 	return s.repo.Create(user)
 }
 
-func (s *userService) Login(username, CompanyTIN, password string) (*models.User, error) {
+func (s *userService) Login(username, CompanyID, CompanyTIN, password string) (*models.User, error) {
 	// Input validation
 	if username == "" && CompanyTIN == "" {
 		return nil, errors.New("username or company TIN is required")
@@ -70,8 +80,12 @@ func (s *userService) Login(username, CompanyTIN, password string) (*models.User
 
 	if username != "" {
 		user, err = s.repo.GetByUsername(username)
+	}
+
+	if CompanyID != "" {
+		user, err = s.repo.GetByID(CompanyID)
 	} else {
-		user, err = s.repo.GetByCompanyTIN(user.Company.TIN)
+		user, err = s.repo.GetByCompanyTIN(CompanyTIN)
 	}
 
 	if err != nil {

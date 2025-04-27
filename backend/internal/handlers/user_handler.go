@@ -40,15 +40,16 @@ func (h *userHandler) Register(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, echo.Map{
-		"message": "user registered",
+		"message": "user registered sucessfully",
 		"user":    user,
 	})
 }
 
 func (h *userHandler) Login(c echo.Context) error {
 	var input struct {
-		CompanyTIN string `json:"companyTIN"`
 		Username   string `json:"username"`
+		CompanyID  string `json:"companyID"`
+		CompanyTIN string `json:"companyTIN"`
 		Password   string `json:"password"`
 	}
 	// var dbUser models.User
@@ -57,7 +58,7 @@ func (h *userHandler) Login(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "invalid input"})
 	}
 
-	user, err := h.service.Login(input.Username, input.CompanyTIN, input.Password)
+	user, err := h.service.Login(input.Username, input.CompanyID, input.CompanyTIN, input.Password)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, map[string]string{
 			"error": err.Error(),

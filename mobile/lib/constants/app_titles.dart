@@ -7,9 +7,11 @@ class AppTitle {
   static const String noAccount = "Don't have an Account?";
   static const String registerButton = "Register";
   static const String createAccount = "Click here.";
+  static const String hasAccount = "Already have an account?";
 
   //LOGIN
   static const String loginTitle = "SIGN INTO INVENTRA";
+  static const String registerTitle = "SIGN UP ON INVENTRA";
   static const String loginDescription = "Please sign-in to your account";
   static const String logInButton = "Log In";
 
@@ -34,8 +36,11 @@ class AppTitle {
   static const String noPasswordError = "Please enter your password";
   static const String usernameLengthError = "Username should not be less than 6 characters";
   static const String passwordLengthError = "Password should not be less than 6 characters";
-  static const String companyTINError = "Please enter your business TIN";
+  static const String companyTINError = "Please enter your company TIN";
+  static const String companyIDError = "Please enter your company ID";
   static const String validCompanyTINError =
+      "Please enter a valid 11 character TIN";
+  static const String validCompanyIDError =
       "Please enter a valid 11 character TIN";
   static const String invoiceNumberError = "Please enter your invoice number";
   static const String noItemCodeError = "Please enter your item code";
