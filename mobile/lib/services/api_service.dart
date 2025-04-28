@@ -10,6 +10,7 @@ class APIService {
     required String firstName,
     required String lastName,
     required String email,
+    required String companyName,
     required String companyID,
     required String companyTIN,
     required String username,
@@ -24,6 +25,7 @@ class APIService {
         body: jsonEncode({
           'firstName': firstName,
           'lastName': lastName,
+          'companyName': companyName,
           'email': email,
           'companyTIN': companyTIN,
           'companyID': companyID,

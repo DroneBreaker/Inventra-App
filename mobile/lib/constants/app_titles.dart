@@ -38,6 +38,7 @@ class AppTitle {
   static const String passwordLengthError = "Password should not be less than 6 characters";
   static const String companyTINError = "Please enter your company TIN";
   static const String companyIDError = "Please enter your company ID";
+  static const String companyNameError = "Please enter your company name";
   static const String validCompanyTINError =
       "Please enter a valid 11 character TIN";
   static const String validCompanyIDError =
