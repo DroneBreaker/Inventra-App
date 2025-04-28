@@ -7,6 +7,7 @@ import (
 	"github.com/DroneBreaker/Inventra-App/internal/models"
 	"github.com/DroneBreaker/Inventra-App/internal/repository"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type UserService interface {
@@ -89,11 +90,17 @@ func (s *userService) Login(username, CompanyID, CompanyTIN, password string) (*
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve user: %w", err)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("User not found")
+		}
 	}
-	if user == nil {
-		return nil, errors.New("user not found")
-	}
+
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed to retrieve user: %w", err)
+	// }
+	// if user == nil {
+	// 	return nil, errors.New("user not found")
+	// }
 
 	// Verify password
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))

@@ -32,16 +32,16 @@ func (r *itemRepo) GetAll(companyID string) ([]models.Item, error) {
 	return items, result.Error
 }
 
-func (r *itemRepo) Create(item *models.Item, companyID string) error {
+func (r *itemRepo) Create(item *models.Item, companyTIN string) error {
 	result := r.db.Create(item)
 	return result.Error
 }
 
-func (r *itemRepo) GetByID(companyID string) (*models.Item, error) {
+func (r *itemRepo) GetByID(companyTIN string) (*models.Item, error) {
 	var item models.Item
 	result := r.db.Select("id", "itemCode", "itemName", "price", "isTaxInclusive", "itemDescription", "isTaxable",
 		"tourismCSTOption", "itemCategory", "isDiscountable", "companyID", "createdAt").
-		First(&item, companyID)
+		First(&item, companyTIN)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, errors.New("user not found")
 	}

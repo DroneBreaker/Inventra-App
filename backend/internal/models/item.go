@@ -38,9 +38,9 @@ type Item struct {
 	IsDiscountable   bool    `gorm:"default:true" json:"isDiscountable" xml:"isDiscountable"`
 	// InvoiceID  uint
 	// Invoice    Invoice   `gorm:"foreignKey:InvoiceID"`
-	CompanyID string  `gorm:"type:char(6);not null" json:"companyID" xml:"companyID"`
-	Company   Company `gorm:"foreignKey:CompanyID;references:ID"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"-" xml:"-"`
+	CompanyTIN string  `gorm:"type:char(20);not null" json:"companyTIN" xml:"companyTIN"`
+	Company    Company `gorm:"foreignKey:CompanyTIN;references:TIN"`
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-" xml:"-"`
 }

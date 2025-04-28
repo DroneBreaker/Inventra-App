@@ -22,15 +22,15 @@ import "time"
 // }
 
 type Company struct {
-	ID        string `gorm:"primaryKey;type:char(6)" json:"id" xml:"id"`
+	ID        string `gorm:"primaryKey;type:char(20);not null" json:"companyID" xml:"companyID"`
 	Name      string `gorm:"unique;not null" json:"companyName" xml:"companyName"`
-	TIN       string `gorm:"unique;not null" json:"companyTIN" xml:"companyTIN"`
+	TIN       string `gorm:"unique;not null;type:char(20)" json:"companyTIN" xml:"companyTIN"`
 	Email     string
 	Address   string
 	Phone     string
-	Users     []User   `gorm:"foreignKey:CompanyID;references:ID" json:"users" xml:"user"`
-	Items     []Item   `gorm:"foreignKey:CompanyID;references:ID" json:"items" xml:"items"`
-	Clients   []Client `gorm:"foreignKey:CompanyID;references:ID"`
+	Users     []User   `gorm:"foreignKey:CompanyTIN;references:TIN" json:"users" xml:"user"`
+	Items     []Item   `gorm:"foreignKey:CompanyTIN;references:TIN" json:"items" xml:"items"`
+	Clients   []Client `gorm:"foreignKey:CompanyTIN;references:TIN"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

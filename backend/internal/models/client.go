@@ -18,8 +18,8 @@ type Client struct {
 	ClienTIN   string `gorm:"not null; unique" json:"clientTIN" xml:"clientTIN"`
 	Email      string
 	Phone      string
-	CompanyID  string    `gorm:"type:char(6);not null" json:"companyID" xml:"companyID"`
-	Company    Company   `gorm:"foreignKey:CompanyID;references:ID"`
+	CompanyTIN string    `gorm:"type:char(20);not null" json:"companyTIN" xml:"companyTIN"`
+	Company    Company   `gorm:"foreignKey:CompanyTIN;references:TIN"`
 	ClientType string    `json:"clientType" xml:"clientType"` // customer, supllier, export
 	Invoices   []Invoice `gorm:"foreignKey:ClientID;references:ID" json:"invoices"`
 	CreatedAt  time.Time `json:"createdAt" xml:"createdAt"`

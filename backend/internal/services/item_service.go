@@ -8,12 +8,12 @@ import (
 )
 
 type ItemService interface {
-	GetAll(companyID string) ([]models.Item, error)
-	Create(item *models.Item, companyID string) error
+	GetAll(companyTIN string) ([]models.Item, error)
+	Create(item *models.Item, companyTIN string) error
 	GetByID(companyID string) (*models.Item, error)
-	GetByItemName(iteName string, companyID string) (*models.Item, error)
-	Update(item *models.Item, companyID string) error
-	Delete(id int, companyID string) error
+	GetByItemName(iteName string, companyTIN string) (*models.Item, error)
+	Update(item *models.Item, companyTIN string) error
+	Delete(id int, companyTIN string) error
 }
 
 type itemService struct {
@@ -24,34 +24,34 @@ func NewItemService(repo repository.ItemRepository) ItemService {
 	return &itemService{repo: repo}
 }
 
-func (s *itemService) GetAll(companyID string) ([]models.Item, error) {
-	return s.repo.GetAll(companyID)
+func (s *itemService) GetAll(companyTIN string) ([]models.Item, error) {
+	return s.repo.GetAll(companyTIN)
 }
 
-func (s *itemService) Create(item *models.Item, companyID string) error {
-	item.CompanyID = companyID
-	return s.repo.Create(item, companyID)
+func (s *itemService) Create(item *models.Item, companyTIN string) error {
+	item.CompanyTIN = companyTIN
+	return s.repo.Create(item, companyTIN)
 }
 
-func (s *itemService) GetByID(companyID string) (*models.Item, error) {
-	return s.repo.GetByID(companyID)
+func (s *itemService) GetByID(companyTIN string) (*models.Item, error) {
+	return s.repo.GetByID(companyTIN)
 }
 
-func (s *itemService) GetByItemName(itemName string, companyID string) (*models.Item, error) {
-	return s.repo.GetByItemName(itemName, companyID)
+func (s *itemService) GetByItemName(itemName string, companyTIN string) (*models.Item, error) {
+	return s.repo.GetByItemName(itemName, companyTIN)
 }
 
-func (s *itemService) Update(item *models.Item, companyID string) error {
+func (s *itemService) Update(item *models.Item, companyTIN string) error {
 	// Make sure the item belongs to this business partner
-	existingItem, err := s.repo.GetByID(item.CompanyID)
+	existingItem, err := s.repo.GetByID(item.CompanyTIN)
 	if err != nil {
 		return err
 	}
 
-	if existingItem.CompanyID != companyID {
+	if existingItem.CompanyTIN != companyTIN {
 		return errors.New("unauthorized: item does not belong to this business partner")
 	}
-	return s.repo.Update(item, companyID)
+	return s.repo.Update(item, companyTIN)
 }
 
 func (s *itemService) Delete(id int, companyID string) error {
