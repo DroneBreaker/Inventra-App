@@ -1,5 +1,7 @@
-#[derive(Debug, Serialize, Deserialize, Queryable, Insertable)]
-#[table_name = "companies"]
+use serde::{Serialize, Serializer, Deserialize, Deserializer};
+use chrono::{DateTime, Utc };
+
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Company {
     pub id: String,                           // UUID or string ID
     pub company_name: String,
@@ -7,6 +9,6 @@ pub struct Company {
     pub email: String,
     pub address: Option<String>,
     pub phone: String,                        // Phone numbers better as String
-    pub created_at: chrono::NaiveDateTime,
-    pub updated_at: chrono::NaiveDateTime,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
