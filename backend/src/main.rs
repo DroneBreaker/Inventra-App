@@ -1,4 +1,6 @@
-use actix_web::{get, App, HttpServer, Responder};
+use std::env;
+
+use actix_web::{get, web, App, HttpServer, Responder};
 use dotenvy::dotenv;
 mod db;
 
@@ -13,11 +15,11 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
     env_logger::init();
 
-    let db_pool = db::init_db_pool().await;
+    let pool = db::init_db_pool().await;
 
-
-    HttpServer::new(|| {
+    HttpServer::new(move || {
         App::new()
+            .app_data(web::Data::new(pool.clone()))
             .service(hello)
     })
     .bind(("127.0.0.1", 8080))?
