@@ -4,16 +4,16 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class APIService {
-  static const String baseUrl = "http://10.0.2.2:1323/api";
+  static const String baseUrl = "http://10.0.2.2:8080/api";
 
   static Future<http.Response> registerUser ({
     required String firstName,
     required String lastName,
     required String email,
+    required String username,
     required String companyName,
     required String companyID,
     required String companyTIN,
-    required String username,
     required String password,
   }) async {
     final url = Uri.parse("$baseUrl/register");
@@ -23,13 +23,13 @@ class APIService {
         url,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
-          'firstName': firstName,
-          'lastName': lastName,
-          'companyName': companyName,
+          'first_name': firstName,
+          'last_name': lastName,
           'email': email,
-          'companyTIN': companyTIN,
-          'companyID': companyID,
           'username': username,
+          'company_name': companyName,
+          'company_tin': companyTIN,
+          'company_id': companyID,
           'password': password,
         }),
       );
@@ -61,7 +61,7 @@ class APIService {
       body: jsonEncode({
         // if (companyTIN != null) 'companyTIN': companyTIN,
         'username': username,
-        'companyTIN': companyTIN,
+        'company_tin': companyTIN,
         'password': password,
       }),
     );

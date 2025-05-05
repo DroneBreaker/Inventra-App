@@ -1,4 +1,4 @@
-use serde::{Serialize, Serializer, Deserialize, Deserializer};
+use serde::{Serialize, Deserialize};
 use chrono::{DateTime, Utc };
 
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]

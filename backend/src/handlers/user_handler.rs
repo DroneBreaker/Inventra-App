@@ -45,7 +45,6 @@ pub async fn get_users(db: web::Data<MySqlPool>) -> impl Responder {
     let query = r#"
         SELECT
             id, first_name, last_name, email, username, company_name, company_id, company_tin, password, created_at, updated_at, deleted_at
-            updated_at
         FROM users
     "#;
 
@@ -62,7 +61,7 @@ pub async fn get_users(db: web::Data<MySqlPool>) -> impl Responder {
     }
 }
 
-pub async fn create_user(db: web::Data<MySqlPool>, req: web::Json<CreateUser>) -> impl Responder {
+pub async fn create_user(db: web::Data<MySqlPool>, req: web::Json<CreateUser>) -> HttpResponse {
     let hashed = match hash_password(&req.password) {
         Ok(h) => h,
         Err(_) => return HttpResponse::InternalServerError().body("Password has failed"),
@@ -88,7 +87,7 @@ pub async fn create_user(db: web::Data<MySqlPool>, req: web::Json<CreateUser>) -
         hashed,
         now,
         now,
-        now,
+        now
     )
     .execute(db.get_ref())
     .await;
@@ -122,10 +121,7 @@ pub async fn create_user(db: web::Data<MySqlPool>, req: web::Json<CreateUser>) -
     }
 }
 
-pub async fn get_user_by_id(
-    db: web::Data<MySqlPool>,
-    id: web::Path<String>,
-) -> impl Responder {
+pub async fn get_user_by_id(db: web::Data<MySqlPool>, id: web::Path<String>) -> impl Responder {
     let result = sqlx::query_as::<_, User>("SELECT * FROM users WHERE id = ?")
         .bind(id.into_inner())
         .fetch_optional(db.get_ref())
@@ -138,10 +134,7 @@ pub async fn get_user_by_id(
     }
 }
 
-pub async fn get_user_by_username(
-    db: web::Data<MySqlPool>,
-    username: web::Path<String>,
-) -> impl Responder {
+pub async fn get_user_by_username(db: web::Data<MySqlPool>,username: web::Path<String>) -> impl Responder {
     let result = sqlx::query_as::<_, User>("SELECT * FROM users WHERE username = ?")
         .bind(username.into_inner())
         .fetch_optional(db.get_ref())
@@ -154,10 +147,7 @@ pub async fn get_user_by_username(
     }
 }
 
-pub async fn get_users_by_company_tin(
-    db: web::Data<MySqlPool>,
-    tin: web::Path<String>,
-) -> impl Responder {
+pub async fn get_users_by_company_tin(db: web::Data<MySqlPool>,tin: web::Path<String>,) -> impl Responder {
     let result = sqlx::query_as::<_, User>("SELECT * FROM users WHERE company_tin = ?")
         .bind(tin.into_inner())
         .fetch_all(db.get_ref())
@@ -169,11 +159,7 @@ pub async fn get_users_by_company_tin(
     }
 }
 
-pub async fn update_user(
-    db: web::Data<MySqlPool>,
-    id: web::Path<String>,
-    req: web::Json<CreateUser>,
-) -> impl Responder {
+pub async fn update_user(db: web::Data<MySqlPool>, tin: web::Path<String>, req: web::Json<CreateUser>) -> impl Responder {
     let now = Utc::now();
 
     let result = sqlx::query!(
@@ -181,7 +167,7 @@ pub async fn update_user(
         UPDATE users
         SET first_name = ?, last_name = ?, email = ?, username = ?,
             company_name = ?, company_id = ?, company_tin = ?, updated_at = ?
-        WHERE id = ?
+        WHERE company_tin = ?
         "#,
         req.first_name,
         req.last_name,
@@ -191,7 +177,7 @@ pub async fn update_user(
         req.company_id,
         req.company_tin,
         now,
-        id.into_inner(),
+        tin.into_inner(),
     )
     .execute(db.get_ref())
     .await;
@@ -219,15 +205,77 @@ pub async fn delete_user(db: web::Data<MySqlPool>,id: web::Path<String>) -> impl
     }
 }
 
-pub async fn register_user(db: web::Data<MySqlPool>, req: web::Json<CreateUser>) -> impl Responder {
-    create_user(db, req).await
-}
+// pub async fn register_user(db: web::Data<MySqlPool>, req: web::Json<CreateUser>) -> impl Responder {
+//     create_user(db, req).await
+// }
 
-pub async fn login_user(db: web::Data<MySqlPool>, req: web::Json<LoginRequest>,) -> impl Responder {
-    let user = sqlx::query_as::<_, User>("SELECT * FROM users WHERE username = ?")
-        .bind(&req.username)
+
+pub async fn register_user(db: web::Data<MySqlPool>, req: web::Json<CreateUser>) -> impl Responder {
+    // First, check if the company exists
+    let company_exists = sqlx::query_scalar::<_, i32>("SELECT 1 FROM companies WHERE tin = ? LIMIT 1")
+        .bind(&req.company_tin)
         .fetch_optional(db.get_ref())
         .await;
+
+
+    match company_exists {
+        Ok(Some(_)) => {
+            // Company exists, proceed with user creation
+            create_user(db, req).await
+        },
+        Ok(None) => {
+            // Company doesn't exist, create it first
+            let company_id = Uuid::new_v4().to_string();
+            let now = Utc::now();
+            
+            let company_result = sqlx::query!(
+                r#"
+                INSERT INTO companies (id, company_name, tin, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?)
+                "#,
+                company_id,
+                req.company_name,
+                req.company_tin,
+                now,
+                now
+            )
+            .execute(db.get_ref())
+            .await;
+            
+            // match company_result {
+            //     Ok(_) => {
+            //         // Now create the user
+            //         create_user(db, req).await
+            //     },
+            //     Err(err) => {
+            //         eprintln!("Company creation error: {:?}", err);
+            //         return HttpResponse::InternalServerError().body("Failed to create company")
+            //     }
+            // }
+
+            match company_result {
+                Ok(_) => create_user(db, req).await,
+                Err(err) => {
+                    eprintln!("Company creation error: {:?}", err);
+                    return HttpResponse::InternalServerError().body("Failed to create company");
+                }
+            }
+        },
+        Err(err) => {
+            eprintln!("DB query error: {:?}", err);
+            return HttpResponse::InternalServerError().body("Database error")
+        }
+    }
+}
+
+pub async fn login_user(db: web::Data<MySqlPool>, req: web::Json<LoginRequest>) -> impl Responder {
+    let user = sqlx::query_as::<_, User>(
+        "SELECT * FROM users WHERE username = ? AND company_tin = ?"
+    )
+    .bind(&req.username)
+    .bind(&req.company_tin)
+    .fetch_optional(db.get_ref())
+    .await;
 
     match user {
         Ok(Some(u)) => {
@@ -236,18 +284,18 @@ pub async fn login_user(db: web::Data<MySqlPool>, req: web::Json<LoginRequest>,)
                 Ok(hash) => hash,
                 Err(_) => return HttpResponse::InternalServerError().body("Invalid password hash format"),
             };
-            
+
             // Verify the password
             let argon2 = argon2::Argon2::default();
             let is_valid = parsed_hash.verify_password(&[&argon2], req.password.as_bytes()).is_ok();
-            
+
             if is_valid {
                 HttpResponse::Ok().json("Login successful")
             } else {
                 HttpResponse::Unauthorized().body("Invalid credentials")
             }
         }
-        Ok(None) => HttpResponse::NotFound().body("User not found"),
+        Ok(None) => HttpResponse::NotFound().body("User not found for this company"),
         Err(_) => HttpResponse::InternalServerError().body("DB error"),
     }
 }

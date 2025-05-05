@@ -1,10 +1,9 @@
-use std::env;
-
 use actix_web::{get, web, App, HttpServer, Responder};
+use backend::routes::{self};
 use dotenvy::dotenv;
 mod db;
 
-#[get("/")]
+#[get("")]
 async fn hello() -> impl Responder {
     "Hello world!"
 }
@@ -21,6 +20,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(web::Data::new(pool.clone()))
             .service(hello)
+            .configure(routes::user_routes::init)
     })
     .bind(("127.0.0.1", 8080))?
     .run()

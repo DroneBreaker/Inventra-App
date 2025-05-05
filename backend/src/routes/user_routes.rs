@@ -1,16 +1,24 @@
-use actix_web::{get, web, HttpResponse, Responder};
+use actix_web::{ web, HttpResponse, Responder};
 
 use crate::handlers::user_handler;
 
-#[get("/health")]
 pub async fn health_check() -> impl Responder {
-    HttpResponse::Ok().json("INVENTA API is running")
+    HttpResponse::Ok().json("INVENTRA API is running")
 }
 
 pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/users")
-        .route("/", web::get().to(user_handler::get_users))
-        .route("/", web::post().to(user_handler::create_user))
+        web::scope("/api")
+        .route("/health", web::get().to(health_check))
+        //    web::scope("/users") 
+        .route("/users", web::get().to(user_handler::get_users))
+        .route("/users", web::post().to(user_handler::create_user))
+        .route("/users/{id}", web::get().to(user_handler::get_user_by_id))
+        .route("/users/{username}", web::get().to(user_handler::get_user_by_username))
+        .route("/users/company/{tin}", web::get().to(user_handler::get_users_by_company_tin))
+        .route("/users/update/{tin}", web::put().to(user_handler::update_user))
+        .route("/users/delete/{tin}", web::delete().to(user_handler::delete_user))
+        .route("/register", web::post().to(user_handler::register_user))
+        .route("/login", web::post().to(user_handler::login_user))
     );
 }

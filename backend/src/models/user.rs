@@ -19,7 +19,7 @@ pub struct User {
     pub deleted_at: DateTime<Utc>,
 }
 
-#[derive(Deserialize, Serialize, sqlx::FromRow)]
+#[derive(Deserialize, Serialize)]
 pub struct CreateUser {
     pub first_name: String,
     pub last_name: String,

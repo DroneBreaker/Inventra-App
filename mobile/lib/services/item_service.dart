@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 class ItemService {
   // Base URL for API requests
-  static const String baseUrl = "http://localhost:1323";
+  static const String baseUrl = "http://localhost:8080";
 
   // Create item endpoint
   static Future<bool> createItem(Item item) async {
