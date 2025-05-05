@@ -79,6 +79,12 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         );
 
+        // Navigate to login
+        Navigator.pushReplacement(
+          context, 
+          MaterialPageRoute(builder: (context) => const LoginPage())
+        );
+
         // // Navigate based on user type
         // if(selected == "Taxpayer") {
         //   Navigator.pushReplacement(

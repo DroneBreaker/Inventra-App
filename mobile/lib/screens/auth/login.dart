@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:inventra/constants/app_colors.dart';
 import 'package:inventra/constants/app_titles.dart';
 import 'package:inventra/screens/auth/register.dart';
+import 'package:inventra/screens/main_wrapper.dart';
 import 'package:inventra/services/api_service.dart';
 import 'package:inventra/screens/home.dart';
 import 'package:inventra/widgets/app_text.dart';
@@ -148,28 +149,16 @@ class _LoginPageState extends State<LoginPage> {
 
 
   Future<void> handleLogin() async {
-    // Validate form
     if(!_formKey.currentState!.validate()) {
       return;
     }
-
-    // // Validate user type selection
-    // if(selected == "Select User Type") {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(
-    //       content: AppText(title: "Please select a user type"),
-    //       backgroundColor: AppColors.error,
-    //     ),
-    //   );
-    //   return;
-    // }
 
     // Show loading indicator
     showDialog(
       context: context, 
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return const Center(child: CircularProgressIndicator(),);
+        return const Center(child: CircularProgressIndicator());
       }
     );
 
@@ -180,38 +169,30 @@ class _LoginPageState extends State<LoginPage> {
         password: passwordController.text,
       );
 
-      // Hide loading indicator
-      Navigator.pop(context);
+      // Always dismiss dialog first
+      Navigator.of(context, rootNavigator: true).pop();
 
       final responseData = jsonDecode(response.body);
 
       if(response.statusCode == 200) {
-        // Login successful
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: AppText(title: responseData['message'] ?? 'Login successful!'),
-            backgroundColor: AppColors.success,
-          ),
-        );
+        // Store user session here (if needed)
+        // await storage.write(key: 'token', value: responseData['token']);
 
-        // Navigate based on user type
-        Navigator.pushReplacement(
-          context, 
-          MaterialPageRoute(builder: (context) => const HomePage()),
+        // Navigate to home
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const MainWrapper()),
+          (Route<dynamic> route) => false,
         );
       } else {
-        // Login failed
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: AppText(title: responseData['error'] ?? 'Login failed'),
+            content: Text(responseData['error'] ?? 'Login failed'),
             backgroundColor: AppColors.error,
           ),
         );
       }
     } catch (e) {
-      // Hide loading indicator
-      Navigator.pop(context);
-
+      Navigator.of(context, rootNavigator: true).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Error: ${e.toString()}"),
