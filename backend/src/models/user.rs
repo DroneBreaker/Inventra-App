@@ -18,3 +18,23 @@ pub struct User {
     pub updated_at: DateTime<Utc>,
     pub deleted_at: DateTime<Utc>,
 }
+
+#[derive(Deserialize, Serialize, sqlx::FromRow)]
+pub struct CreateUser {
+    pub first_name: String,
+    pub last_name: String,
+    pub email: String,
+    pub username: String,
+    pub company_name: String,
+    pub company_id: String,
+    pub company_tin: String,
+    // pub role: String,  //user, admin
+    pub password: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct LoginRequest {
+    pub username: String,
+    pub company_tin: String,
+    pub password: String,
+}

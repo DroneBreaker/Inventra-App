@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class APIService {
-  static const String baseUrl = "http://10.0.2.2:1323/api/v1";
+  static const String baseUrl = "http://10.0.2.2:1323/api";
 
   static Future<http.Response> registerUser ({
     required String firstName,
