@@ -4,6 +4,9 @@ import 'package:inventra/screens/auth/login.dart';
 import 'package:inventra/screens/home.dart';
 // import 'package:inventra/screens/home.dart';
 import 'package:inventra/screens/intro.dart';
+import 'package:inventra/screens/invoices.dart';
+import 'package:inventra/screens/menu.dart';
+import 'package:inventra/screens/reports.dart';
 
 void main() {
   runApp(const MyApp());
@@ -22,6 +25,9 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/register': (context) => const RegisterPage(),
         '/home': (context) => const HomePage(),
+        '/invoice': (context) => const InvoicePage(),
+        '/report': (context) => ReportPage(),
+        '/menu': (context) => MenuPage()
         // '/taxpayer': (context) => const TaxpayerPage(),
       },
       theme: ThemeData(

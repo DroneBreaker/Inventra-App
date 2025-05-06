@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:inventra/constants/app_colors.dart';
 import 'package:inventra/constants/app_titles.dart';
 import 'package:inventra/screens/auth/register.dart';
+import 'package:inventra/screens/home.dart';
 import 'package:inventra/screens/main_wrapper.dart';
 import 'package:inventra/services/api_service.dart';
-import 'package:inventra/screens/home.dart';
 import 'package:inventra/widgets/app_text.dart';
 import 'package:inventra/widgets/button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:inventra/widgets/button.dart';
 
 
@@ -169,21 +170,28 @@ class _LoginPageState extends State<LoginPage> {
         password: passwordController.text,
       );
 
-      // Always dismiss dialog first
+      
+      if (!mounted) return;
       Navigator.of(context, rootNavigator: true).pop();
 
       final responseData = jsonDecode(response.body);
 
       if(response.statusCode == 200) {
-        // Store user session here (if needed)
-        // await storage.write(key: 'token', value: responseData['token']);
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString("userData", jsonEncode(responseData['user']));
+        print("Navigation executing");
 
         // Navigate to home
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const MainWrapper()),
-          (Route<dynamic> route) => false,
+        if(!mounted) return;
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) {
+            print("Building MainWrapper -> to PAGE");
+            return const MainWrapper();
+          }),
+          (route) => false
         );
       } else {
+        if(!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(responseData['error'] ?? 'Login failed'),

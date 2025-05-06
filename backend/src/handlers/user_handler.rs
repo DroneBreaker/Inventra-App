@@ -268,6 +268,51 @@ pub async fn register_user(db: web::Data<MySqlPool>, req: web::Json<CreateUser>)
     }
 }
 
+// pub async fn login_user(db: web::Data<MySqlPool>, req: web::Json<LoginRequest>) -> impl Responder {
+//     let user = sqlx::query_as::<_, User>(
+//         "SELECT * FROM users WHERE username = ? AND company_tin = ?"
+//     )
+//     .bind(&req.username)
+//     .bind(&req.company_tin)
+//     .fetch_optional(db.get_ref())
+//     .await;
+
+//     match user {
+//         Ok(Some(u)) => {
+//             // Parse the stored password hash
+//             let parsed_hash = match argon2::PasswordHash::new(&u.password) {
+//                 Ok(hash) => hash,
+//                 Err(_) => return HttpResponse::InternalServerError().body("Invalid password hash format"),
+//             };
+
+//             // Verify the password
+//             let argon2 = argon2::Argon2::default();
+//             let is_valid = parsed_hash.verify_password(&[&argon2], req.password.as_bytes()).is_ok();
+
+//             if is_valid {
+//                 HttpResponse::Ok().json("Login successful")
+//                 // HttpResponse::Ok().json(json!({
+//                 //     "message": "Login successful",
+//                 //     "token": token,
+//                 //     "user": {
+//                 //         "id": user.id,
+//                 //         "username": user.username,
+//                 //         "email": user.email,
+//                 //         "first_name": user.first_name,
+//                 //         "last_name": user.last_name,
+//                 //         "company_id": user.company_id,
+//                 //         "company_tin": user.company_tin
+//                 //     }
+//                 // }));
+//             } else {
+//                 HttpResponse::Unauthorized().body("Invalid credentials")
+//             }
+//         }
+//         Ok(None) => HttpResponse::NotFound().body("User not found for this company"),
+//         Err(_) => HttpResponse::InternalServerError().body("DB error"),
+//     }
+// }
+
 pub async fn login_user(db: web::Data<MySqlPool>, req: web::Json<LoginRequest>) -> impl Responder {
     let user = sqlx::query_as::<_, User>(
         "SELECT * FROM users WHERE username = ? AND company_tin = ?"
@@ -282,7 +327,9 @@ pub async fn login_user(db: web::Data<MySqlPool>, req: web::Json<LoginRequest>) 
             // Parse the stored password hash
             let parsed_hash = match argon2::PasswordHash::new(&u.password) {
                 Ok(hash) => hash,
-                Err(_) => return HttpResponse::InternalServerError().body("Invalid password hash format"),
+                Err(_) => return HttpResponse::InternalServerError().json(serde_json::json!({
+                    "error": "Invalid password hash format"
+                })),
             };
 
             // Verify the password
@@ -290,12 +337,32 @@ pub async fn login_user(db: web::Data<MySqlPool>, req: web::Json<LoginRequest>) 
             let is_valid = parsed_hash.verify_password(&[&argon2], req.password.as_bytes()).is_ok();
 
             if is_valid {
-                HttpResponse::Ok().json("Login successful")
+                HttpResponse::Ok().json(serde_json::json!({
+                    "message": "Login successful",
+                    "user": {
+                        "id": u.id,
+                        "first_name": u.first_name,
+                        "last_name": u.last_name,
+                        "username": u.username,
+                        "email": u.email,
+                        "company_id": u.company_id,
+                        "company_tin": u.company_tin
+                    }
+                }))
             } else {
-                HttpResponse::Unauthorized().body("Invalid credentials")
+                HttpResponse::Unauthorized().json(serde_json::json!({
+                    "error": "Invalid credentials"
+                }))
             }
         }
-        Ok(None) => HttpResponse::NotFound().body("User not found for this company"),
-        Err(_) => HttpResponse::InternalServerError().body("DB error"),
+        Ok(None) => HttpResponse::NotFound().json(serde_json::json!({
+            "error": "User not found for this company"
+        })),
+        Err(err) => {
+            eprintln!("DB error: {:?}", err);
+            HttpResponse::InternalServerError().json(serde_json::json!({
+                "error": "Database error"
+            }))
+        },
     }
 }

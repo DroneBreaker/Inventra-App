@@ -64,7 +64,7 @@ class APIService {
         'company_tin': companyTIN,
         'password': password,
       }),
-    );
+    ).timeout(const Duration(seconds: 10));
 
     return response;
   } on http.ClientException catch(e) {
