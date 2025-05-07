@@ -16,7 +16,7 @@ class AppTitle {
   static const String logInButton = "Log In";
 
   // HOME
-  static const String recentTransaction = "Recent Transaction";
+  static const String recentTransaction = "Recent transaction";
 
   //TAXPAYER
   static const String taxpayerTitle = "Enter details to issue an invoice";

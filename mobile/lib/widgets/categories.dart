@@ -4,13 +4,14 @@ import 'package:inventra/widgets/app_text.dart';
 
 Widget buildCategories() {
   final categories = [
-    {'icon': Icons.create, 'label': "Create Invoice", 'route': "/invoice", 'color': AppColors.success},
+    {'icon': Icons.create, 'label': "Create Invoice", 'route': "/create-invoice", 'color': AppColors.success},
     {'icon': Icons.attach_money, 'label': "Advance Invoice", 'route': "/advance-invoice", 'color': Colors.yellow},
     {'icon': Icons.people, 'label': "Customers", 'route': "/customers", 'color': AppColors.success},
     {'icon': Icons.shopping_basket, 'label': "Items", 'route': "/items", 'color': Colors.orange},
     {'icon': Icons.add_shopping_cart, 'label': "Expenses", 'route': "/expenses", 'color': Colors.red},
     {'icon': Icons.analytics, 'label': "Income", 'route': "/income", 'color': Colors.green},
   ];
+  
 
   return StatefulBuilder(builder: (context, setState) {
     return GridView.builder(
@@ -45,8 +46,8 @@ Widget _buildCategoryItem(
   required String route,
   required Color color,
 }) {
-  return GestureDetector(
-    onTap: () => Navigator.pushNamed(context, route),
+  return InkWell(
+    onTap: () => Navigator.of(context).pushNamed(route),
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [

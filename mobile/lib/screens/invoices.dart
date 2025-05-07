@@ -11,7 +11,9 @@ class _InvoicePageState extends State<InvoicePage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: const Scaffold()
+      child: const Scaffold(
+        body: Center(child: Text("Hello INVOICE"),),
+      )
     );
   }
 }

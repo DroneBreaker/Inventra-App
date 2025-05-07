@@ -5,7 +5,7 @@ import 'package:inventra/constants/app_colors.dart';
 import 'package:inventra/constants/app_titles.dart';
 import 'package:inventra/screens/auth/register.dart';
 import 'package:inventra/screens/home.dart';
-import 'package:inventra/screens/main_wrapper.dart';
+import 'package:inventra/wrappers/main_wrapper.dart';
 import 'package:inventra/services/api_service.dart';
 import 'package:inventra/widgets/app_text.dart';
 import 'package:inventra/widgets/button.dart';
@@ -33,19 +33,8 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Container(
-          height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-              AppColors.success,
-              AppColors.white
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          )
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 220.0, left: 20, right: 20),
+        body: Padding(
+            padding: const EdgeInsets.only(top: 200.0, left: 20, right: 20),
             child: Form(
               key: _formKey,
               child: Column(
@@ -144,7 +133,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           )
         ),
-      ),
     );
   }
 
