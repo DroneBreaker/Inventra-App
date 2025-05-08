@@ -26,9 +26,9 @@ class Button extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialButton(
       elevation: 2,
-      hoverColor: AppColors.grey900,
+      hoverColor: Colors.grey,
       height: 50,
-      textColor: Colors.black54,
+      textColor: Colors.grey[400],
       onPressed: onTap,
       color: colors,
       // materialTapTargetSize: size,

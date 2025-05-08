@@ -14,7 +14,9 @@ pub struct Item {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub deleted_at: DateTime<Utc>,
-        // isTaxable, isTaxable, Discount
+    pub is_taxable: bool, 
+    pub is_taxinclusive: bool,
+        // isTaxable, Discount
 }
 
 #[derive(Debug, Serialize, Deserialize, sqlx::Type)]

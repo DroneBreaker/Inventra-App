@@ -91,7 +91,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       child: Scaffold(
         body: SingleChildScrollView(
           child: Container(
-            height: MediaQuery.of(context).size.height,
+            height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top,
             child: Column(
               children: [
 

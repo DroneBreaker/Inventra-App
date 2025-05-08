@@ -12,39 +12,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final List _categories = [
-    {
-      "name": "Create Invoice",
-       "icon": Icon(Icons.inventory, color: AppColors.success,)
-    },
-    {
-      "name": "Advance Invoice",
-       "icon": Icon(Icons.inventory, color: AppColors.primary,)
-    },
-    {
-      "name": "Customers",
-       "icon": Icon(Icons.people, color: AppColors.buttonSecondary,)
-    },
-    {
-      "name": "Items / Service",
-       "icon": Icon(Icons.shopping_basket, color: Colors.amber,)
-    },
-    {
-      "name": "Expenses",
-       "icon": Icon(Icons.track_changes)
-    },
-    {
-      "name": "Income",
-       "icon": Icon(Icons.summarize)
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
+        child: Padding(
             padding: const EdgeInsets.only(left: 30.0, top: 20, right: 35, bottom: 30),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,13 +86,10 @@ class _HomePageState extends State<HomePage> {
                 
                 // Transaction section
                 transaction(),
-                
-                const SizedBox(height: 20),
               ],
             ),
           ),
         ),
-      ),
     );
   }
 }

@@ -43,23 +43,6 @@ Widget transaction() {
             ],
           )
         )
-        // GridView.builder(
-        //   shrinkWrap: true,
-        //   itemCount: transactionTypes.length,
-        //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        //     crossAxisCount: 3
-        //     ), 
-        //     itemBuilder: (context, index) {
-        //       final transactionType = transactionTypes[index];
-        //       // return Row(
-        //       //   children: [
-        //       //    Tab(child: ,),
-        //       //    Tab(),
-        //       //    Tab()
-        //       //   ],
-        //       // );
-        //     },
-        //   ),
       ],
   );
 }

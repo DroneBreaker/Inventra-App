@@ -123,18 +123,19 @@ class _RegisterPageState extends State<RegisterPage> {
     return SafeArea(
       child: Scaffold(
         body: Container(
+          color: Colors.black,
           height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-              AppColors.success,
-              AppColors.white
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          )
-          ),
+          // decoration: BoxDecoration(
+          //   gradient: LinearGradient(colors: [
+          //     AppColors.success,
+          //     AppColors.white
+          //   ],
+          //   begin: Alignment.topLeft,
+          //   end: Alignment.bottomRight,
+          // )
+          // ),
           child: Padding(
-            padding: const EdgeInsets.only(top: 60.0, left: 20, right: 20),
+            padding: const EdgeInsets.only(top: 30.0, left: 20, right: 20),
             child: Form(
               key: _formKey,
               child: Column(
@@ -149,7 +150,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       contentPadding: const EdgeInsets.only(left: 20),
                       labelText: "First Name",
-                      labelStyle: TextStyle(color: Colors.black, fontSize: 18)
+                      labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
                     ),
                     validator: (value) {
                       if(value == null || value.isEmpty) {
@@ -170,7 +171,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       contentPadding: const EdgeInsets.only(left: 20),
                       labelText: "Last Name",
-                      labelStyle: TextStyle(color: Colors.black, fontSize: 18)
+                      labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
                     ),
                     validator: (value) {
                       if(value == null || value.isEmpty) {
@@ -191,7 +192,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       contentPadding: const EdgeInsets.only(left: 20),
                       labelText: "Email",
-                      labelStyle: TextStyle(color: Colors.black, fontSize: 18)
+                      labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
                     ),
                     validator: (value) {
                       if(value == null || value.isEmpty) {
@@ -212,7 +213,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       contentPadding: const EdgeInsets.only(left: 20),
                       labelText: "Username",
-                      labelStyle: TextStyle(color: Colors.black, fontSize: 18)
+                      labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
                     ),
                     validator: (value) {
                       if(value == null || value.isEmpty) {
@@ -233,7 +234,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       contentPadding: const EdgeInsets.only(left: 20),
                       labelText: "Company Name",
-                      labelStyle: TextStyle(color: Colors.black, fontSize: 18)
+                      labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
                     ),
                     validator: (value) {
                       if(value == null || value.isEmpty) {
@@ -251,7 +252,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       contentPadding: const EdgeInsets.only(left: 20),
                       labelText: "Company ID",
-                      labelStyle: TextStyle(color: Colors.black, fontSize: 18)
+                      labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
                     ),
                     validator: (value) {
                       if(value == null || value.isEmpty) {
@@ -263,6 +264,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                   ),
                   const SizedBox(height: 20,),
+                  // Company Textform field
                   TextFormField(
                     controller: companyTINController,
                     decoration: InputDecoration(
@@ -271,7 +273,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       contentPadding: const EdgeInsets.only(left: 20),
                       labelText: "Company TIN",
-                      labelStyle: TextStyle(color: Colors.black, fontSize: 18)
+                      labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
                     ),
                     validator: (value) {
                       if(value == null || value.isEmpty) {
@@ -283,6 +285,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                   ),
                   const SizedBox(height: 20,),
+                  // Passwod Textform field
                   TextFormField(
                     obscureText: true,
                     controller: passwordController,
@@ -292,7 +295,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       contentPadding: const EdgeInsets.only(left: 20),
                       labelText: "Password",
-                      labelStyle: TextStyle(color: Colors.black, fontSize: 18)
+                      labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
                     ),
                     validator: (value) {
                       if(value == null || value.isEmpty) {
@@ -313,7 +316,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       contentPadding: const EdgeInsets.only(left: 20),
                       labelText: "Confirm Password",
-                      labelStyle: TextStyle(color: Colors.black, fontSize: 18)
+                      labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
                     ),
                     validator: (value) {
                       if(value == null || value.isEmpty) {
@@ -324,9 +327,11 @@ class _RegisterPageState extends State<RegisterPage> {
                       }
                     },
                   ),
+                  SizedBox(height: 10,),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      AppText(title: AppTitle.hasAccount, fontSize: 18,),
+                      AppText(title: AppTitle.hasAccount, fontSize: 18, colors: Colors.grey,),
                       Button(buttonText: AppTitle.loginButton, fontSize: 18, onTap: () {
                         Navigator.pushReplacement(
                           context, 
@@ -335,12 +340,13 @@ class _RegisterPageState extends State<RegisterPage> {
                       })
                     ],
                   ),
+                  SizedBox(height: 15,),
                   SizedBox(
                     width: double.infinity,
                     height: 60,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black54,
+                          backgroundColor: Colors.grey,
                           foregroundColor: Colors.white
                       ),
                       onPressed: () {

@@ -33,105 +33,112 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Padding(
-            padding: const EdgeInsets.only(top: 200.0, left: 20, right: 20),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  Center(child: AppText(title: AppTitle.loginTitle, fontSize: 30,),),
-                  const SizedBox(height: 20,),
-                  TextFormField(
-                    controller: usernameController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)
+        body: Container(
+          height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top,
+          decoration: BoxDecoration(
+            color: Colors.white70
+          ),
+          child: Padding(
+              padding: const EdgeInsets.only(top: 200.0, left: 20, right: 20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    Center(child: AppText(title: AppTitle.loginTitle, fontSize: 30,),),
+                    const SizedBox(height: 20,),
+                    TextFormField(
+                      controller: usernameController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10)
+                        ),
+                        contentPadding: const EdgeInsets.only(left: 20),
+                        labelText: "Username",
+                        labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
                       ),
-                      contentPadding: const EdgeInsets.only(left: 20),
-                      labelText: "Username",
-                      labelStyle: TextStyle(color: Colors.black, fontSize: 18)
+                      validator: (value) {
+                        if(value == null || value.isEmpty) {
+                          return AppTitle.noUsernameError;
+                        }
+                        if(value.length < 6) {
+                          return AppTitle.usernameLengthError;
+                        }
+                      }
                     ),
-                    validator: (value) {
-                      if(value == null || value.isEmpty) {
-                        return AppTitle.noUsernameError;
-                      }
-                      if(value.length < 6) {
-                        return AppTitle.usernameLengthError;
-                      }
-                    }
-                  ),
-                  const SizedBox(height: 20,),
-                  TextFormField(
-                    controller: companyTINController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)
+                    const SizedBox(height: 20,),
+                    TextFormField(
+                      controller: companyTINController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10)
+                        ),
+                        contentPadding: const EdgeInsets.only(left: 20),
+                        labelText: "Company TIN",
+                        labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
                       ),
-                      contentPadding: const EdgeInsets.only(left: 20),
-                      labelText: "Company TIN",
-                      labelStyle: TextStyle(color: Colors.black, fontSize: 18)
+                      validator: (value) {
+                        if(value == null || value.isEmpty) {
+                          return AppTitle.companyTINError;
+                        }
+                        if(value.length < 6) {
+                          return AppTitle.validCompanyTINError;
+                        }
+                      }
                     ),
-                    validator: (value) {
-                      if(value == null || value.isEmpty) {
-                        return AppTitle.companyTINError;
-                      }
-                      if(value.length < 6) {
-                        return AppTitle.validCompanyTINError;
-                      }
-                    }
-                  ),
-                  const SizedBox(height: 20,),
-                  TextFormField(
-                    obscureText: true,
-                    controller: passwordController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10)
+                    const SizedBox(height: 20,),
+                    TextFormField(
+                      obscureText: true,
+                      controller: passwordController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10)
+                        ),
+                        contentPadding: const EdgeInsets.only(left: 20),
+                        labelText: "Password",
+                        labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
                       ),
-                      contentPadding: const EdgeInsets.only(left: 20),
-                      labelText: "Password",
-                      labelStyle: TextStyle(color: Colors.black, fontSize: 18)
-                    ),
-                    validator: (value) {
-                      if(value == null || value.isEmpty) {
-                        return AppTitle.noPasswordError;
-                      }
-                      if(value.length < 6) {
-                        return AppTitle.passwordLengthError;
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 20,),
-                  Row(
-                    children: [
-                      AppText(title: AppTitle.noAccount, fontSize: 18,),
-                      Button(buttonText: AppTitle.createAccount, fontSize: 18, onTap: () {
-                        Navigator.pushReplacement(
-                          context, 
-                          MaterialPageRoute(builder: (context) => RegisterPage())
-                        );
-                      })
-                    ],
-                  ),
-                  const SizedBox(height: 20,),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 60,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black54,
-                          foregroundColor: Colors.white
-                      ),
-                      onPressed: () {
-                        handleLogin();
+                      validator: (value) {
+                        if(value == null || value.isEmpty) {
+                          return AppTitle.noPasswordError;
+                        }
+                        if(value.length < 6) {
+                          return AppTitle.passwordLengthError;
+                        }
                       },
-                      child: AppText(title: AppTitle.loginButton, colors: Colors.black, fontSize: 20,),
                     ),
-                  )
-                ],
+                    const SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        AppText(title: AppTitle.noAccount, fontSize: 18, colors: Colors.grey,),
+                        Button(buttonText: AppTitle.createAccount, fontSize: 18, onTap: () {
+                          Navigator.pushReplacement(
+                            context, 
+                            MaterialPageRoute(builder: (context) => RegisterPage())
+                          );
+                        })
+                      ],
+                    ),
+                    const SizedBox(height: 20,),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 60,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey,
+                            foregroundColor: Colors.white
+                        ),
+                        onPressed: () {
+                          handleLogin();
+                        },
+                        child: AppText(title: AppTitle.loginButton, colors: Colors.black, fontSize: 20,),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
-          )
+        )
         ),
     );
   }

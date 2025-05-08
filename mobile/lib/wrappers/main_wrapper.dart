@@ -34,21 +34,21 @@ class _MainWrapperState extends State<MainWrapper> {
         children: pages,
       ),
       bottomNavigationBar: SizedBox(
-        height: 150,
+        height: 140,
         child: BottomNavigationBar(
-          currentIndex: currentPage,
-           unselectedItemColor: Colors.grey[400],
-          selectedItemColor: Colors.amber[800],
-          onTap: (index) => setState(() => currentPage = index),
-          iconSize: 30,
-          type: BottomNavigationBarType.fixed,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.receipt), label: 'Invoices'),
-            BottomNavigationBarItem(icon: Icon(Icons.analytics), label: 'Reports'),
-            BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
-          ],
-        ),
+              currentIndex: currentPage,
+              unselectedItemColor: Colors.grey[400],
+              selectedItemColor: Colors.amber[800],
+              onTap: (index) => setState(() => currentPage = index),
+              iconSize: 30,
+              type: BottomNavigationBarType.fixed,
+              items: const [
+                BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+                BottomNavigationBarItem(icon: Icon(Icons.receipt), label: 'Invoices'),
+                BottomNavigationBarItem(icon: Icon(Icons.analytics), label: 'Reports'),
+                BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
+              ],
+            ),
       ),
     );
   }
