@@ -17,18 +17,19 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-            padding: const EdgeInsets.only(left: 30.0, top: 20, right: 35, bottom: 30),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.only(left: 30.0, top: 20, right: 35, bottom: 80),
+            child: ListView(
+              // crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Header
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Icon(Icons.notification_add, size: 30, color: Colors.black),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 120.0),
-                      child: AppText(title: "Droners Inc", colors: Colors.black, fontSize: 20),
+                    Expanded(
+                      child: Center(
+                          child: AppText(title: "Droners Inc", colors: Colors.black, fontSize: 20)
+                        ),
                     ),
                     IconButton(
                       onPressed: () {}, 

@@ -5,7 +5,7 @@ use serde::Serialize;
 use sqlx::MySqlPool;
 use uuid::Uuid;
 
-use crate::models::user::{CreateUser, LoginRequest, User};
+use crate::{models::user::{CreateUser, LoginRequest, User}, utils::jwt::generate_jwt};
 
 
 #[derive(Serialize)]
@@ -337,8 +337,19 @@ pub async fn login_user(db: web::Data<MySqlPool>, req: web::Json<LoginRequest>) 
             let is_valid = parsed_hash.verify_password(&[&argon2], req.password.as_bytes()).is_ok();
 
             if is_valid {
+                let token = match generate_jwt(&u.company_tin) {
+                    Ok(t) => t,
+                    Err(_) => {
+                        return HttpResponse::InternalServerError().json(serde_json::json!({
+                            "error": "Failed to generate token"
+                        }))
+                    }
+                };
+
+
                 HttpResponse::Ok().json(serde_json::json!({
                     "message": "Login successful",
+                    "token": token,
                     "user": {
                         "id": u.id,
                         "first_name": u.first_name,

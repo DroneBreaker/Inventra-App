@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 actix-web = "4.10.2"
+actix-web-httpauth = "0.8.2"
 argon2 = { version = "0.5.3", features= ["password-hash"] }
 bcrypt = "0.17.0"
 chrono = { version = "0.4.40", features = ["serde"] }

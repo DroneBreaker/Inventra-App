@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inventra/widgets/app_text.dart';
 
 class AllItemsPage extends StatefulWidget {
   const AllItemsPage({super.key});
@@ -10,6 +11,12 @@ class AllItemsPage extends StatefulWidget {
 class _AllItemsPageState extends State<AllItemsPage> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return SafeArea(
+      child: Scaffold(
+        body: Center(
+          child: AppText(title: "ALL ITEMS PAGE IS UNDER CONSTRUCTION", fontSize: 18,),
+        ),
+      ),
+    );
   }
 }

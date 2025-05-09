@@ -10,12 +10,13 @@ pub struct Item {
     pub price: f64,
     pub company_tin: String,
     pub item_category: ItemCategory, // Regular, Rent, Exempt
+    pub is_taxable: bool, 
+    pub is_tax_inclusive: bool,
+    pub tourism_cst_option: TourismCSTOption,
     pub remarks: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub deleted_at: DateTime<Utc>,
-    pub is_taxable: bool, 
-    pub is_taxinclusive: bool,
         // isTaxable, Discount
 }
 
@@ -24,6 +25,13 @@ pub enum ItemCategory {
     RegularVAT,
     Rent,
     Exempt
+}
+
+#[derive(Debug, Serialize, Deserialize, sqlx::Type)]
+pub enum TourismCSTOption {
+    None,
+    CST,
+    Tourism
 }
 
 impl std::fmt::Display for ItemCategory {
