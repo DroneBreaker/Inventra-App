@@ -33,9 +33,7 @@ class _MainWrapperState extends State<MainWrapper> {
         index: currentPage,
         children: pages,
       ),
-      bottomNavigationBar: SizedBox(
-        height: 140,
-        child: BottomNavigationBar(
+      bottomNavigationBar: BottomNavigationBar(
               currentIndex: currentPage,
               unselectedItemColor: Colors.grey[400],
               selectedItemColor: Colors.amber[800],
@@ -49,7 +47,6 @@ class _MainWrapperState extends State<MainWrapper> {
                 BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
               ],
             ),
-      ),
     );
   }
 }

@@ -1,12 +1,40 @@
 use actix_web::{web, HttpResponse, Responder};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use chrono::Utc;
+use serde::Deserialize;
 use sqlx::MySqlPool;
 use uuid::Uuid;
 use serde_json::json;
 
 
-use crate::{models::item::Item, utils::jwt::validate_jwt};
+use crate::{models::item::{Item, ItemCategory, TourismCSTOption}, utils::jwt::validate_jwt};
+
+#[derive(Debug, Deserialize)]
+pub struct CreateItemRequest {
+    pub id: i64,
+    pub item_code: i64,
+    pub item_name: String,
+    pub item_description: String,
+    pub price: f64,
+    pub company_tin: String,
+    pub item_category: ItemCategory, // Regular, Rent, Exempt
+    pub is_taxable: bool, 
+    pub is_tax_inclusive: bool,
+    pub tourism_cst_option: TourismCSTOption,
+    pub remarks: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct UpdateItemRequest {
+    pub item_name: Option<String>,
+    pub item_description: Option<String>,
+    pub price: Option<f64>,
+    pub item_category: Option<ItemCategory>,
+    pub is_taxable: Option<bool>,
+    pub is_tax_inclusive: Option<bool>,
+    pub tourism_cst_option: Option<TourismCSTOption>,
+    pub remarks: Option<String>,
+}
 
 
 pub async fn get_items(db: web::Data<MySqlPool>, credentials: BearerAuth) -> impl Responder {
@@ -48,7 +76,7 @@ pub async fn get_items(db: web::Data<MySqlPool>, credentials: BearerAuth) -> imp
 } 
 
 
-pub async fn create_items(db: web::Data<MySqlPool>, req: web::Json<Item>, credentials: BearerAuth,) -> impl Responder {
+pub async fn create_items(db: web::Data<MySqlPool>, req: web::Json<CreateItemRequest>, credentials: BearerAuth,) -> impl Responder {
     // Validate JWT first
     let claims = match validate_jwt(credentials.token()) {
         Ok(claims) => claims,
@@ -67,8 +95,8 @@ pub async fn create_items(db: web::Data<MySqlPool>, req: web::Json<Item>, creden
         r#"
             INSERT INTO items 
                 (id, item_code, item_name, item_description, price, is_taxable, is_tax_inclusive, 
-                tourism_cst_option, company_tin, created_at, updated_at, deleted_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                tourism_cst_option, company_tin, remarks, created_at, updated_at, deleted_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         "#,
         id,
         req.item_code,
@@ -78,6 +106,7 @@ pub async fn create_items(db: web::Data<MySqlPool>, req: web::Json<Item>, creden
         req.is_taxable,
         req.is_tax_inclusive,
         req.tourism_cst_option,
+        req.remarks,
         claims.sub, // Use company_tin from JWT claims
         now,
         now,
@@ -89,8 +118,7 @@ pub async fn create_items(db: web::Data<MySqlPool>, req: web::Json<Item>, creden
         Ok(result) => {
             if result.rows_affected() == 1 {
                 HttpResponse::Created().json(json!({
-                    "id": id,
-                    "message": "Item created successfully"
+                    "message": "Item created successfully",
                 }))
             } else {
                 HttpResponse::InternalServerError().json(json!({
@@ -107,3 +135,115 @@ pub async fn create_items(db: web::Data<MySqlPool>, req: web::Json<Item>, creden
         }
     }
 }
+
+// pub async fn get_item_by_id(db: web::Data<MySqlPool>, path: web::Path<(i64, String)>, _:(item_id, company_tin)) -> impl Responder {
+//     let (item_id, company_tin) = path.into_inner();
+
+//     let result = sqlx::query_as!(
+//         Item,
+//         "SELECT * FROM items WHERE id = ? AND company_tin = ?",
+//         item_id,
+//         company_tin
+//     )
+//     .fetch_optional(db.get_ref())
+//     .await;
+
+//     match result {
+//         Ok(Some(item)) => HttpResponse::Ok().json(item),
+//         Ok(None) => HttpResponse::NotFound().json(serde_json::json!({ "error": "Item not found" })),
+//         Err(e) => {
+//             eprintln!("DB fetch error: {:?}", e);
+//             HttpResponse::InternalServerError().json(serde_json::json!({ "error": "Failed to fetch item" }))
+//         }
+//     }
+// }
+
+// pub async fn get_items_by_company_tin( db: web::Data<MySqlPool>, path: web::Path<String>) -> impl Responder {
+//     let company_tin = path.into_inner();
+
+//     let result = sqlx::query_as!(
+//         Item,
+//         "SELECT * FROM items WHERE company_tin = ?",
+//         company_tin
+//     )
+//     .fetch_all(db.get_ref())
+//     .await;
+
+//     match result {
+//         Ok(items) => HttpResponse::Ok().json(items),
+//         Err(e) => {
+//             eprintln!("DB fetch error: {:?}", e);
+//             HttpResponse::InternalServerError().json({ "error": "Failed to fetch items" })
+//         }
+//     }
+// }
+
+// pub async fn update_item(
+//     pool: web::Data<MySqlPool>,
+//     path: web::Path<(String, String)>, // (item_id, company_tin)
+//     payload: web::Json<UpdateItemRequest>,
+// ) -> impl Responder {
+//     let (item_id, company_tin) = path.into_inner();
+//     let now = Utc::now();
+
+//     let result = sqlx::query!(
+//         r#"UPDATE items SET
+//             item_name = COALESCE(?, item_name),
+//             item_description = COALESCE(?, item_description),
+//             price = COALESCE(?, price),
+//             item_category = COALESCE(?, item_category),
+//             is_taxable = COALESCE(?, is_taxable),
+//             is_tax_inclusive = COALESCE(?, is_tax_inclusive),
+//             tourism_cst_option = COALESCE(?, tourism_cst_option),
+//             remarks = COALESCE(?, remarks),
+//             updated_at = ?
+//         WHERE id = ? AND company_tin = ?"#,
+//         payload.item_name.as_deref(),
+//         payload.item_description.as_deref(),
+//         payload.price,
+//         payload.item_category.map(|c| c as ItemCategory),
+//         payload.is_taxable,
+//         payload.is_tax_inclusive,
+//         payload.tourism_cst_option.map(|o| o as TourismCSTOption),
+//         payload.remarks.as_deref(),
+//         now,
+//         item_id,
+//         company_tin
+//     )
+//     .execute(pool.get_ref())
+//     .await;
+
+//     match result {
+//         Ok(_) => HttpResponse::Ok().json({ "message": "Item updated" }),
+//         Err(e) => {
+//             eprintln!("DB update error: {:?}", e);
+//             HttpResponse::InternalServerError().json({ "error": "Failed to update item" })
+//         }
+//     }
+// }
+
+
+// pub async fn delete_item(
+//     pool: web::Data<MySqlPool>,
+//     path: web::Path<(String, String)>, // (item_id, company_tin)
+// ) -> impl Responder {
+//     let (item_id, company_tin) = path.into_inner();
+//     let now = Utc::now();
+
+//     let result = sqlx::query!(
+//         "UPDATE items SET deleted_at = ? WHERE id = ? AND company_tin = ?",
+//         now,
+//         item_id,
+//         company_tin
+//     )
+//     .execute(pool.get_ref())
+//     .await;
+
+//     match result {
+//         Ok(_) => HttpResponse::Ok().json({ "message": "Item deleted" }),
+//         Err(e) => {
+//             eprintln!("DB delete error: {:?}", e);
+//             HttpResponse::InternalServerError().json({ "error": "Failed to delete item" })
+//         }
+//     }
+// }

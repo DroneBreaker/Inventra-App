@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
@@ -14,9 +14,9 @@ pub struct Item {
     pub is_tax_inclusive: bool,
     pub tourism_cst_option: TourismCSTOption,
     pub remarks: String,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-    pub deleted_at: DateTime<Utc>,
+    pub created_at: NaiveDateTime,    // pub created_at: DateTime<Utc>,
+    pub updated_at: NaiveDateTime,    // pub updated_at: DateTime<Utc>,
+    pub deleted_at: NaiveDateTime,    // pub deleted_at: DateTime<Utc>,
         // isTaxable, Discount
 }
 

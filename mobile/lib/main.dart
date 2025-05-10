@@ -5,6 +5,7 @@ import 'package:inventra/screens/create_invoice.dart';
 import 'package:inventra/screens/home.dart';
 import 'package:inventra/screens/intro.dart';
 import 'package:inventra/screens/invoices.dart';
+import 'package:inventra/wrappers/customer_wrapper.dart';
 import 'package:inventra/wrappers/item_wrapper.dart';
 import 'package:inventra/screens/items/all_items.dart';
 import 'package:inventra/screens/menu.dart';
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
         '/reports': (context) => ReportPage(),
         '/menu': (context) => MenuPage(),
         '/create-invoice': (context) => const CreateInvoice(),
-        '/customers': (context) => const CreateInvoice(),
+        '/customers': (context) => const CustomerWrapper(),
         '/items': (context) => const ItemWrapper(),
         '/all-items': (context) => const AllItemsPage(),
       },

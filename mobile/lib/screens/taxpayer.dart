@@ -339,7 +339,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                 ),
                                 const SizedBox(width: 15),
                                 Button(
-                                  buttonText: AppTitle.addPartnerButton,
+                                  buttonText: AppTitle.addClientButton,
                                   onTap: () {},
                                   // size: const Size(110, 55),
                                   colors: AppColors.buttonPrimary,
@@ -1057,7 +1057,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                 child: const Text('Close'),
               ),
               Button(
-                buttonText: AppTitle.addPartnerButton,
+                buttonText: AppTitle.addClientButton,
                 onTap: () {
                   _addPartner();
                   Navigator.pop(context);

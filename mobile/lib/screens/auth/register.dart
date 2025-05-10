@@ -142,6 +142,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: [
                   Center(child: AppText(title: AppTitle.registerTitle, fontSize: 30,),),
                   const SizedBox(height: 20,),
+
+                  
+                  // First Name TextForm field
                   TextFormField(
                     controller: firstNameController,
                     decoration: InputDecoration(
@@ -162,6 +165,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     }
                   ),
                   const SizedBox(height: 20,),
+
+
                   //  Last Name TextForm field
                   TextFormField(
                     controller: lastNameController,
@@ -183,9 +188,12 @@ class _RegisterPageState extends State<RegisterPage> {
                     }
                   ),
                   const SizedBox(height: 20,),
+
+
                   // Email TextForm field
                   TextFormField(
                     controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10)
@@ -204,6 +212,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                   ),
                   const SizedBox(height: 20,),
+
+
                   // Username TextForm field
                   TextFormField(
                     controller: usernameController,
@@ -225,6 +235,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                   ),
                   const SizedBox(height: 20,),
+
+
                   // Company Name TextForm field
                   TextFormField(
                     controller: companyNameController,
@@ -244,6 +256,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   
                   const SizedBox(height: 20,),
+
+                  // Company ID TextForm field
                   TextFormField(
                     controller: companyIDController,
                     decoration: InputDecoration(
@@ -264,7 +278,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                   ),
                   const SizedBox(height: 20,),
-                  // Company Textform field
+
+
+                  // Company TIN Textform field
                   TextFormField(
                     controller: companyTINController,
                     decoration: InputDecoration(
@@ -285,7 +301,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                   ),
                   const SizedBox(height: 20,),
-                  // Passwod Textform field
+
+
+                  // Password Textform field
                   TextFormField(
                     obscureText: true,
                     controller: passwordController,
@@ -307,6 +325,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                   ),
                   const SizedBox(height: 20,),
+
+
+                  // 
                   TextFormField(
                     obscureText: true,
                     controller: confirmPasswordController,

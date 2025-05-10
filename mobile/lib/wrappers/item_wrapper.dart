@@ -40,9 +40,7 @@ class _ItemWrapperState extends State<ItemWrapper> {
             ],
           ),
         ),
-      bottomNavigationBar: SizedBox(
-        height: 140,
-        child: BottomNavigationBar(
+      bottomNavigationBar: BottomNavigationBar(
                 currentIndex: _currentItemTab,
                 onTap: (index) => setState(() => _currentItemTab = index),
                 unselectedItemColor: Colors.grey[400],
@@ -58,7 +56,6 @@ class _ItemWrapperState extends State<ItemWrapper> {
                   ),
                 ],
               ),
-      ),
     );
   }
 }

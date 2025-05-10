@@ -23,7 +23,7 @@ class AppTitle {
   static const String invoiceDate = "Invoice Date";
   static const String invoiceTime = "Invoice Time";
   static const String documentType = "Please select a document type";
-  static const String addPartnerButton = "Add Partner";
+  static const String addClientButton = "Add Client";
   static const String invoiceNumberField = "Invoice Number";
   static const String totalAmountField = "Total Amount";
   static const String itemField = "Product";

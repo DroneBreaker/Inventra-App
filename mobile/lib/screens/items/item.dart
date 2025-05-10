@@ -21,12 +21,12 @@ class _ItemsPageState extends State {
   final TextEditingController companyTINController = TextEditingController();
 
   // ITEM CATERGORY
-  final selectedItemCategory = "Regular VAT";
   final itemCategoryOptions = [
     "Regular VAT",
     "Rent",
     "Exempt"
   ];
+  String selectedItemCategory = "Regular VAT";
 
   // TAX INCLUSIVE
   bool isTaxable = false;
@@ -142,6 +142,8 @@ class _ItemsPageState extends State {
                           ),
                         ),
                         const SizedBox(height: 20),
+
+
                         // Item Category Dropdown
                         DropdownButtonFormField(
                           value: selectedItemCategory,
@@ -157,9 +159,17 @@ class _ItemsPageState extends State {
                               child: Text(option),
                             );
                           }).toList(),
-                          onChanged: (_) {},
+                          onChanged: (String? newValue) {
+                            if(newValue != null) {
+                              setState(() {
+                                selectedItemCategory = newValue;
+                              });
+                            }
+                          },
                         ),
                         const SizedBox(height: 20), 
+
+
                         // Checkboxes in a Column instead of Row to prevent overflow
                         Column(
                           children: [

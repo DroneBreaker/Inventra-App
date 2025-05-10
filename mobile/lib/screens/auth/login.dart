@@ -31,8 +31,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
+    return Scaffold(
         body: Container(
           // height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top,
           decoration: BoxDecoration(
@@ -46,6 +45,9 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       Center(child: AppText(title: AppTitle.loginTitle, fontSize: 30,),),
                       const SizedBox(height: 20,),
+
+
+                      // Username TextForm field
                       TextFormField(
                         controller: usernameController,
                         decoration: InputDecoration(
@@ -66,6 +68,9 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       ),
                       const SizedBox(height: 20,),
+
+
+                      // Company TIN TextForm field
                       TextFormField(
                         controller: companyTINController,
                         decoration: InputDecoration(
@@ -86,6 +91,9 @@ class _LoginPageState extends State<LoginPage> {
                         }
                       ),
                       const SizedBox(height: 20,),
+
+
+                      // Password TextForm field
                       TextFormField(
                         obscureText: true,
                         controller: passwordController,
@@ -139,7 +147,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
           ),
-        )
     );
   }
 
