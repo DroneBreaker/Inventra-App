@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:inventra/screens/create_invoice.dart';
 import 'package:inventra/screens/home.dart';
 import 'package:inventra/screens/invoices.dart';
+import 'package:inventra/wrappers/advance_invoice_wrapper.dart';
 import 'package:inventra/wrappers/item_wrapper.dart';
-import 'package:inventra/screens/items/item.dart';
 import 'package:inventra/screens/menu.dart';
 import 'package:inventra/screens/reports.dart';
 
@@ -23,7 +22,8 @@ class _MainWrapperState extends State<MainWrapper> {
     const InvoicePage(),
     const ReportPage(),
     const MenuPage(),
-    const ItemWrapper()
+    const ItemWrapper(),
+    const AdvanceInvoiceWrapper()
   ];
 
   @override

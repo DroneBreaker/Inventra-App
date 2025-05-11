@@ -162,6 +162,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       if(value.length < 6) {
                         return AppTitle.usernameLengthError;
                       }
+                      return null;
                     }
                   ),
                   const SizedBox(height: 20,),
@@ -185,6 +186,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       if(value.length < 6) {
                         return AppTitle.validCompanyTINError;
                       }
+                      return null;
                     }
                   ),
                   const SizedBox(height: 20,),
@@ -209,6 +211,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       if(value.length < 6) {
                         return AppTitle.passwordLengthError;
                       }
+                      return null;
                     },
                   ),
                   const SizedBox(height: 20,),
@@ -232,6 +235,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       if(value.length < 6) {
                         return AppTitle.passwordLengthError;
                       }
+                      return null;
                     },
                   ),
                   const SizedBox(height: 20,),
@@ -252,6 +256,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       if(value == null || value.isEmpty) {
                         return AppTitle.companyNameError;
                       }
+                      return null;
                     },
                   ),
                   
@@ -275,6 +280,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       if(value.length < 6) {
                         return AppTitle.validCompanyIDError;
                       }
+                      return null;
                     },
                   ),
                   const SizedBox(height: 20,),
@@ -298,6 +304,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       if(value.length < 6) {
                         return AppTitle.validCompanyTINError;
                       }
+                      return null;
                     },
                   ),
                   const SizedBox(height: 20,),
@@ -322,6 +329,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       if(value.length < 6) {
                         return AppTitle.passwordLengthError;
                       }
+                      return null;
                     },
                   ),
                   const SizedBox(height: 20,),
@@ -346,6 +354,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       if(value.length < 6) {
                         return AppTitle.passwordLengthError;
                       }
+                      return null;
                     },
                   ),
                   SizedBox(height: 10,),

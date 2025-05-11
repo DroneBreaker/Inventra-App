@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:inventra/wrappers/main_wrapper.dart';
-import 'package:inventra/widgets/app_text.dart';
 
 class CreateInvoice extends StatefulWidget {
   const CreateInvoice({super.key});
@@ -90,7 +88,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
-          child: Container(
+          child: SizedBox(
             height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top,
             child: Column(
               children: [

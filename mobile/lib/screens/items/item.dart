@@ -69,6 +69,7 @@ class _ItemsPageState extends State {
                             if(value == null || value.isEmpty) {
                               return AppTitle.noItemCodeError;
                             }
+                            return null;
                           },
                         ),
                         const SizedBox(height: 20), 
@@ -88,6 +89,7 @@ class _ItemsPageState extends State {
                             if(value == null || value.isEmpty) {
                               return AppTitle.invalidItemNameError;
                             }
+                            return null;
                           },
                         ),
                         const SizedBox(height: 20), 
@@ -124,6 +126,7 @@ class _ItemsPageState extends State {
                             if(value == null || value.isEmpty) {
                               return AppTitle.priceIsEmptyError;
                             }
+                            return null;
                           },
                         ),
                         const SizedBox(height: 20), 

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:inventra/constants/app_colors.dart';
 import 'package:inventra/constants/app_titles.dart';
 import 'package:inventra/screens/auth/register.dart';
-import 'package:inventra/screens/home.dart';
 import 'package:inventra/wrappers/main_wrapper.dart';
 import 'package:inventra/services/api_service.dart';
 import 'package:inventra/widgets/app_text.dart';
@@ -65,6 +64,7 @@ class _LoginPageState extends State<LoginPage> {
                           if(value.length < 6) {
                             return AppTitle.usernameLengthError;
                           }
+                          return null;
                         }
                       ),
                       const SizedBox(height: 20,),
@@ -88,6 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                           if(value.length < 6) {
                             return AppTitle.validCompanyTINError;
                           }
+                          return null;
                         }
                       ),
                       const SizedBox(height: 20,),
@@ -112,6 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                           if(value.length < 6) {
                             return AppTitle.passwordLengthError;
                           }
+                          return null;
                         },
                       ),
                       const SizedBox(height: 20,),

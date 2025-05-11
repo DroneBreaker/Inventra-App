@@ -41,9 +41,7 @@ class _CustomerWrapperState extends State<CustomerWrapper> {
           ],
         )
       ),
-      bottomNavigationBar: SizedBox(
-        height: 140,
-        child: BottomNavigationBar(
+      bottomNavigationBar: BottomNavigationBar(
           currentIndex: currentCustomerPage,
           unselectedItemColor: Colors.grey[400],
           selectedItemColor: Colors.amber[800],
@@ -61,7 +59,6 @@ class _CustomerWrapperState extends State<CustomerWrapper> {
             BottomNavigationBarItem(icon: Icon(Icons.import_export), label: "Export"),
           ]
         ),
-      ),
     );
   }
 }

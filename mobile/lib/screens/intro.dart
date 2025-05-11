@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:inventra/constants/app_colors.dart';
 import 'package:inventra/screens/auth/register.dart';
 import 'package:inventra/screens/auth/login.dart';
 import 'package:inventra/widgets/app_text.dart';

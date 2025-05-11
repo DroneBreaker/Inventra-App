@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:inventra/screens/items/all_items.dart';
 import 'package:inventra/screens/items/item.dart';
-import 'package:inventra/widgets/app_text.dart';
 
 class ItemWrapper extends StatefulWidget {
   const ItemWrapper({super.key});
