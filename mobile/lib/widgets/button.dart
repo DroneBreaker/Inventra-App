@@ -23,32 +23,43 @@ class Button extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialButton(
-      elevation: 2,
-      hoverColor: Colors.grey,
-      height: 50,
-      textColor: Colors.grey[400],
+    return TextButton(
       onPressed: onTap,
-      color: colors,
-      // materialTapTargetSize: size,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (icon != null) ...[
+          if(icon != null) ...[
             icon!,
-            const SizedBox(width: 8),
+            const SizedBox(width: 8,)
           ],
-          AppText(
-            title: buttonText,
-            colors: colors,
-            fontSize: fontSize,
-            fontWeight: FontWeight.bold,
-          ),
+          AppText(title: buttonText, colors: colors, fontSize: fontSize,fontWeight: FontWeight.bold,)
         ],
-      ),
-    );
+    ),);
+    // return MaterialButton(
+    //   elevation: 2,
+    //   hoverColor: Colors.grey,
+    //   height: 50,
+    //   onPressed: onTap,
+    //   color: colors,
+    //   // materialTapTargetSize: size,
+    //   shape: RoundedRectangleBorder(
+    //     borderRadius: BorderRadius.circular(10.0),
+    //   ),
+    //   child: Row(
+    //     mainAxisSize: MainAxisSize.min,
+    //     children: [
+    //       if (icon != null) ...[
+    //         icon!,
+    //         const SizedBox(width: 8),
+    //       ],
+    //       AppText(
+    //         title: buttonText,
+    //         colors: colors,
+    //         fontSize: fontSize,
+    //         fontWeight: FontWeight.bold,
+    //       ),
+    //     ],
+    //   ),
+    // );
   }
 }

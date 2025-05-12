@@ -362,7 +362,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       AppText(title: AppTitle.hasAccount, fontSize: 18, colors: Colors.grey,),
-                      Button(buttonText: AppTitle.loginButton, fontSize: 18, onTap: () {
+                      Button(buttonText: AppTitle.loginButton, fontSize: 18, colors: Colors.black, onTap: () {
                         Navigator.pushReplacement(
                           context, 
                           MaterialPageRoute(builder: (context) => LoginPage())

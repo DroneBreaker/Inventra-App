@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:inventra/widgets/app_text.dart';
+import 'package:inventra/widgets/button.dart';
 
 class CreateAdvanceIncome extends StatefulWidget {
   const CreateAdvanceIncome({super.key});
@@ -233,13 +234,31 @@ class _CreateAdvanceIncomeState extends State<CreateAdvanceIncome> {
                             ),
                           ),
                           SizedBox(height: 20,),
+
+
+                          // Related Invoices
+
+
+
+                          // Button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 60,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // handleAdvanceIncome();
+                              }, 
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.grey
+                              ),
+                              child: AppText(title: "Submit", colors: Colors.white, fontSize: 18,),)
+                          )
                       
           
                       // pub struct AdvanceIncome {
               
               // pub related_invoices: Vec<String>,
-              // pub created_at: DateTime<Utc>,
-              // pub updated_at: DateTime<Utc>
+             
           // }
                     ],
                   ),

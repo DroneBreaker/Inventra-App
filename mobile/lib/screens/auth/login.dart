@@ -116,33 +116,38 @@ class _LoginPageState extends State<LoginPage> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 20,),
+                      // const SizedBox(height: 10,),
+
+
+                      // 
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           AppText(title: AppTitle.noAccount, fontSize: 18, colors: Colors.grey,),
-                          Button(buttonText: AppTitle.createAccount, fontSize: 18, onTap: () {
-                            Navigator.pushReplacement(
-                              context, 
-                              MaterialPageRoute(builder: (context) => RegisterPage())
-                            );
-                          })
+
+                          Button(buttonText: AppTitle.createAccount, colors: Colors.grey, fontSize: 18, onTap: () {
+                              Navigator.pushReplacement(
+                                context, 
+                                MaterialPageRoute(builder: (context) => RegisterPage())
+                              );
+                            }),
                         ],
                       ),
-                      const SizedBox(height: 20,),
+                      // const SizedBox(height: 20,),
+
+
+                      // Button
                       SizedBox(
                         width: double.infinity,
                         height: 60,
                         child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey,
-                              foregroundColor: Colors.white
-                          ),
                           onPressed: () {
                             handleLogin();
-                          },
-                          child: AppText(title: AppTitle.loginButton, colors: Colors.black, fontSize: 20,),
-                        ),
+                          }, 
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey
+                          ),
+                          child: AppText(title: AppTitle.loginButton, colors: Colors.white, fontSize: 18,),)
                       )
                     ],
                   ),

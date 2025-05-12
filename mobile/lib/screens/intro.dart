@@ -28,16 +28,17 @@ class _IntroPageState extends State<IntroPage> {
                 children: [
                   Center(child: AppText(title: "INVENTRA", fontSize: 45,),),
                   Padding(
-                    padding: const EdgeInsets.only(left: 100.0, top: 280),
+                    padding: const EdgeInsets.only(left: 30.0, top: 280, right: 30),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Button(buttonText: "Sign In", fontSize: 20, onTap: () {
+                        Button(buttonText: "Sign In", fontSize: 20, colors: Colors.grey, onTap: () {
                           Navigator.pushReplacement(
                             context, 
                             MaterialPageRoute(builder: (context) => const LoginPage())
                           );
                         }),
-                        Button(buttonText: "Sign Up", fontSize: 20, onTap: () {
+                        Button(buttonText: "Sign Up", fontSize: 20, colors: Colors.grey, onTap: () {
                           Navigator.pushReplacement(
                           context, 
                           MaterialPageRoute(builder: (context) => const RegisterPage()),
