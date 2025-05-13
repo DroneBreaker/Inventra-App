@@ -71,6 +71,9 @@ class _CreateAdvanceIncomeState extends State<CreateAdvanceIncome> {
     "Fully Applied"
   ];
 
+
+  bool _isRecurring = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -237,6 +240,17 @@ class _CreateAdvanceIncomeState extends State<CreateAdvanceIncome> {
 
 
                           // Related Invoices
+                          // Recurring Option
+                          SwitchListTile(
+                            title: Text('Recurring Advance'),
+                            subtitle: Text('Is this a recurring advance payment?'),
+                            value: _isRecurring,
+                            onChanged: (bool value) {
+                              setState(() {
+                                _isRecurring = value;
+                              });
+                            },
+                          ),
 
 
 

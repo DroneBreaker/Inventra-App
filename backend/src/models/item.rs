@@ -6,7 +6,7 @@ pub struct Item {
     pub id: String,
     pub item_code: i64,
     pub item_name: String,
-    pub item_description: String,
+    pub item_description: Option<String>,
     pub price: f64,
     pub company_tin: String,
     pub item_category: ItemCategory, // Regular, Rent, Exempt
