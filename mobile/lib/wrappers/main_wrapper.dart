@@ -45,7 +45,7 @@ class _MainWrapperState extends State<MainWrapper> {
               items: const [
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
                 BottomNavigationBarItem(icon: Icon(Icons.receipt), label: 'Invoices'),
-                BottomNavigationBarItem(icon: Icon(Icons.analytics), label: 'Reports'),
+                BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Reports'),
                 BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
               ],
             ),

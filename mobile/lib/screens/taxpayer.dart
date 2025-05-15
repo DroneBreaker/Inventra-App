@@ -266,7 +266,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                             const SizedBox(
                               height: 10,
                             ),
-                            Wrap(
+                          Wrap(
                                 spacing: 12.0,
                                 runSpacing: 12.0,
                                 children: flags.map((flag) {
@@ -311,7 +311,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                 //   colors: Colors.white,
                                 //   fontSize: 16,
                                 // ),
-                                ),
+                          ),
                             const SizedBox(height: 20),
 
                             // Business Partner section

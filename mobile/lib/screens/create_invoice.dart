@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:inventra/constants/app_colors.dart';
 import 'package:inventra/constants/app_titles.dart';
 import 'package:inventra/widgets/app_text.dart';
+import 'package:inventra/widgets/button.dart';
 
 class CreateInvoice extends StatefulWidget {
   const CreateInvoice({super.key});
@@ -12,7 +14,7 @@ class CreateInvoice extends StatefulWidget {
 
 class _CreateInvoiceState extends State<CreateInvoice> {
   final TextEditingController invoiceNumberController = TextEditingController();
-  final TextEditingController sellerController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
   final TextEditingController clientNameController =
       TextEditingController();
   final TextEditingController clientTINController = TextEditingController();
@@ -125,7 +127,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   final List<Map<String, dynamic>> flags = [
     {
       'text': 'Invoice',
-      'icon': Icons.inventory,
+      'icon': Icons.receipt_long,
     },
     {
       'text': 'Purchase',
@@ -162,232 +164,306 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                   Positioned(
                     top: 10,
                     left: 8,
-                    child: Icon(Icons.arrow_back, size: 40,),
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      icon: Icon(Icons.arrow_back, size: 40,)
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0, right: 20, top: 70),
                     child: Form(
+                      key: _formKey,
                       child: Column(
                         children: [
-                          AppText(title: "INVOICE FUCKERS"),
-                          SizedBox(height: 10,),
-                      
+                          FormField<String>(validator: (value) {
+                            if (selectedFlag == null) {
+                              return 'Please select an invoice type';
+                            }
+                            return null;
+                          }, 
+                          builder: (FormFieldState<String> state) {
+                            return Column(
+                              children: [
+                                AppText(title: "INVOICE FUCKERS"),
+                                SizedBox(height: 10,),
+                            
 
-                          // Invoice Number TextForm field
-                          TextFormField(
-                            controller: invoiceNumberController,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.only(left: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10)
-                              ),
-                              hintText: "Invoice Number"
-                            ),
-                          ),
-                          SizedBox(height: 20,),
+                                // Document Type
+                                AppText(title: "Select Document Type", fontSize: 17,),
+                                SizedBox(height: 10,),
 
-
-                          // Seller TextForm field
-                          TextFormField(
-                            controller: sellerController,
-                            enabled: false,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.only(left: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10)
-                              ),
-                              hintText: "Seller"
-                            ),
-                          ),
-                          SizedBox(height: 20,),
-
-
-                          // Client TextForm field
-                          TextFormField(
-                            controller: clientNameController,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.only(left: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10)
-                              ),
-                              hintText: "Client Name"
-                            ),
-                          ),
-                          SizedBox(height: 20,),
-
-
-                          // Client TIN
-                          TextFormField(
-                            controller: clientTINController,
-                            enabled: false,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.only(left: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10)
-                              ),
-                              hintText: "Client TIN"
-                            ),
-                          ),
-                          SizedBox(height: 20,),
-
-
-                          // Invoice Date TextForm field
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Form(
-                                  child: TextFormField(
-                                      controller: invoiceDateController,
-                                      keyboardType: TextInputType.datetime,
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(10)
-                                        ),
-                                        contentPadding: EdgeInsets.only(top: 40, left: 20),
-                                        hintText: "Invoice Date"
-                                      ),
-                                      onChanged: (value) {
-                                        print('Invoice Date: $value');
-                                      },
-                                    ),
+                                
+                                // INVOICE FLAGS
+                                Wrap(
+                                      spacing: 25.0,
+                                      runSpacing: 12.0,
+                                      children: flags.map((flag) {
+                                        final bool isActive =
+                                            activeButton == flag['text'];
+                                        return Button(
+                                            
+                                              buttonText: flag['text'],
+                                              onTap: () {
+                                                setState(() {
+                                                  activeButton = flag['text'];
+                                                  selectedFlag = flag['text'];
+                                                });
+                                                                      
+                                                state.didChange(flag['text']);
+                                              },
+                                              colors: AppColors.buttonPrimary,
+                                              fontSize: 16,
+                                              icon: isActive
+                                                  ? Icon(
+                                                      flag['icon'],
+                                                      color: Colors.amber,
+                                                      size: 25,
+                                                    )
+                                                  : null);
+                                      }).toList()
+                            
+                                      // Button(
+                                      //   buttonText: "Purchase",
+                                      //   onTap: () {},
+                                      //   colors: Colors.white,
+                                      //   fontSize: 16,
+                                      // ),
+                                      // Button(
+                                      //   buttonText: "Refund",
+                                      //   onTap: () {},
+                                      //   colors: Colors.white,
+                                      //   fontSize: 16,
+                                      // ),
+                                      // Button(
+                                      //   buttonText: "Credit Note",
+                                      //   onTap: () {},
+                                      //   colors: Colors.white,
+                                      //   fontSize: 16,
+                                      // ),
                                 ),
-                              ),
-                              IconButton(onPressed: () => _selectInvoiceDate(context), 
-                                icon: Icon(Icons.calendar_month, size: 30,)
-                              )
-                            ],
-                          ),
-                          SizedBox(height: 20,),
-
-
-                          // Invoice Time TextForm field
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Form(
-                                  child: TextFormField(
-                                      controller: invoiceTimeController,
-                                      keyboardType: TextInputType.datetime,
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(10)
-                                        ),
-                                        contentPadding: EdgeInsets.only(top: 40, left: 20),
-                                        hintText: "Invoice Time"
-                                      ),
-                                      onChanged: (value) {
-                                        print('Invoice Time: $value');
-                                      },
+                                SizedBox(height: 20,),
+                            
+                            
+                                // Invoice Number TextForm field
+                                TextFormField(
+                                  controller: invoiceNumberController,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10)
                                     ),
+                                    hintText: "Invoice Number"
+                                  ),
                                 ),
-                              ),
-                              IconButton(onPressed: () => _selectInvoiceTime(context), 
-                                icon: Icon(Icons.calendar_month, size: 30,)
-                              )
-                            ],
-                          ),
-                          SizedBox(height: 20,),
-
-
-                          // Due Date TextForm field
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Form(
-                                  child: TextFormField(
-                                      controller: dueDateController,
-                                      keyboardType: TextInputType.datetime,
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(10)
-                                        ),
-                                        contentPadding: EdgeInsets.only(top: 40, left: 20),
-                                        hintText: "Due Date"
-                                      ),
-                                      onChanged: (value) {
-                                        print('Due Date: $value');
-                                      },
+                                SizedBox(height: 20,),
+                            
+                            
+                                // Username TextForm field
+                                TextFormField(
+                                  controller: usernameController,
+                                  enabled: false,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10)
                                     ),
+                                    hintText: "Seller"
+                                  ),
                                 ),
-                              ),
-                              IconButton(onPressed: () => _selectDueDate(context), 
-                                icon: Icon(Icons.calendar_month, size: 30,)
-                              )
-                            ],
-                          ),
-                          SizedBox(height: 20,),
-
-
-                          // Total VAT TextForm field
-                          TextFormField(
-                            controller: totalVATController,
-                            enabled: false,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.only(left: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10)
-                              ),
-                              hintText: "Total VAT"
-                            ),
-                          ),
-                          SizedBox(height: 20,),
-
-
-                          // Total Amount TextForm field
-                          TextFormField(
-                            controller: totalAmountController,
-                            enabled: false,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.only(left: 20),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10)
-                              ),
-                              hintText: "Total Amount"
-                            ),
-                          ),
-                          SizedBox(height: 20,),
-
-
-                          // Invoice Status Dropdown
-                          DropdownButtonFormField(
-                            value: selectedInvoiceStatus,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              labelText: 'Invoice Status',
-                            ),
-                            items: invoiceStatus.map((String option) {
-                              return DropdownMenuItem(
-                                value: option,
-                                child: Text(option),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              if(newValue != null) {
-                                setState(() {
-                                  selectedItemCategory = newValue;
-                                });
-                              }
-                            },
-                          ),
-                          SizedBox(height: 20,),
-
-
-                          // Button
-                          SizedBox(
-                            width: double.infinity,
-                            height: 60,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.grey[400]
-                              ),
-                              onPressed: () {
-                              // handleInvoice();
-                              }, 
-                              child: AppText(title: "Submit", fontSize: 17, colors: Colors.black,)
-                            ),
-                          )
+                                SizedBox(height: 20,),
+                            
+                            
+                                // Client TextForm field
+                                TextFormField(
+                                  controller: clientNameController,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10)
+                                    ),
+                                    hintText: "Client Name"
+                                  ),
+                                ),
+                                SizedBox(height: 20,),
+                            
+                            
+                                // Client TIN
+                                TextFormField(
+                                  controller: clientTINController,
+                                  enabled: false,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10)
+                                    ),
+                                    hintText: "Client TIN"
+                                  ),
+                                ),
+                                SizedBox(height: 20,),
+                            
+                            
+                                // Invoice Date TextForm field
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Form(
+                                        child: TextFormField(
+                                            controller: invoiceDateController,
+                                            keyboardType: TextInputType.datetime,
+                                            decoration: InputDecoration(
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10)
+                                              ),
+                                              contentPadding: EdgeInsets.only(top: 40, left: 20),
+                                              hintText: "Invoice Date"
+                                            ),
+                                            onChanged: (value) {
+                                              print('Invoice Date: $value');
+                                            },
+                                          ),
+                                      ),
+                                    ),
+                                    IconButton(onPressed: () => _selectInvoiceDate(context), 
+                                      icon: Icon(Icons.calendar_month, size: 30,)
+                                    )
+                                  ],
+                                ),
+                                SizedBox(height: 20,),
+                            
+                            
+                                // Invoice Time TextForm field
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Form(
+                                        child: TextFormField(
+                                            controller: invoiceTimeController,
+                                            keyboardType: TextInputType.datetime,
+                                            decoration: InputDecoration(
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10)
+                                              ),
+                                              contentPadding: EdgeInsets.only(top: 40, left: 20),
+                                              hintText: "Invoice Time"
+                                            ),
+                                            onChanged: (value) {
+                                              print('Invoice Time: $value');
+                                            },
+                                          ),
+                                      ),
+                                    ),
+                                    IconButton(onPressed: () => _selectInvoiceTime(context), 
+                                      icon: Icon(Icons.calendar_month, size: 30,)
+                                    )
+                                  ],
+                                ),
+                                SizedBox(height: 20,),
+                            
+                            
+                                // Due Date TextForm field
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Form(
+                                        child: TextFormField(
+                                            controller: dueDateController,
+                                            keyboardType: TextInputType.datetime,
+                                            decoration: InputDecoration(
+                                              border: OutlineInputBorder(
+                                                borderRadius: BorderRadius.circular(10)
+                                              ),
+                                              contentPadding: EdgeInsets.only(top: 40, left: 20),
+                                              hintText: "Due Date"
+                                            ),
+                                            onChanged: (value) {
+                                              print('Due Date: $value');
+                                            },
+                                          ),
+                                      ),
+                                    ),
+                                    IconButton(onPressed: () => _selectDueDate(context), 
+                                      icon: Icon(Icons.calendar_month, size: 30,)
+                                    )
+                                  ],
+                                ),
+                                SizedBox(height: 20,),
+                            
+                            
+                                // Total VAT TextForm field
+                                TextFormField(
+                                  controller: totalVATController,
+                                  enabled: false,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10)
+                                    ),
+                                    hintText: "Total VAT"
+                                  ),
+                                ),
+                                SizedBox(height: 20,),
+                            
+                            
+                                // Total Amount TextForm field
+                                TextFormField(
+                                  controller: totalAmountController,
+                                  enabled: false,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.only(left: 20),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10)
+                                    ),
+                                    hintText: "Total Amount"
+                                  ),
+                                ),
+                                SizedBox(height: 20,),
+                            
+                            
+                                // Invoice Status Dropdown
+                                DropdownButtonFormField(
+                                  value: selectedInvoiceStatus,
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    labelText: 'Invoice Status',
+                                  ),
+                                  items: invoiceStatus.map((String option) {
+                                    return DropdownMenuItem(
+                                      value: option,
+                                      child: Text(option),
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? newValue) {
+                                    if(newValue != null) {
+                                      setState(() {
+                                        selectedItemCategory = newValue;
+                                      });
+                                    }
+                                  },
+                                ),
+                                SizedBox(height: 20,),
+                            
+                            
+                                // Button
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 60,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.grey[400]
+                                    ),
+                                    onPressed: () {
+                                    // handleInvoice();
+                                    }, 
+                                    child: AppText(title: "Submit", fontSize: 17, colors: Colors.black,)
+                                  ),
+                                )
+                              ],
+                            );
+                          }),
                         ],
                       ),
                     ),
