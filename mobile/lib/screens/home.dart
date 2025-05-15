@@ -17,7 +17,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-            padding: const EdgeInsets.only(left: 30.0, top: 20, right: 35, bottom: 80),
+            padding: const EdgeInsets.only(left: 30.0, top: 20, right: 35),
             child: ListView(
               // crossAxisAlignment: CrossAxisAlignment.start,
               children: [

@@ -95,7 +95,7 @@ pub async fn create_items(db: web::Data<MySqlPool>, req: web::Json<CreateItemReq
         r#"
             INSERT INTO items 
                 (id, item_code, item_name, item_description, price, is_taxable, is_tax_inclusive, 
-                tourism_cst_option, company_tin, remarks, created_at, updated_at, deleted_at)
+                tourism_cst_option, remarks, company_tin, created_at, updated_at, deleted_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         "#,
         id,
@@ -136,8 +136,56 @@ pub async fn create_items(db: web::Data<MySqlPool>, req: web::Json<CreateItemReq
     }
 }
 
-// pub async fn get_item_by_id(db: web::Data<MySqlPool>, path: web::Path<(i64, String)>, _:(item_id, company_tin)) -> impl Responder {
+pub async fn get_item_by_id(db: web::Data<MySqlPool>, path: web::Path<(String, String)>) -> impl Responder {
+    let (id, company_tin) = path.into_inner();
+
+    let query = r#"
+        SELECT * FROM items WHERE id = ? AND company_tin = ? AND deleted_at IS NULL
+    "#;
+
+    let item = sqlx::query_as::<_, Item>(query)
+        .bind(id)
+        .bind(company_tin)
+        .fetch_optional(db.get_ref())
+        .await;
+
+    match item {
+        Ok(Some(item)) => HttpResponse::Ok().json(item),
+        Ok(None) => HttpResponse::NotFound().body("Item not found"),
+        Err(_) => HttpResponse::InternalServerError().body("Failed to fetch item"),
+    }
+}
+
+pub async fn get_clients_by_company_tin(db: web::Data<MySqlPool>, path: web::Path<String>,) -> impl Responder {
+    let company_tin = path.into_inner();
+
+    let query: &'static str = r#"
+        SELECT * FROM items WHERE company_tin = ? AND deleted_at IS NULL
+    "#;
+
+    let items = sqlx::query_as::<_, Item>(query)
+        .bind(company_tin)
+        .fetch_all(db.get_ref())
+        .await;
+
+    match items {
+        Ok(items) => HttpResponse::Ok().json(items),
+        Err(_) => HttpResponse::InternalServerError().body("Failed to fetch items"),
+    }
+}
+
+// pub async fn get_item_by_id(db: web::Data<MySqlPool>, path: web::Path<(String, String)>) -> impl Responder {
 //     let (item_id, company_tin) = path.into_inner();
+    
+//     // Parse the item_id from string to i64
+//     let item_id = match item_id.parse::<i64>() {
+//         Ok(id) => id,
+//         Err(_) => {
+//             return HttpResponse::BadRequest().json(
+//                 serde_json::json!({ "error": "Invalid item ID format" })
+//             );
+//         }
+//     };
 
 //     let result = sqlx::query_as!(
 //         Item,

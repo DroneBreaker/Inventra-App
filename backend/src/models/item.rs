@@ -16,7 +16,7 @@ pub struct Item {
     pub remarks: String,
     pub created_at: NaiveDateTime,    // pub created_at: DateTime<Utc>,
     pub updated_at: NaiveDateTime,    // pub updated_at: DateTime<Utc>,
-    pub deleted_at: NaiveDateTime,    // pub deleted_at: DateTime<Utc>,
+    pub deleted_at: Option<NaiveDateTime>,    // pub deleted_at: DateTime<Utc>,
         // isTaxable, Discount
 }
 

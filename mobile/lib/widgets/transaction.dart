@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inventra/constants/app_colors.dart';
 import 'package:inventra/constants/app_titles.dart';
 import 'package:inventra/widgets/app_text.dart';
 
@@ -32,12 +33,63 @@ Widget transaction() {
               ),
 
               SizedBox(
-                height: 100,
+                height: 300,
                 child: TabBarView(
                   children: [
-                    for(var type in transactionTypes)
-                    Center(child: AppText(title: "$type['label] content"),)
-                  ]
+                    // All Invoices Tab Content
+                    ListView.builder(
+                      itemCount: 60, // Example count
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: Colors.blue.shade100,
+                            child: Icon(Icons.receipt, color: Colors.blue),
+                          ),
+                          title: Text('Invoice #${1000 + index}'),
+                          subtitle: Text('May ${index + 10}, 2025'),
+                          trailing: Text('\$${(index + 1) * 100}.00', 
+                            style: TextStyle(fontWeight: FontWeight.bold)
+                          ),
+                        );
+                      }
+                    ),
+
+
+                    // Expenses Tab Content
+                    ListView.builder(
+                      itemCount: 15, // Example count
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: Colors.red.shade100,
+                            child: Icon(Icons.arrow_downward, color: Colors.red),
+                          ),
+                          title: Text('Equipment Purchase'),
+                          subtitle: Text('May ${index + 5}, 2025'),
+                          trailing: AppText(title: '-\$${(index + 2) * 75}.00', colors: AppColors.error, fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      }
+                    ),
+
+
+                    // Income Tab Content
+                  ListView.builder(
+                    itemCount: 34, // Example count
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.green.shade100,
+                          child: Icon(Icons.arrow_upward, color: Colors.green),
+                        ),
+                        title: AppText(title: 'Client Payment'),
+                        subtitle: AppText(title: 'May ${index + 1}, 2025'),
+                        trailing: AppText(title: '+\$${(index + 3) * 150}.00', colors: AppColors.success, fontWeight: FontWeight.bold, 
+                        ),
+                      );
+                    }
+                  ),
+                  ],
                 ),
               )
             ],

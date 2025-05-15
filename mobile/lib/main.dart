@@ -7,6 +7,7 @@ import 'package:inventra/screens/intro.dart';
 import 'package:inventra/screens/invoices.dart';
 import 'package:inventra/wrappers/advance_invoice_wrapper.dart';
 import 'package:inventra/wrappers/customer_wrapper.dart';
+import 'package:inventra/wrappers/income_wrapper.dart';
 import 'package:inventra/wrappers/item_wrapper.dart';
 import 'package:inventra/screens/items/all_items.dart';
 import 'package:inventra/screens/menu.dart';
@@ -39,6 +40,7 @@ class MyApp extends StatelessWidget {
         '/customers': (context) => const CustomerWrapper(),
         '/items': (context) => const ItemWrapper(),
         '/all-items': (context) => const AllItemsPage(),
+        '/income': (context) => const IncomeWrapper()
       },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
@@ -48,3 +50,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+
+// mercy black

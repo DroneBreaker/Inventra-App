@@ -42,6 +42,7 @@ class _AdvanceInvoiceWrapper extends State<AdvanceInvoiceWrapper> {
       ),
       bottomNavigationBar: BottomNavigationBar(
           currentIndex: currentAdvanceIncomePage,
+          backgroundColor: Colors.grey[700],
           unselectedItemColor: Colors.grey[400],
           selectedItemColor: Colors.amber[800],
           onTap: (index) {

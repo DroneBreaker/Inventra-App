@@ -42,6 +42,7 @@ class _ItemWrapperState extends State<ItemWrapper> {
       bottomNavigationBar: BottomNavigationBar(
                 currentIndex: _currentItemTab,
                 onTap: (index) => setState(() => _currentItemTab = index),
+                backgroundColor: Colors.grey[700],
                 unselectedItemColor: Colors.grey[400],
                 selectedItemColor: Colors.amber[800],
                 items: const [

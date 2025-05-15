@@ -35,6 +35,8 @@ class _MainWrapperState extends State<MainWrapper> {
       ),
       bottomNavigationBar: BottomNavigationBar(
               currentIndex: currentPage,
+              elevation: 16,
+              backgroundColor: Colors.grey[700],
               unselectedItemColor: Colors.grey[400],
               selectedItemColor: Colors.amber[800],
               onTap: (index) => setState(() => currentPage = index),

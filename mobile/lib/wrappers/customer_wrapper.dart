@@ -43,6 +43,7 @@ class _CustomerWrapperState extends State<CustomerWrapper> {
       ),
       bottomNavigationBar: BottomNavigationBar(
           currentIndex: currentCustomerPage,
+              backgroundColor: Colors.grey[700],
           unselectedItemColor: Colors.grey[400],
           selectedItemColor: Colors.amber[800],
           onTap: (index) {

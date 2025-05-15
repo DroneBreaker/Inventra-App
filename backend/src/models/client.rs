@@ -4,19 +4,19 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 pub struct Client {
-    id: String,
-    client_name: String,
-    client_email: String,
-    client_tin: String,
-    client_phone: String,
-    company_tin: String,
-    client_type: ClientType, // customer, supllier, export
-    created_at: DateTime<Utc>,
-    updated_at: DateTime<Utc>,
-    deleted_at: DateTime<Utc>
+    pub id: String,
+    pub client_name: String,
+    pub client_email: String,
+    pub client_tin: String,
+    pub client_phone: String,
+    pub company_tin: String,
+    pub client_type: ClientType, // customer, supllier, export
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub deleted_at: DateTime<Utc>
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, sqlx::Type)]
 pub enum ClientType {
     Customer,
     Supplier,
