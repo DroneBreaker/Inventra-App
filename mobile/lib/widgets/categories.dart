@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:inventra/constants/app_colors.dart';
+import 'package:inventra/constants/routes.dart';
 import 'package:inventra/widgets/app_text.dart';
 
 Widget buildCategories() {
   final categories = [
-    {'icon': Icons.create, 'label': "Create Invoice", 'route': "/create-invoice", 'color': AppColors.success},
-    {'icon': Icons.attach_money, 'label': "Advance Invoice", 'route': "/advance-invoice", 'color': Colors.yellow},
-    {'icon': Icons.people, 'label': "Customers", 'route': "/customers", 'color': AppColors.success},
-    {'icon': Icons.shopping_basket, 'label': "Items", 'route': "/items", 'color': Colors.orange},
-    {'icon': Icons.add_shopping_cart, 'label': "Expenses", 'route': "/expenses", 'color': Colors.red},
-    {'icon': Icons.analytics, 'label': "Income", 'route': "/income", 'color': Colors.green},
+    {'icon': Icons.create, 'label': "Create Invoice", 'route': RouteNames.createInvoice, 'color': AppColors.success},
+    {'icon': Icons.attach_money, 'label': "Advance Invoice", 'route': RouteNames.advanceInvoice, 'color': Colors.yellow},
+    {'icon': Icons.people, 'label': "Customers", 'route': RouteNames.customers, 'color': AppColors.success},
+    {'icon': Icons.shopping_basket, 'label': "Items", 'route': RouteNames.items, 'color': Colors.orange},
+    {'icon': Icons.add_shopping_cart, 'label': "Expenses", 'route': RouteNames.expenses, 'color': Colors.red},
+    {'icon': Icons.analytics, 'label': "Income", 'route': RouteNames.income, 'color': Colors.green},
   ];
   
 
@@ -55,7 +56,7 @@ Widget _buildCategoryItem(
           height: 60,
           width: 60,
           decoration: BoxDecoration(
-            color: AppColors.grey400,
+            color: AppColors.grey400.withOpacity(0.3),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: color ?? Color.fromRGBO(56, 255, 67, 0.6), size: 30,),

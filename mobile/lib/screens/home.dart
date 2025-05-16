@@ -44,7 +44,7 @@ class _HomePageState extends State<HomePage> {
                 Container(
                   height: MediaQuery.of(context).size.height * 0.16,
                   decoration: BoxDecoration(
-                    color: AppColors.grey400,
+                    color: AppColors.grey400.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(10)
                   ),
                   child: Padding(

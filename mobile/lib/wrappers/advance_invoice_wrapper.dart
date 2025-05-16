@@ -32,7 +32,7 @@ class _AdvanceInvoiceWrapper extends State<AdvanceInvoiceWrapper> {
               left: 10,
               child: IconButton(
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).popUntil((route) => route.isFirst);
                 }, 
                 icon: Icon(Icons.arrow_back, size: 40,)
               )

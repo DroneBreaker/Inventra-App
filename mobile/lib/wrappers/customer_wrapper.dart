@@ -34,7 +34,7 @@ class _CustomerWrapperState extends State<CustomerWrapper> {
               top: 8,
               left: 10,
               child: IconButton(
-                onPressed: () => Navigator.pop(context), 
+                onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst), 
                 icon: Icon(Icons.arrow_back, color: Colors.black, size: 40,)
               )
             )

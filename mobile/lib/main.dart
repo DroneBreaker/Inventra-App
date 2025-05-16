@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inventra/constants/routes.dart';
 import 'package:inventra/screens/auth/register.dart';
 import 'package:inventra/screens/auth/login.dart';
 import 'package:inventra/screens/create_invoice.dart';
@@ -27,20 +28,22 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
+      initialRoute: RouteNames.intro,
       routes: {
-        '/login': (context) => const LoginPage(),
-        '/register': (context) => const RegisterPage(),
-        '/home': (context) => const HomePage(),
-        '/invoices': (context) => const InvoicePage(),
-        '/reports': (context) => ReportPage(),
-        '/menu': (context) => MenuPage(),
-        '/create-invoice': (context) => const CreateInvoice(),
-        '/advance-invoice': (context) => const AdvanceInvoiceWrapper(),
-        '/customers': (context) => const CustomerWrapper(),
-        '/items': (context) => const ItemWrapper(),
-        '/all-items': (context) => const AllItemsPage(),
-        '/income': (context) => const IncomeWrapper()
+        RouteNames.login: (context) => const LoginPage(),
+        RouteNames.register: (context) => const RegisterPage(),
+        RouteNames.home: (context) => const HomePage(),
+        RouteNames.invoices: (context) => const InvoicePage(),
+        RouteNames.reports: (context) => ReportPage(),
+        RouteNames.menu: (context) => MenuPage(),
+        RouteNames.createInvoice: (context) => const CreateInvoice(),
+        RouteNames.advanceInvoice: (context) => const AdvanceInvoiceWrapper(),
+        RouteNames.customers: (context) => const CustomerWrapper(),
+        RouteNames.items: (context) => const ItemWrapper(),
+        RouteNames.allItems: (context) => const AllItemsPage(),
+        RouteNames.income: (context) => const IncomeWrapper(),
+        // RouteNames.expenses: (context) => const IncomeWrapper(),
+        // RouteNames.users: (context) => const UserWrapper(),
       },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
