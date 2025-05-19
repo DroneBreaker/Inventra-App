@@ -34,6 +34,10 @@ class AppTitle {
   static const String itemSetupTitle = "Setup a Product or a service";
   static const String itemCodeField = "Item Code";
 
+
+  // REPORT
+  static const String reportHeader = "Financial Reports";
+
   // ERRORS
   static const String noUsernameError = "Please enter your username";
   static const String noPasswordError = "Please enter your password";

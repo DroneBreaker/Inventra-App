@@ -3,6 +3,7 @@ import 'package:inventra/constants/routes.dart';
 import 'package:inventra/screens/auth/register.dart';
 import 'package:inventra/screens/auth/login.dart';
 import 'package:inventra/screens/create_invoice.dart';
+import 'package:inventra/screens/expenses.dart';
 import 'package:inventra/screens/home.dart';
 import 'package:inventra/screens/intro.dart';
 import 'package:inventra/screens/invoices.dart';
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
         RouteNames.items: (context) => const ItemWrapper(),
         RouteNames.allItems: (context) => const AllItemsPage(),
         RouteNames.income: (context) => const IncomeWrapper(),
-        // RouteNames.expenses: (context) => const IncomeWrapper(),
+        RouteNames.expenses: (context) => const ExpensesPage(),
         // RouteNames.users: (context) => const UserWrapper(),
       },
       theme: ThemeData(
