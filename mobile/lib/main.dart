@@ -7,6 +7,7 @@ import 'package:inventra/screens/expenses.dart';
 import 'package:inventra/screens/home.dart';
 import 'package:inventra/screens/intro.dart';
 import 'package:inventra/screens/invoices.dart';
+import 'package:inventra/screens/user.dart';
 import 'package:inventra/wrappers/advance_invoice_wrapper.dart';
 import 'package:inventra/wrappers/customer_wrapper.dart';
 import 'package:inventra/wrappers/income_wrapper.dart';
@@ -44,7 +45,7 @@ class MyApp extends StatelessWidget {
         RouteNames.allItems: (context) => const AllItemsPage(),
         RouteNames.income: (context) => const IncomeWrapper(),
         RouteNames.expenses: (context) => const ExpensesPage(),
-        // RouteNames.users: (context) => const UserWrapper(),
+        RouteNames.users: (context) => const UserManagementPage(),
       },
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
