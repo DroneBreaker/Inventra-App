@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:inventra/constants/app_titles.dart';
+import 'package:inventra/services/item_service.dart';
 import 'package:inventra/widgets/app_text.dart';
 
 class ItemsPage extends StatefulWidget {
@@ -19,6 +20,7 @@ class _ItemsPageState extends State {
   final TextEditingController itemDescriptionController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
   final TextEditingController companyTINController = TextEditingController();
+  final TextEditingController remarksController = TextEditingController();
 
   // ITEM CATERGORY
   final itemCategoryOptions = [
@@ -31,6 +33,14 @@ class _ItemsPageState extends State {
   // TAX INCLUSIVE
   bool isTaxable = false;
   bool isTaxInclusive = true;
+
+   // TOURISM CST CATERGORY
+  final tourismCSTOptions = [
+    "None",
+    "Tourism",
+    "CST"
+  ];
+  String selectedTourismCSTOption = "None";
   
   final _formKey = GlobalKey<FormState>();
 
@@ -41,9 +51,7 @@ class _ItemsPageState extends State {
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.only(top: 60.0),
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top,
-                child: Padding(
+              child: Padding(
                   padding: const EdgeInsets.only(left: 20.0, right: 20),
                   child: Form(
                     key: _formKey,
@@ -95,7 +103,7 @@ class _ItemsPageState extends State {
                         const SizedBox(height: 20), 
 
 
-                        // Item Desscription TextForm field
+                        // Item Description TextForm field
                         TextFormField(
                           controller: itemDescriptionController,
                           keyboardType: TextInputType.multiline,
@@ -104,7 +112,7 @@ class _ItemsPageState extends State {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10)
                             ),
-                            contentPadding: const EdgeInsets.only(left: 20),
+                            contentPadding: const EdgeInsets.only(left: 20, top: 30),
                             labelText: "Item Description"
                           ),
                         ),
@@ -132,19 +140,19 @@ class _ItemsPageState extends State {
                         const SizedBox(height: 20), 
 
 
-                        // CompanyTIN TextForm field
-                        TextFormField(
-                          enabled: false,
-                          controller: companyTINController,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)
-                            ),
-                            contentPadding: const EdgeInsets.only(left: 20),
-                            labelText: "Company TIN"
-                          ),
-                        ),
-                        const SizedBox(height: 20),
+                        // // CompanyTIN TextForm field
+                        // TextFormField(
+                        //   enabled: false,
+                        //   controller: companyTINController,
+                        //   decoration: InputDecoration(
+                        //     border: OutlineInputBorder(
+                        //       borderRadius: BorderRadius.circular(10)
+                        //     ),
+                        //     contentPadding: const EdgeInsets.only(left: 20),
+                        //     labelText: "Company TIN"
+                        //   ),
+                        // ),
+                        // const SizedBox(height: 20),
 
 
                         // Item Category Dropdown
@@ -199,20 +207,34 @@ class _ItemsPageState extends State {
                           ],
                         ),
                         const SizedBox(height: 20), // Increased spacing
-                        // Remarks TextForm field
-                        TextFormField(
-                          controller: itemDescriptionController,
-                          keyboardType: TextInputType.multiline,
-                          maxLines: 4,
+
+
+                        // TourismCST Dropdown
+                        DropdownButtonFormField(
+                          value: selectedTourismCSTOption,
                           decoration: InputDecoration(
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            contentPadding: const EdgeInsets.only(left: 20),
-                            labelText: "Remarks"
+                            labelText: 'Item Category',
                           ),
+                          items: tourismCSTOptions.map((String option) {
+                            return DropdownMenuItem(
+                              value: option,
+                              child: Text(option),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            if(newValue != null) {
+                              setState(() {
+                                selectedTourismCSTOption = newValue;
+                              });
+                            }
+                          },
                         ),
-                        const SizedBox(height: 30), // Increased spacing
+                        const SizedBox(height: 20), 
+
+                       // Increased spacing
                         SizedBox(
                           width: double.infinity,
                           height: 50,
@@ -221,7 +243,7 @@ class _ItemsPageState extends State {
                               backgroundColor: Colors.grey
                             ),
                             onPressed: () {
-                              // addItems();
+                              addItems();
                             }, 
                             child: AppText(title: AppTitle.addItemButton, colors: Colors.black)
                           ),
@@ -234,8 +256,58 @@ class _ItemsPageState extends State {
               ),
             ),
           ),
-        ),
     );
+  }
+
+
+  // Function to add items
+  Future<void> addItems() async {
+    if(_formKey.currentState!.validate()) {
+      try {
+        // Create the item object
+        final response = await ItemService.addItem(
+          itemCode: itemCodeController.text, 
+          itemName: itemNameController.text,
+          itemDescription: itemDescriptionController.text.isEmpty ? null : itemDescriptionController.text,
+          price: double.parse(priceController.text),
+          companyTIN: companyTINController.text,
+          itemCategory: selectedItemCategory,
+          isTaxable: isTaxable,
+          isTaxInclusive: isTaxInclusive,
+          tourismCSTOption: selectedTourismCSTOption,
+        );
+
+        // Hide loading indicator
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+        if (response['success'] == true) {
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(response['message'])),
+          );
+          
+          // Clear the form
+          _formKey.currentState!.reset();
+          setState(() {
+            selectedItemCategory = "Regular VAT";
+            isTaxable = false;
+            isTaxInclusive = true;
+          });
+        } else {
+          // Error
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(response['message'])),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: AppText(title: 'Error: $e')),
+          );
+        }
+      }
+    }
+    // print("Item added");
   }
 }
 

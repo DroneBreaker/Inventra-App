@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:inventra/constants/routes.dart';
 import 'package:inventra/screens/auth/register.dart';
 import 'package:inventra/screens/auth/login.dart';
+// import 'package:inventra/screens/clients/export.dart';
+// import 'package:inventra/screens/clients/supplier.dart';
 import 'package:inventra/screens/create_invoice.dart';
 import 'package:inventra/screens/expenses.dart';
-import 'package:inventra/screens/home.dart';
+// import 'package:inventra/screens/home.dart';
+import 'package:inventra/wrappers/main_wrapper.dart';
 import 'package:inventra/screens/intro.dart';
 import 'package:inventra/screens/invoices.dart';
 import 'package:inventra/screens/user.dart';
@@ -34,16 +37,18 @@ class MyApp extends StatelessWidget {
       routes: {
         RouteNames.login: (context) => const LoginPage(),
         RouteNames.register: (context) => const RegisterPage(),
-        RouteNames.home: (context) => const HomePage(),
+        RouteNames.home: (context) => const MainWrapper(),
         RouteNames.invoices: (context) => const InvoicePage(),
         RouteNames.reports: (context) => ReportPage(),
         RouteNames.menu: (context) => MenuPage(),
         RouteNames.createInvoice: (context) => const CreateInvoice(),
         RouteNames.advanceInvoice: (context) => const AdvanceInvoiceWrapper(),
         RouteNames.customers: (context) => const CustomerWrapper(),
+        // RouteNames.suppliers: (context) => SupplierPage(),
+        // RouteNames.exports: (context) => ExportPage(),
         RouteNames.items: (context) => const ItemWrapper(),
         RouteNames.allItems: (context) => const AllItemsPage(),
-        RouteNames.income: (context) => const IncomeWrapper(),
+      RouteNames.income: (context) => const IncomeWrapper(),
         RouteNames.expenses: (context) => const ExpensesPage(),
         RouteNames.users: (context) => const UserManagementPage(),
       },

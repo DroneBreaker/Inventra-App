@@ -8,7 +8,7 @@ pub async fn health_check() -> impl Responder {
 
 pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/api")
+        web::scope("/user_account")
         .route("/health", web::get().to(health_check))
         //    web::scope("/users") 
         .route("/users", web::get().to(user_handler::get_users))

@@ -14,7 +14,7 @@ class _MenuPageState extends State<MenuPage> {
   String _selectedItem = 'Dashboard';
 
   final List<Map<String, dynamic>> _menuItems = [
-    {'icon': Icons.dashboard, 'label': 'Home', 'route': RouteNames.intro},
+    {'icon': Icons.dashboard, 'label': 'Home', 'route': RouteNames.home},
     {'icon': Icons.description, 'label': 'Invoices', 'route': RouteNames.invoices},
     {'icon': Icons.people, 'label': 'Customers', 'route': RouteNames.customers},
     {'icon': Icons.assignment, 'label': 'Incomes', 'route': RouteNames.income},

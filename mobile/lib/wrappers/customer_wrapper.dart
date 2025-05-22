@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:inventra/screens/clients/create_customer.dart';
 import 'package:inventra/screens/clients/customer.dart';
 import 'package:inventra/screens/clients/export.dart';
+import 'package:inventra/screens/clients/supplier.dart';
 
 class CustomerWrapper extends StatefulWidget {
   const CustomerWrapper({super.key});
@@ -16,6 +17,7 @@ class _CustomerWrapperState extends State<CustomerWrapper> {
   final List<Widget> customerPages = [
     CreateCustomerPage(),
     CustomerPage(),
+    SupplierPage(),
     ExportPage()
   ];
 
@@ -34,7 +36,7 @@ class _CustomerWrapperState extends State<CustomerWrapper> {
               top: 8,
               left: 10,
               child: IconButton(
-                onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst), 
+                onPressed: () => Navigator.of(context).pop(), 
                 icon: Icon(Icons.arrow_back, color: Colors.black, size: 40,)
               )
             )

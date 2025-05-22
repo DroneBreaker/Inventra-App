@@ -18,17 +18,16 @@ class _IntroPageState extends State<IntroPage> {
       body: SafeArea(
           // backgroundColor: AppColors.grey600,
           child: Container(
-            height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top,
             decoration: BoxDecoration(
               color: Colors.black
             ),
             child: Padding(
-              padding: const EdgeInsets.only(top: 420.0),
+              padding: const EdgeInsets.only(top: 380.0),
               child: Column(
                 children: [
                   Center(child: AppText(title: "INVENTRA", fontSize: 45, colors: Colors.grey,),),
                   Padding(
-                    padding: const EdgeInsets.only(left: 30.0, top: 280, right: 30),
+                    padding: const EdgeInsets.only(left: 30.0, top: 235, right: 30),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [

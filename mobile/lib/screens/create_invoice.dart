@@ -129,14 +129,17 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       'text': 'Invoice',
       'icon': Icons.receipt_long,
     },
+
     {
       'text': 'Purchase',
       'icon': Icons.shopping_cart,
     },
+
     {
       'text': 'Refund',
       'icon': Icons.assignment_return,
     },
+
     {
       'text': 'Credit Note',
       'icon': Icons.note,
@@ -269,7 +272,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10)
                                     ),
-                                    hintText: "Seller"
+                                    hintText: "Username"
                                   ),
                                 ),
                                 SizedBox(height: 20,),
@@ -460,7 +463,8 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                                     }, 
                                     child: AppText(title: "Submit", fontSize: 17, colors: Colors.black,)
                                   ),
-                                )
+                                ),
+                                SizedBox(height: 20,),
                               ],
                             );
                           }),

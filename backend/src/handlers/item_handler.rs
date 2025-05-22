@@ -11,17 +11,15 @@ use crate::{models::item::{Item, ItemCategory, TourismCSTOption}, utils::jwt::va
 
 #[derive(Debug, Deserialize)]
 pub struct CreateItemRequest {
-    pub id: i64,
+    pub id: Option<String>,
     pub item_code: i64,
     pub item_name: String,
     pub item_description: String,
     pub price: f64,
-    pub company_tin: String,
     pub item_category: ItemCategory, // Regular, Rent, Exempt
     pub is_taxable: bool, 
     pub is_tax_inclusive: bool,
     pub tourism_cst_option: TourismCSTOption,
-    pub remarks: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -33,7 +31,6 @@ pub struct UpdateItemRequest {
     pub is_taxable: Option<bool>,
     pub is_tax_inclusive: Option<bool>,
     pub tourism_cst_option: Option<TourismCSTOption>,
-    pub remarks: Option<String>,
 }
 
 
@@ -48,13 +45,13 @@ pub async fn get_items(db: web::Data<MySqlPool>, credentials: BearerAuth) -> imp
     };
 
     // The company_tin is stored in claims.sub
-    let company_tin = claims.sub;
+    let company_tin = claims.tin;
 
 
     let query = r#"
         SELECT
-            id, item_code, item_name, item_description, price, is_taxable, is_tax_inclusive, company_tin, item_category, is_taxable, 
-            is_taxinclusive, remarks, created_at, updated_at
+            id, item_code, item_name, item_description, price, is_taxable, is_tax_inclusive, item_category, is_taxable, 
+            is_taxinclusive, created_at, updated_at
         FROM items
         WHERE company_tin = ?
     "#; 
@@ -95,8 +92,8 @@ pub async fn create_items(db: web::Data<MySqlPool>, req: web::Json<CreateItemReq
         r#"
             INSERT INTO items 
                 (id, item_code, item_name, item_description, price, is_taxable, is_tax_inclusive, 
-                tourism_cst_option, remarks, company_tin, created_at, updated_at, deleted_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                tourism_cst_option, company_tin, created_at, updated_at, deleted_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         "#,
         id,
         req.item_code,
@@ -106,8 +103,7 @@ pub async fn create_items(db: web::Data<MySqlPool>, req: web::Json<CreateItemReq
         req.is_taxable,
         req.is_tax_inclusive,
         req.tourism_cst_option,
-        req.remarks,
-        claims.sub, // Use company_tin from JWT claims
+        claims.tin, // Use company_tin from JWT claims
         now,
         now,
         Option::<chrono::DateTime<Utc>>::None // Use NULL for deleted_at

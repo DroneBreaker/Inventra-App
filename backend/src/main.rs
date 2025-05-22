@@ -20,10 +20,14 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(web::Data::new(pool.clone()))
             .service(hello)
-            .configure(routes::user_routes::init)
-            .configure(routes::item_routes::init) 
+            .service(
+                web::scope("/api")
+                    .configure(routes::user_routes::init)
+                    .configure(routes::item_routes::init) 
+            )
     }) 
     .bind(("127.0.0.1", 8080))?
+    // .bind(("0.0.0.0", 8080))?
     .run()
     .await
 }

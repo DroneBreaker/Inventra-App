@@ -96,7 +96,7 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
   // date range widget
   Widget _buildDateRangeSelector() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
@@ -244,6 +244,7 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
     );
   }
 
+// Financial Summary
   Widget _buildFinancialSummary() {
     return Row(
       children: [
@@ -511,7 +512,7 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
         const Text(
           'Invoice Status',
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 17,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -521,11 +522,11 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
             Expanded(
               child: _buildStatusCard('Paid', '45', Colors.green),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: _buildStatusCard('Pending', '12', Colors.orange),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             Expanded(
               child: _buildStatusCard('Overdue', '3', Colors.red),
             ),
@@ -537,7 +538,7 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
 
   Widget _buildStatusCard(String status, String count, Color color) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),

@@ -34,7 +34,7 @@ pub async fn create_clients(db: web::Data<MySqlPool>, req: web::Json<Client>, cr
         req.client_email,
         req.client_tin,
         req.client_phone,
-        claims.sub,
+        claims.tin,
         req.client_type,
         now, 
         now, 

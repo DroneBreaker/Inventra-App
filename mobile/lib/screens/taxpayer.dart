@@ -853,7 +853,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                   buttonText: "Add Item",
                   fontSize: 17,
                   onTap: () {
-                    _addItems;
+                    // _addItems;
                     Navigator.pop(context);
                   },
                   colors: AppColors.buttonPrimary,
@@ -864,45 +864,46 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
 
   // Adds new items to the items list
   Future<bool> _addItems() async {
-    try {
-      // Get the businessPartnerTIN from auth
-      final businessPartnerTIN = await ItemService.getBusinessPartnerTIN();
+   throw AboutDialog();
+  //   try {
+  //     // Get the businessPartnerTIN from auth
+  //     // final businessPartnerTIN = await ItemService.getBusinessPartnerTIN();
 
-      // Create the item object
-      final item = Item(
-        itemCode: int.parse(itemCodeController.text),
-        itemName: itemNameController.text,
-        price: int.parse(priceController.text),
-        isTaxInclusive: isTaxInclusive,
-        itemDescription: itemDescriptionController.text,
-        isTaxable: isTaxable,
-        tourismCstOption: selectedTourismOrCST,
-        itemCategory: selectedItemCategory,
-        isDiscountable: isDiscount,
-        businessPartnerTIN: businessPartnerTIN,
-      );
+  //     // Create the item object
+  //     // final item = Item(
+  //     //   itemCode: int.parse(itemCodeController.text),
+  //     //   itemName: itemNameController.text,
+  //     //   price: int.parse(priceController.text),
+  //     //   isTaxInclusive: isTaxInclusive,
+  //     //   itemDescription: itemDescriptionController.text,
+  //     //   isTaxable: isTaxable,
+  //     //   tourismCstOption: selectedTourismOrCST,
+  //     //   itemCategory: selectedItemCategory,
+  //     //   isDiscountable: isDiscount,
+  //     //   businessPartnerTIN: businessPartnerTIN,
+  //     // );
 
-      final result = await ItemService.createItem(item);
-      if(result) {
-        _clearForm();
-      }
-      return result;
-    } catch(e) {
-      print("Error adding items: $e");
-      return false;
-    }
-  }
+  //     // final result = await ItemService.createItem(item);
+  //     // if(result) {
+  //     //   _clearForm();
+  //     // }
+  //     // return result;
+  //   } catch(e) {
+  //     print("Error adding items: $e");
+  //     return false;
+  //   }
+  // }
 
-  void _clearForm() {
-    itemCodeController.clear();
-    itemNameController.clear();
-    priceController.clear();
-    itemDescriptionController.clear();
-    isTaxInclusive = false;
-    isTaxable = false;
-    selectedTourismOrCST = 'None';
-    selectedItemCategory = 'General';
-    isDiscount = false;
+  // void _clearForm() {
+  //   itemCodeController.clear();
+  //   itemNameController.clear();
+  //   priceController.clear();
+  //   itemDescriptionController.clear();
+  //   isTaxInclusive = false;
+  //   isTaxable = false;
+  //   selectedTourismOrCST = 'None';
+  //   selectedItemCategory = 'General';
+  //   isDiscount = false;
   }
 
   // Filter items based on the search text

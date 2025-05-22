@@ -44,11 +44,11 @@ class _HomePageState extends State<HomePage> {
                 Container(
                   height: MediaQuery.of(context).size.height * 0.16,
                   decoration: BoxDecoration(
-                    color: AppColors.grey400.withOpacity(0.3),
+                    color: AppColors.grey400.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10)
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8, top: 30),
+                    padding: const EdgeInsets.only(left: 8.0, right: 8, top: 20),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

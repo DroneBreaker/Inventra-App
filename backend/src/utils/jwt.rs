@@ -6,7 +6,7 @@ const SECRET: &[u8] = b"supersecret_INVENTRA"; // Replace with env variable in p
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-    pub sub: String,
+    pub tin: String,
     pub exp: usize,
 }
 
@@ -17,7 +17,7 @@ pub fn generate_jwt(company_tin: &str) -> Result<String, jsonwebtoken::errors::E
         .timestamp() as usize;
 
     let claims = Claims {
-        sub: company_tin.to_owned(),
+        tin: company_tin.to_owned(),
         exp: expiration,
     };
 

@@ -5,6 +5,8 @@ class RouteNames {
   static const createInvoice = '/create-invoice';
   static const advanceInvoice = '/advance-invoice';
   static const customers = '/customers';
+  static const suppliers = '/suppliers';
+  static const exports = '/exports';
   static const income = '/income';
   static const expenses = '/expenses';
   static const items = '/items';
