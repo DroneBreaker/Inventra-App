@@ -12,7 +12,7 @@ pub struct User {
     pub company_name: String,
     pub company_id: String,
     pub company_tin: String,
-    // pub role: String,  //user, admin
+    pub role: Role,  //staff, admin
     pub password: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -28,7 +28,7 @@ pub struct CreateUser {
     pub company_name: String,
     pub company_id: String,
     pub company_tin: String,
-    // pub role: String,  //user, admin
+    pub role: Role,  //user, admin
     pub password: String,
 }
 
@@ -37,4 +37,10 @@ pub struct LoginRequest {
     pub username: String,
     pub company_tin: String,
     pub password: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, sqlx::Type, Clone)]
+pub enum Role {
+    Staff,
+    Admin
 }

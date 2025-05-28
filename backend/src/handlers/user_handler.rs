@@ -5,7 +5,7 @@ use serde::Serialize;
 use sqlx::MySqlPool;
 use uuid::Uuid;
 
-use crate::{models::user::{CreateUser, LoginRequest, User}, utils::jwt::generate_jwt};
+use crate::{models::user::{CreateUser, LoginRequest, Role, User}, utils::jwt::generate_jwt};
 
 
 #[derive(Serialize)]
@@ -24,6 +24,7 @@ struct UserResponse {
     company_name: String,
     company_id: String,
     company_tin: String,
+    role: Role,
     created_at: DateTime<Utc>,
 }
 
@@ -44,7 +45,8 @@ fn hash_password(password: &str) -> Result<String, argon2::password_hash::Error>
 pub async fn get_users(db: web::Data<MySqlPool>) -> impl Responder {
     let query = r#"
         SELECT
-            id, first_name, last_name, email, username, company_name, company_id, company_tin, password, created_at, updated_at, deleted_at
+            id, first_name, last_name, email, username, company_name, company_id, company_tin, role, password, created_at, 
+            updated_at, deleted_at
         FROM users
     "#;
 
@@ -56,7 +58,10 @@ pub async fn get_users(db: web::Data<MySqlPool>) -> impl Responder {
         Ok(users) => HttpResponse::Ok().json(users),
         Err(err) => {
             eprintln!("DB error: {:?}", err);
-            HttpResponse::InternalServerError().body("Failed to fetch users")
+            HttpResponse::InternalServerError().json(serde_json::json!({
+                "message": "Failed to fetch users",
+                "error": err.to_string()
+            }))
         }
     }
 }
@@ -72,9 +77,9 @@ pub async fn create_user(db: web::Data<MySqlPool>, req: web::Json<CreateUser>) -
 
     let result = sqlx::query!(
         r#"
-            INSERT INTO users (id, first_name, last_name, email, username, company_name, company_id, company_tin, password, 
+            INSERT INTO users (id, first_name, last_name, email, username, company_name, company_id, company_tin, role, password, 
                 created_at, updated_at, deleted_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ? ,?, ?, ?, ?, ?)
         "#,
         id,
         req.first_name,
@@ -84,6 +89,7 @@ pub async fn create_user(db: web::Data<MySqlPool>, req: web::Json<CreateUser>) -
         req.company_name,
         req.company_id,
         req.company_tin,
+        req.role,
         hashed,
         now,
         now,
@@ -103,6 +109,7 @@ pub async fn create_user(db: web::Data<MySqlPool>, req: web::Json<CreateUser>) -
                 company_name: req.company_name.clone(),
                 company_id: req.company_id.clone(),
                 company_tin: req.company_tin.clone(),
+                role: req.role.clone(),
                 created_at: now,
             };
 
@@ -116,7 +123,10 @@ pub async fn create_user(db: web::Data<MySqlPool>, req: web::Json<CreateUser>) -
         },
         Err(err) => {
             eprintln!("DB insert error: {:?}", err);
-            HttpResponse::InternalServerError().body("Failed to create user")
+            HttpResponse::InternalServerError().json(serde_json::json!({
+                "message": "Failed to create user",
+                "err": err.to_string()
+            }))
         }
     }
 }
@@ -166,7 +176,7 @@ pub async fn update_user(db: web::Data<MySqlPool>, tin: web::Path<String>, req: 
         r#"
         UPDATE users
         SET first_name = ?, last_name = ?, email = ?, username = ?,
-            company_name = ?, company_id = ?, company_tin = ?, updated_at = ?
+            company_name = ?, company_id = ?, company_tin = ?, role = ?, updated_at = ?
         WHERE company_tin = ?
         "#,
         req.first_name,
@@ -176,6 +186,7 @@ pub async fn update_user(db: web::Data<MySqlPool>, tin: web::Path<String>, req: 
         req.company_name,
         req.company_id,
         req.company_tin,
+        req.role,
         now,
         tin.into_inner(),
     )
@@ -188,22 +199,29 @@ pub async fn update_user(db: web::Data<MySqlPool>, tin: web::Path<String>, req: 
     }
 }
 
-pub async fn delete_user(db: web::Data<MySqlPool>,id: web::Path<String>) -> impl Responder {
-    let now = Utc::now();
-
-    let result = sqlx::query!(
-        "UPDATE users SET deleted_at = ? WHERE id = ?",
-        now,
-        id.into_inner()
-    )
-    .execute(db.get_ref())
-    .await;
+pub async fn delete_user(db: web::Data<MySqlPool>, id: web::Path<String>) -> impl Responder {
+    let user_id = id.into_inner();
+    
+    let result = sqlx::query!("DELETE FROM users WHERE id = ?", user_id)
+        .execute(db.get_ref())
+        .await;
 
     match result {
-        Ok(_) => HttpResponse::Ok().body("User soft-deleted"),
-        Err(_) => HttpResponse::InternalServerError().body("Failed to delete user"),
+        Ok(result) => {
+            eprintln!("Rows affected: {}", result.rows_affected());
+            if result.rows_affected() == 0 {
+                HttpResponse::NotFound().body("User not found")
+            } else {
+                HttpResponse::Ok().body("User deleted successfully")
+            }
+        }
+        Err(err) => {
+            eprintln!("Delete error: {:?}", err);
+            HttpResponse::InternalServerError().body("Failed to delete user")
+        }
     }
 }
+
 
 // pub async fn register_user(db: web::Data<MySqlPool>, req: web::Json<CreateUser>) -> impl Responder {
 //     create_user(db, req).await

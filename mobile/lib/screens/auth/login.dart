@@ -9,9 +9,6 @@ import 'package:inventra/services/api_service.dart';
 import 'package:inventra/widgets/app_text.dart';
 import 'package:inventra/widgets/button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:inventra/widgets/button.dart';
-
-
 
 
 
@@ -204,12 +201,11 @@ class _LoginPageState extends State<LoginPage> {
 
         // Navigate to home
         if(!mounted) return;
-        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+        Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) {
             print("Building MainWrapper -> to PAGE");
             return const MainWrapper();
           }),
-          (route) => false
         );
       } else {
         if(!mounted) return;

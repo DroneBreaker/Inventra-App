@@ -4,8 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class ItemService {
-  // static const String baseUrl = 'http://localhost:8080/api';
-  static const String baseUrl = "http://10.0.2.2:8080/api/";
+  // static const String baseUrl = "http://192.168.80.147:8080/api";
+  static const String baseUrl = "http://10.0.2.2:8080/api";
 
 
   // Helper method to get JWT token from shared preferences
@@ -58,36 +58,44 @@ class ItemService {
           'is_taxable': isTaxable,
           'is_tax_inclusive': isTaxInclusive,
           'tourism_cst_option': tourismCSTOption,
-        }),
+        }..removeWhere((key, value) => value == null)),
       );
 
-      // Handle empty responses
-      if (response.body.isEmpty) {
-        return {
-          'success': false,
-          'message': 'Empty response from server',
-        };
-      }
+      // // Handle empty responses
+      // if (response.body.isEmpty) {
+      //   return {
+      //     'success': false,
+      //     'message': 'Empty response from server',
+      //   };
+      // }
 
       final responseData = jsonDecode(response.body);
 
       if (response.statusCode == 201) {
-        return {
-          'success': true,
-          'message': 'Item created successfully',
-          'data': responseData,
-        };
+        // return {
+        //   'success': true,
+        //   'message': 'Item created successfully',
+        //   'data': responseData,
+        // };
+        return responseData;
       } else {
-        return {
-          'success': false,
-          'message': responseData['error'] ?? 'Failed to create item',
-        };
+          throw Exception(responseData['error'] ?? 'Failed to create item');
+        // return {
+        //   'success': false,
+        //   'message': responseData['error'] ?? 'Failed to create item',
+        // };
       }
-    } catch (e) {
-      return {
-        'success': false,
-        'message': 'An error occurred: ${e.toString()}',
-      };
+    } catch(e) {
+        throw Exception("Item creation failed: ${e.toString()}");
+
+      //  print('Error in addItem: $e');
+      //  rethrow;
     }
+    // } catch (e) {
+    //   return {
+    //     'success': false,
+    //     'message': 'An error occurred: ${e.toString()}',
+    //   };
+    // }
   }
 }

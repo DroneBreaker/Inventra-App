@@ -30,6 +30,13 @@ class _RegisterPageState extends State<RegisterPage> {
 
   bool isLoading = false;
 
+  // Role options
+  String selectedRoles = "Staff";
+  final roleOptions = [
+    "Staff",
+    "Admin"
+  ];
+
   Future<void> handleRegister() async {
     // Validate inputs
     if(passwordController.text != confirmPasswordController.text) {
@@ -64,7 +71,8 @@ class _RegisterPageState extends State<RegisterPage> {
         username: usernameController.text, 
         companyName: companyNameController.text,
         companyID: companyIDController.text, 
-        companyTIN: companyTINController.text, 
+        companyTIN: companyTINController.text,
+        role: selectedRoles,
         password: passwordController.text,
       );
 
@@ -124,7 +132,7 @@ class _RegisterPageState extends State<RegisterPage> {
       child: Scaffold(
         body: SingleChildScrollView(
           child: Container(
-            color: Colors.black,
+            // color: Colors.black,
             // decoration: BoxDecoration(
             //   gradient: LinearGradient(colors: [
             //     AppColors.success,
@@ -308,6 +316,28 @@ class _RegisterPageState extends State<RegisterPage> {
                       },
                     ),
                     const SizedBox(height: 20,),
+
+
+                    // Role
+                    DropdownButtonFormField<String>(
+                      value: selectedRoles,
+                      items: roleOptions
+                          .map((role) => DropdownMenuItem(
+                                value: role,
+                                child: Text(role),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedRoles = value!;
+                        });
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Role',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    SizedBox(height: 20,),
           
           
                     // Password Textform field
@@ -384,7 +414,8 @@ class _RegisterPageState extends State<RegisterPage> {
                         },
                         child: AppText(title: AppTitle.registerButton, colors: Colors.black, fontSize: 20,),
                       ),
-                    )
+                    ),
+                    SizedBox(height: 20,),
                   ],
                 ),
               ),

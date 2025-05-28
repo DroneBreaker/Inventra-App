@@ -4,8 +4,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class APIService {
-  static const String baseUrl = "http://10.0.2.2:8080/user";
-  // static const String baseUrl = "http://192.168.80.147:8080/api";
+  static const String baseUrl = "http://10.0.2.2:8080/api/user_account";
+  // static const String baseUrl = "http://192.168.80.147:8080/api/user_account";
 
   static Future<http.Response> registerUser ({
     required String firstName,
@@ -15,6 +15,7 @@ class APIService {
     required String companyName,
     required String companyID,
     required String companyTIN,
+    required String role,
     required String password,
   }) async {
     final url = Uri.parse("$baseUrl/register");
@@ -31,6 +32,7 @@ class APIService {
           'company_name': companyName,
           'company_tin': companyTIN,
           'company_id': companyID,
+          'role': role,
           'password': password,
         }),
       );

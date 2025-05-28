@@ -12,9 +12,9 @@ use crate::{models::item::{Item, ItemCategory, TourismCSTOption}, utils::jwt::va
 #[derive(Debug, Deserialize)]
 pub struct CreateItemRequest {
     pub id: Option<String>,
-    pub item_code: i64,
+    pub item_code: String,
     pub item_name: String,
-    pub item_description: String,
+    pub item_description: Option<String>,
     pub price: f64,
     pub item_category: ItemCategory, // Regular, Rent, Exempt
     pub is_taxable: bool, 
@@ -35,66 +35,68 @@ pub struct UpdateItemRequest {
 
 
 pub async fn get_items(db: web::Data<MySqlPool>, credentials: BearerAuth) -> impl Responder {
-    // Validate JWT using your existing utility
-    let claims = match validate_jwt(credentials.token()) {
-        Ok(claims) => claims,
-        Err(e) => {
-            eprintln!("JWT validation failed: {:?}", e);
-            return HttpResponse::Unauthorized().json("Invalid token");
-        }
-    };
-
-    // The company_tin is stored in claims.sub
-    let company_tin = claims.tin;
-
-
-    let query = r#"
-        SELECT
-            id, item_code, item_name, item_description, price, is_taxable, is_tax_inclusive, item_category, is_taxable, 
-            is_taxinclusive, created_at, updated_at
-        FROM items
-        WHERE company_tin = ?
-    "#; 
-
-    let result = sqlx::query_as::<_, Item>(query)
-        .bind(company_tin)
-        .fetch_all(db.get_ref())
-        .await;
-
-    match result {
-        Ok(items) => HttpResponse::Ok().json(items),
-        Err(err) => {
-            eprintln!("DB error: {:?}", err);
-            HttpResponse::InternalServerError().json(serde_json::json!({
-                "error": "Failed to fetch items"
-        }))
-        }
-    }
-} 
-
-
-pub async fn create_items(db: web::Data<MySqlPool>, req: web::Json<CreateItemRequest>, credentials: BearerAuth,) -> impl Responder {
-    // Validate JWT first
+    // Validate JWT
     let claims = match validate_jwt(credentials.token()) {
         Ok(claims) => claims,
         Err(e) => {
             eprintln!("JWT validation failed: {:?}", e);
             return HttpResponse::Unauthorized().json(json!({
-                "error": "Invalid token"
+                "error": "Invalid token",
+                "details": e.to_string()
             }));
         }
+    };
+
+    // Debug print the company_tin
+    println!("Fetching items for company_tin: {}", claims.tin);
+
+    match sqlx::query_as::<_, Item>(
+        r#"
+        SELECT 
+            id, item_code, item_name, item_description, price, is_taxable, is_tax_inclusive, item_category, created_at, 
+            updated_at, company_tin, tourism_cst_option, created_at, updated_at, deleted_at
+        FROM items 
+        WHERE company_tin = ? AND deleted_at IS NULL
+        "#,
+    )
+    .bind(&claims.tin)
+    .fetch_all(db.get_ref())
+    .await
+    {
+        Ok(items) => {
+            println!("Successfully fetched {} items", items.len());
+            HttpResponse::Ok().json(items)
+        },
+        Err(err) => {
+            eprintln!("Database error: {:?}\nQuery: {}", err, 
+                r#"SELECT id, item_code... [your full query]"#);
+            
+            HttpResponse::InternalServerError().json(json!({
+                "error": "Failed to fetch items",
+                "details": err.to_string(),
+                "suggestion": "Verify the database connection and table structure"
+            }))
+        }
+    }
+} 
+
+
+pub async fn create_items(db: web::Data<MySqlPool>, req: web::Json<CreateItemRequest>, credentials: BearerAuth) -> impl Responder {
+    // Validate JWT
+    let claims = match validate_jwt(credentials.token()) {
+        Ok(claims) => claims,
+        Err(e) => return HttpResponse::Unauthorized().json(json!({"error": "Invalid token"})),
     };
 
     let id = Uuid::new_v4().to_string();
     let now = Utc::now();
 
+    // Insert the item
     match sqlx::query!(
-        r#"
-            INSERT INTO items 
-                (id, item_code, item_name, item_description, price, is_taxable, is_tax_inclusive, 
-                tourism_cst_option, company_tin, created_at, updated_at, deleted_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        "#,
+        r#"INSERT INTO items 
+            (id, item_code, item_name, item_description, price, is_taxable, 
+             is_tax_inclusive, tourism_cst_option, company_tin, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"#,
         id,
         req.item_code,
         req.item_name,
@@ -103,32 +105,72 @@ pub async fn create_items(db: web::Data<MySqlPool>, req: web::Json<CreateItemReq
         req.is_taxable,
         req.is_tax_inclusive,
         req.tourism_cst_option,
-        claims.tin, // Use company_tin from JWT claims
+        claims.tin,
         now,
-        now,
-        Option::<chrono::DateTime<Utc>>::None // Use NULL for deleted_at
+        now
     )
     .execute(db.get_ref())
     .await
     {
-        Ok(result) => {
-            if result.rows_affected() == 1 {
-                HttpResponse::Created().json(json!({
-                    "message": "Item created successfully",
-                }))
-            } else {
-                HttpResponse::InternalServerError().json(json!({
-                    "error": "Failed to create item"
-                }))
+        Ok(result) if result.rows_affected() == 1 => {
+            // Fetch the created item using query_as (more flexible than query_as!)
+            match sqlx::query_as::<_, Item>(
+                r#"
+                SELECT 
+                    id, item_code, item_name, item_description, price, company_tin, item_category, is_taxable,
+                    is_tax_inclusive, tourism_cst_option, created_at, updated_at, deleted_at
+                FROM items WHERE id = ? AND company_tin = ?
+                "#,
+            )
+            .bind(&id)
+            .bind(&claims.tin)
+            .fetch_one(db.get_ref())
+            .await
+            {
+                Ok(item) => HttpResponse::Created().json(json!({
+                    "item": item,
+                    "message": "Item created successfully"
+                })),
+                Err(e) => HttpResponse::InternalServerError().json(json!({
+                    "error": "Failed to fetch created item",
+                    "details": e.to_string()
+                })),
             }
         },
-        Err(err) => {
-            eprintln!("Database error: {:?}", err);
+        Ok(_) => HttpResponse::InternalServerError().json(json!({
+            "error": "No rows affected"
+        })),
+        Err(e) => {
+            // log::error!("Database insert error: {}", e);
+            // log::error!("Failed query data - id: {}, item_code: {}, item_name: {}, company_tin: {}", 
+            //            id, req.item_code, req.item_name, claims.tin);
+            println!("Database insert error: {}", e);
+            println!("Failed query data - id: {}, item_code: {}, item_name: {}, company_tin: {}", 
+                       id, req.item_code, req.item_name, claims.tin);
+            
+            // Check for specific error types
+            let error_message = if e.to_string().contains("Duplicate entry") {
+                "Item with this code already exists"
+            } else if e.to_string().contains("cannot be null") {
+                "Required field is missing or null"
+            } else if e.to_string().contains("foreign key constraint") {
+                "Invalid reference to related data"
+            } else {
+                "Database error occurred"
+            };
+
             HttpResponse::InternalServerError().json(json!({
-                "error": "Database operation failed",
-                "details": err.to_string()
+                "error": error_message,
+                "details": e.to_string(),
+                "debug_info": {
+                    "item_id": id,
+                    "item_code": req.item_code,
+                    "item_name": req.item_name,
+                    "company_tin": claims.tin,
+                    "timestamp": now
+                }
             }))
-        }
+        },
     }
 }
 

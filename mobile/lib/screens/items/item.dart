@@ -24,11 +24,11 @@ class _ItemsPageState extends State {
 
   // ITEM CATERGORY
   final itemCategoryOptions = [
-    "Regular VAT",
+    "RegularVAT",
     "Rent",
     "Exempt"
   ];
-  String selectedItemCategory = "Regular VAT";
+  String selectedItemCategory = "RegularVAT";
 
   // TAX INCLUSIVE
   bool isTaxable = false;
@@ -270,11 +270,10 @@ class _ItemsPageState extends State {
           itemName: itemNameController.text,
           itemDescription: itemDescriptionController.text.isEmpty ? null : itemDescriptionController.text,
           price: double.parse(priceController.text),
-          companyTIN: companyTINController.text,
-          itemCategory: selectedItemCategory,
+          itemCategory: selectedItemCategory ?? "RegularVAT",
           isTaxable: isTaxable,
           isTaxInclusive: isTaxInclusive,
-          tourismCSTOption: selectedTourismCSTOption,
+          tourismCSTOption: selectedTourismCSTOption ?? "None",
         );
 
         // Hide loading indicator
@@ -282,17 +281,35 @@ class _ItemsPageState extends State {
 
         if (response['success'] == true) {
           // Show success message
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(response['message'])),
-          );
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(content: Text(response['message'])),
+          // );
+
           
           // Clear the form
           _formKey.currentState!.reset();
           setState(() {
-            selectedItemCategory = "Regular VAT";
+            selectedItemCategory = "RegularVAT";
+            selectedTourismCSTOption = "None";
             isTaxable = false;
             isTaxInclusive = true;
           });
+
+          // Try to get item data from response
+          final itemData = response['data'] ?? response['item'];
+          
+          if (itemData != null) {
+            print('About to show modal with data: $itemData');
+            // Show modal with created item details
+            await showItemCreatedModal(itemData);
+          } else {
+            print('No item data found in response');
+            // Fallback to SnackBar if no item data
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(response['message'] ?? 'Item created successfully')),
+            );
+          }
+            
         } else {
           // Error
           ScaffoldMessenger.of(context).showSnackBar(
@@ -308,6 +325,81 @@ class _ItemsPageState extends State {
       }
     }
     // print("Item added");
+  }
+
+
+  // Add this method to your widget class
+  Future<void> showItemCreatedModal(Map<String, dynamic> itemData) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap button to close
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.green, size: 28),
+              SizedBox(width: 10),
+              Text('Item Created Successfully'),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                _buildDetailRow('Item Code', itemData['item_code']?.toString() ?? 'N/A'),
+                _buildDetailRow('Item Name', itemData['item_name']?.toString() ?? 'N/A'),
+                if (itemData['item_description'] != null)
+                  _buildDetailRow('Description', itemData['item_description'].toString()),
+                _buildDetailRow('Price', '\$${itemData['price']?.toString() ?? '0.00'}'),
+                _buildDetailRow('Category', itemData['item_category']?.toString() ?? 'N/A'),
+                _buildDetailRow('Taxable', itemData['is_taxable'] == true ? 'Yes' : 'No'),
+                _buildDetailRow('Tax Inclusive', itemData['is_tax_inclusive'] == true ? 'Yes' : 'No'),
+                _buildDetailRow('Tourism CST', itemData['tourism_cst_option']?.toString() ?? 'None'),
+                if (itemData['company_tin'] != null)
+                  _buildDetailRow('Company TIN', itemData['company_tin'].toString()),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            ElevatedButton(
+              child: Text('Add Another Item'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                // Form is already cleared, so user can immediately add another item
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+  // Helper method to build detail rows
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              '$label:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(
+            child: Text(value),
+          ),
+        ],
+      ),
+    );
   }
 }
 

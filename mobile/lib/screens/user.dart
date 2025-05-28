@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+
+import 'package:http/http.dart' as http;
+
 
 class UserManagementPage extends StatefulWidget {
   const UserManagementPage({Key? key}) : super(key: key);
@@ -15,10 +20,20 @@ class _UserManagementPageState extends State<UserManagementPage> {
   ];
 
   // Form controllers
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController companyTINController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+
+  // Role options
   String _selectedRole = 'Staff';
+  final roleOptions = [
+    "Staff",
+    "Admin"
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -110,6 +125,8 @@ class _UserManagementPageState extends State<UserManagementPage> {
     );
   }
 
+
+// Add user form
   Widget _buildAddUserForm() {
     return Card(
       elevation: 2,
@@ -124,15 +141,29 @@ class _UserManagementPageState extends State<UserManagementPage> {
             ),
             const SizedBox(height: 16),
             TextField(
-              controller: _nameController,
+              controller: firstNameController,
               decoration: const InputDecoration(
-                labelText: 'Full Name',
+                labelText: 'First Name',
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 12),
+
+
+            // Last NAme TextForm field
             TextField(
-              controller: _emailController,
+              controller: lastNameController,
+              decoration: const InputDecoration(
+                labelText: 'Last Name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+
+            // Email Textform field
+            TextField(
+              controller: emailController,
               decoration: const InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(),
@@ -140,8 +171,10 @@ class _UserManagementPageState extends State<UserManagementPage> {
               keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 12),
+
+            // Password Textformfield
             TextField(
-              controller: _passwordController,
+              controller: passwordController,
               decoration: const InputDecoration(
                 labelText: 'Password',
                 border: OutlineInputBorder(),
@@ -151,7 +184,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               value: _selectedRole,
-              items: ['Admin', 'Staff', 'Viewer']
+              items: roleOptions
                   .map((role) => DropdownMenuItem(
                         value: role,
                         child: Text(role),
@@ -181,6 +214,8 @@ class _UserManagementPageState extends State<UserManagementPage> {
     );
   }
 
+
+// User list
   Widget _buildUsersList() {
     return Card(
       elevation: 2,
@@ -225,10 +260,10 @@ class _UserManagementPageState extends State<UserManagementPage> {
   void _fetchUsers() async {
     // TODO: Call Rust backend API to fetch users
     // Example:
-    // final response = await http.get(Uri.parse('http://your-rust-backend/api/users'));
-    // setState(() {
-    //   users = jsonDecode(response.body);
-    // });
+    final response = await http.get(Uri.parse('http://10.0.2.2:8080/api/user_account'));
+    setState(() {
+      users = jsonDecode(response.body);
+    });
     
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Refreshing users...')),
@@ -236,9 +271,9 @@ class _UserManagementPageState extends State<UserManagementPage> {
   }
 
   void _addUser() async {
-    if (_nameController.text.isEmpty ||
-        _emailController.text.isEmpty ||
-        _passwordController.text.isEmpty) {
+    if (usernameController.text.isEmpty ||
+        companyTINController.text.isEmpty ||
+        passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill all fields')),
       );
@@ -261,17 +296,17 @@ class _UserManagementPageState extends State<UserManagementPage> {
     setState(() {
       users.add({
         'id': (users.length + 1).toString(),
-        'name': _nameController.text,
-        'email': _emailController.text,
+        'name': usernameController.text,
+        'email': companyTINController.text,
         'role': _selectedRole,
         'lastLogin': 'Never',
       });
     });
 
     // Clear form
-    _nameController.clear();
-    _emailController.clear();
-    _passwordController.clear();
+    usernameController.clear();
+    companyTINController.clear();
+    passwordController.clear();
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('User created successfully')),
@@ -306,9 +341,9 @@ class _UserManagementPageState extends State<UserManagementPage> {
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
+    usernameController.dispose();
+    companyTINController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 }
