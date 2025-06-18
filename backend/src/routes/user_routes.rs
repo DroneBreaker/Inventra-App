@@ -16,7 +16,7 @@ pub fn init(cfg: &mut web::ServiceConfig) {
             .route("/users/id/{id}", web::get().to(user_handler::get_user_by_id))
             .route("/users/username/{username}", web::get().to(user_handler::get_user_by_username))
             .route("/users/company/{tin}", web::get().to(user_handler::get_users_by_company_tin))
-            .route("/users/update/{tin}", web::put().to(user_handler::update_user))
+            .route("/users/update/{id}", web::put().to(user_handler::update_user))
             .route("/users/{id}", web::delete().to(user_handler::delete_user))
             .route("/register", web::post().to(user_handler::register_user))
             .route("/login", web::post().to(user_handler::login_user))

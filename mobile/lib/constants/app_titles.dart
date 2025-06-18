@@ -38,6 +38,9 @@ class AppTitle {
   // REPORT
   static const String reportHeader = "Financial Reports";
 
+  // DELETIONS
+  static const String confirmDeletion = "Are you sure you want to delete";
+
   // ERRORS
   static const String noUsernameError = "Please enter your username";
   static const String noPasswordError = "Please enter your password";
