@@ -119,8 +119,18 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     'Supplier',
     "Exempt"
   ];
-  List<Map<String, dynamic>> clients = [];
+  
+// Enhanced client management
+  List<Map<String, dynamic>> clients = [
+    {'name': 'John Doe', 'tin': 'TIN001'},
+    {'name': 'Jane Smith', 'tin': 'TIN002'},
+    {'name': 'Acme Corporation', 'tin': 'TIN003'},
+    {'name': 'Tech Solutions Ltd', 'tin': 'TIN004'},
+  ];
   List<Map<String, dynamic>> filteredClients = [];
+  bool showClientDropdown = false;
+  Map<String, dynamic>? selectedClientData;
+  
 
   // FLAG OPTIONS
   String? selectedFlag;
@@ -155,6 +165,161 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     "Overdue",
     "Canceled",
   ];
+
+
+// Add this to your _CreateInvoiceState class
+
+
+
+@override
+void initState() {
+  super.initState();
+  // Initialize filtered clients
+  filteredClients = List.from(clients);
+  
+  // Add listener to client name controller
+  clientNameController.addListener(_onClientNameChanged);
+}
+
+@override
+void dispose() {
+  clientNameController.removeListener(_onClientNameChanged);
+  super.dispose();
+}
+
+void _onClientNameChanged() {
+  final query = clientNameController.text.toLowerCase();
+  
+  setState(() {
+    if (query.isEmpty) {
+      filteredClients = List.from(clients);
+      showClientDropdown = false;
+      selectedClientData = null;
+      clientTINController.clear();
+    } else {
+      filteredClients = clients.where((client) {
+        return client['name'].toLowerCase().contains(query);
+      }).toList();
+      showClientDropdown = filteredClients.isNotEmpty;
+      
+      // Check if current text exactly matches a client name
+      final exactMatch = clients.firstWhere(
+        (client) => client['name'].toLowerCase() == query,
+        orElse: () => {},
+      );
+      
+      if (exactMatch.isNotEmpty && selectedClientData?['name'] != exactMatch['name']) {
+        selectedClientData = exactMatch;
+        clientTINController.text = exactMatch['tin'];
+      }
+    }
+  });
+}
+
+void _selectClient(Map<String, dynamic> client) {
+  setState(() {
+    selectedClientData = client;
+    clientNameController.text = client['name'];
+    clientTINController.text = client['tin'];
+    showClientDropdown = false;
+  });
+}
+
+// Replace your existing Client Name and Client TIN TextFormFields with this:
+Widget buildClientSelection() {
+  return Column(
+    children: [
+      // Client Name with dropdown
+      Stack(
+        children: [
+          TextFormField(
+            controller: clientNameController,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.only(left: 20),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10)
+              ),
+              hintText: "Client Name",
+              suffixIcon: clientNameController.text.isNotEmpty
+                  ? IconButton(
+                      onPressed: () {
+                        clientNameController.clear();
+                        clientTINController.clear();
+                        setState(() {
+                          showClientDropdown = false;
+                          selectedClientData = null;
+                        });
+                      },
+                      icon: Icon(Icons.clear),
+                    )
+                  : Icon(Icons.search),
+            ),
+            onTap: () {
+              if (clientNameController.text.isNotEmpty) {
+                setState(() {
+                  showClientDropdown = true;
+                });
+              }
+            },
+          ),
+          
+          // Dropdown suggestions
+          if (showClientDropdown && filteredClients.isNotEmpty)
+            Positioned(
+              top: 60,
+              left: 0,
+              right: 0,
+              child: Material(
+                elevation: 4,
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  constraints: BoxConstraints(maxHeight: 200),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white,
+                  ),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: filteredClients.length,
+                    itemBuilder: (context, index) {
+                      final client = filteredClients[index];
+                      return ListTile(
+                        title: Text(client['name']),
+                        subtitle: Text('TIN: ${client['tin']}'),
+                        onTap: () => _selectClient(client),
+                        dense: true,
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+      
+      SizedBox(height: 20),
+      
+      // Client TIN (auto-populated)
+      TextFormField(
+        controller: clientTINController,
+        enabled: false,
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.only(left: 20),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10)
+          ),
+          hintText: "Client TIN",
+          filled: true,
+          fillColor: selectedClientData != null ? Colors.green.shade50 : Colors.grey.shade100,
+        ),
+      ),
+    ],
+  );
+}
+
+// In your build method, replace the existing Client Name and Client TIN sections with:
+// _buildClientSelection(),
 
 
   @override

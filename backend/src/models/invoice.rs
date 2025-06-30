@@ -20,6 +20,7 @@ pub struct Invoice {
     #[sqlx(default)]
     pub total_amount: Decimal,
     pub status: InvoiceStatus,
+    pub items: Vec<InvoiceItem>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -37,7 +38,7 @@ pub struct InvoiceItem {
     pub line_total: Decimal, // (quantity * unit_price) - discount + tax
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, sqlx::Type)]
 pub enum InvoiceFlags {
     Invoice,
     Purchase,
@@ -47,7 +48,7 @@ pub enum InvoiceFlags {
     CreditNote,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, sqlx::Type)]
 pub enum InvoiceStatus {
     Draft,
     Sent,
