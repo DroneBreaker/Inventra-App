@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:inventra/services/api_service.dart';
-import 'package:inventra/widgets/app_text.dart';
+import 'package:inventra/widgets/titles.dart';
 
 class UserManagementPage extends StatefulWidget {
   const UserManagementPage({Key? key}) : super(key: key);
@@ -376,8 +376,8 @@ class _UserManagementPageState extends State<UserManagementPage> {
                         onPressed: () => {
                           showDialog(context: context, builder: (BuildContext context) {
                             return AlertDialog(
-                              title: appText(title: "Confirm Deletion"),
-                              content: appText(title: "Are you sure you want to delete ${user['first_name']} ${user['last_name']}?"),
+                              title: appTitle(title: "Confirm Deletion"),
+                              content: appParagraph(title: "Are you sure you want to delete ${user['first_name']} ${user['last_name']}?"),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(context),

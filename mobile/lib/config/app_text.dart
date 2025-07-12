@@ -1,4 +1,4 @@
-class AppTitle {
+class AppText {
   //INTRO
   static const String intro = "EVAT SUITE";
   static const String description =

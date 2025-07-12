@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:inventra/widgets/app_text.dart';
+import 'package:inventra/widgets/titles.dart';
 
 class SupplierPage extends StatefulWidget {
   const SupplierPage({super.key});
@@ -14,7 +14,7 @@ class _SupplierPageState extends State<SupplierPage> {
     return Scaffold(
       body: SafeArea(
         child: Center(
-          child: appText(title: "SUPPLIER PAGE UNDER CONSTRUCTION.."),
+          child: appTitle(title: "SUPPLIER PAGE UNDER CONSTRUCTION.."),
         ),
       ),
     );

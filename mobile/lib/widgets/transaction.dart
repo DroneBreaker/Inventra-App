@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inventra/config/app_colors.dart';
-import 'package:inventra/config/app_titles.dart';
-import 'package:inventra/widgets/app_text.dart';
+import 'package:inventra/config/app_text.dart';
+import 'package:inventra/widgets/titles.dart';
 
 Widget transaction() {
   final List<Map<String, String>> transactionTypes = [
@@ -16,7 +16,7 @@ Widget transaction() {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 15.0),
-          child: appText(title: AppTitle.recentTransaction, fontSize: 22, fontWeight: FontWeight.w700,),
+          child: appTitle(title: AppText.recentTransaction, fontWeight: FontWeight.w700,),
         ),
 
         // Tabs 
@@ -66,7 +66,7 @@ Widget transaction() {
                           ),
                           title: Text('Equipment Purchase'),
                           subtitle: Text('May ${index + 5}, 2025'),
-                          trailing: appText(title: '-\$${(index + 2) * 75}.00', color: AppColors.error, fontWeight: FontWeight.bold,
+                          trailing: appParagraph(title: '-\$${(index + 2) * 75}.00', color: AppColors.error, fontWeight: FontWeight.bold,
                           ),
                         );
                       }
@@ -82,9 +82,9 @@ Widget transaction() {
                           backgroundColor: Colors.green.shade100,
                           child: Icon(Icons.arrow_upward, color: Colors.green),
                         ),
-                        title: appText(title: 'Client Payment'),
-                        subtitle: appText(title: 'May ${index + 1}, 2025'),
-                        trailing: appText(title: '+\$${(index + 3) * 150}.00', color: AppColors.success, fontWeight: FontWeight.bold, 
+                        title: appParagraph(title: 'Client Payment'),
+                        subtitle: appParagraph(title: 'May ${index + 1}, 2025'),
+                        trailing: appParagraph(title: '+\$${(index + 3) * 150}.00', color: AppColors.success, fontWeight: FontWeight.bold, 
                         ),
                       );
                     }

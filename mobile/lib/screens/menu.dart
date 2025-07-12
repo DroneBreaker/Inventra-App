@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inventra/config/routes.dart';
-import 'package:inventra/widgets/app_text.dart';
+import 'package:inventra/widgets/titles.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -63,8 +63,8 @@ class _MenuPageState extends State<MenuPage> {
               Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Center(
-                  child: appText(title: 
-                    'Inventra', fontSize: 20, fontWeight: FontWeight.bold,
+                  child: appTitle(title: 
+                    'Inventra', fontWeight: FontWeight.bold,
                   ),
                 ),
               ),

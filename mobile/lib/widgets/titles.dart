@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 // class AppText extends StatelessWidget {
 //   final String title;
@@ -24,12 +25,23 @@ import 'package:flutter/material.dart';
 //   }
 // }
 
-Widget appText({required String title, double? fontSize, FontWeight? fontWeight, Color? color}) {
-  return SafeArea(
-    child: Text(title, style: TextStyle(
-      fontSize: fontSize,
+Widget appTitle({required String title, FontWeight? fontWeight, Color? color}) {
+  return Text(
+    title, style: TextStyle(
+      fontSize: 23.sp,
       fontWeight: fontWeight,
+      // fontFamily: ,
       color: color
-    ),)
+    )
+  );
+}
+
+Widget appParagraph({required String title, double fontSize = 17, FontWeight? fontWeight, Color? color}) {
+  return Text(title, style: TextStyle(
+      fontSize: fontSize.sp,
+      fontWeight: fontWeight,
+      color: color,
+      // fontFamily: "Actor",
+    )
   );
 }

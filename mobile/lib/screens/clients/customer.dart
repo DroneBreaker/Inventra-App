@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:inventra/widgets/app_text.dart';
+import 'package:inventra/widgets/titles.dart';
 
 class CustomerPage extends StatefulWidget {
   const CustomerPage({super.key});
@@ -12,7 +12,7 @@ class _CustomerPageState extends State<CustomerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: Center(
-      child: appText(title: "CUSTOMERS PAGE"),
+      child: appTitle(title: "CUSTOMERS PAGE"),
     ),);
   }
 }

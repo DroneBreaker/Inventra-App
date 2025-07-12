@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
 import 'package:inventra/config/app_colors.dart';
-import 'package:inventra/widgets/app_text.dart';
+import 'package:inventra/widgets/titles.dart';
 import 'package:inventra/widgets/categories.dart';
 import 'package:inventra/widgets/transaction.dart';
 
@@ -28,7 +30,7 @@ class _HomePageState extends State<HomePage> {
                     Icon(Icons.notification_add, size: 30, color: Colors.black),
                     Expanded(
                       child: Center(
-                          child: appText(title: "Droners Inc", color: Colors.black, fontSize: 20)
+                          child: appTitle(title: "Droners Inc", color: Colors.black)
                         ),
                     ),
                     IconButton(
@@ -54,36 +56,35 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         Column(
                           children: [
-                            appText(title: "Total Invoices", color: Colors.black),
-                            appText(title: "35", fontSize: 30, color: Colors.black),
-                            appText(title: "Last 24 hours", color: Colors.black),
+                            appTitle(title: "Total Invoices", color: Colors.black),
+                            appTitle(title: "35", color: Colors.black),
+                            appTitle(title: "Last 24 hours", color: Colors.black),
                           ],
                         ),
                         Column(
                           children: [
-                            appText(title: "Paid Invoices", color: Colors.black),
-                            appText(title: "30", fontSize: 30, color: Colors.black),
-                            appText(title: "Last 24 hours", color: Colors.black),
+                            appTitle(title: "Paid Invoices", color: Colors.black),
+                            appTitle(title: "30", color: Colors.black),
+                            appTitle(title: "Last 24 hours", color: Colors.black),
                           ],
                         ),
                         Column(
                           children: [
-                            appText(title: "Total Invoices", color: Colors.black),
-                            appText(title: "35", fontSize: 30, color: Colors.black),
-                            appText(title: "Last 24 hours", color: Colors.black),
+                            appTitle(title: "Total Invoices", color: Colors.black),
+                            appTitle(title: "35", color: Colors.black),
+                            appTitle(title: "Last 24 hours", color: Colors.black),
                           ],
                         ),
                       ],
                     ),
                   ),
                 ),
-                
-                const SizedBox(height: 20),
+                Gap(20.h),
                 
                 // Categories
                 buildCategories(),
                 
-                const SizedBox(height: 10),
+                Gap(20.h),
                 
                 // Transaction section
                 transaction(),

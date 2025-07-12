@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:inventra/widgets/app_text.dart';
+import 'package:inventra/widgets/titles.dart';
 
 class AdvanceIncome extends StatefulWidget {
   const AdvanceIncome({super.key});
@@ -13,7 +13,7 @@ class _AdvanceIncomeState extends State<AdvanceIncome> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: appText(title: "ADVANCE INVOICE HERE..."),
+        child: appTitle(title: "ADVANCE INVOICE HERE..."),
       ),
     );
   }

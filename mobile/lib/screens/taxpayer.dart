@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
 import 'package:inventra/config/app_colors.dart';
-import 'package:inventra/config/app_titles.dart';
-import 'package:inventra/widgets/app_text.dart';
+import 'package:inventra/config/app_text.dart';
+import 'package:inventra/widgets/titles.dart';
 import 'package:inventra/widgets/button.dart';
 import 'package:intl/intl.dart';
 
@@ -184,14 +186,12 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                       return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            appText(
-                              title: AppTitle.taxpayerTitle,
-                              fontSize: 25,
+                            appTitle(
+                              title: AppText.taxpayerTitle,
                             ),
                             const SizedBox(height: 20.0),
-                            appText(
-                              title: AppTitle.invoiceDate,
-                              fontSize: 18,
+                            appTitle(
+                              title: AppText.invoiceDate,
                             ),
 
                             // Invoice Date
@@ -207,7 +207,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                         enabledBorder: const OutlineInputBorder(
                                             borderSide: BorderSide(
                                                 color: Colors.white)),
-                                        labelText: AppTitle.invoiceDate,
+                                        labelText: AppText.invoiceDate,
                                         border: OutlineInputBorder(
                                             borderRadius:
                                                 BorderRadius.circular(10),
@@ -238,7 +238,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                       enabled: false,
                                       controller: timeController,
                                       decoration: InputDecoration(
-                                        labelText: AppTitle.invoiceTime,
+                                        labelText: AppText.invoiceTime,
                                         border: OutlineInputBorder(
                                             borderRadius:
                                                 BorderRadius.circular(10),
@@ -258,9 +258,8 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                     icon: const Icon(Icons.timer))
                               ],
                             ),
-                            appText(
-                              title: AppTitle.documentType,
-                              fontSize: 18,
+                            appTitle(
+                              title: AppText.documentType,
                             ),
                             const SizedBox(
                               height: 10,
@@ -338,7 +337,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                 ),
                                 const SizedBox(width: 15),
                                 Button(
-                                  buttonText: AppTitle.addClientButton,
+                                  buttonText: AppText.addClientButton,
                                   onTap: () {},
                                   // size: const Size(110, 55),
                                   colors: AppColors.buttonPrimary,
@@ -350,16 +349,16 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 15),
+                            Gap(20.h),
 
                             // Business TIN text field
                             TextFormField(
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return AppTitle.companyTINError;
+                                  return AppText.companyTINError;
                                 }
                                 if (value.length < 11) {
-                                  return AppTitle.validCompanyTINError;
+                                  return AppText.validCompanyTINError;
                                 }
                                 return null;
                               },
@@ -374,7 +373,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 15),
+                            Gap(20.h),
 
                             //Username text field
                             Form(
@@ -391,13 +390,13 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                             BorderRadius.circular(10))),
                               ),
                             ),
-                            const SizedBox(height: 15),
+                            Gap(20.h),
 
                             // Invoice number text field
                             TextFormField(
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
-                                  return AppTitle.invoiceNumberError;
+                                  return AppText.invoiceNumberError;
                                 }
                                 return null;
                               },
@@ -406,7 +405,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                 enabledBorder: const OutlineInputBorder(
                                     borderSide:
                                         BorderSide(color: Colors.white)),
-                                labelText: AppTitle.invoiceNumberField,
+                                labelText: AppText.invoiceNumberField,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -430,7 +429,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                   disabledBorder: const OutlineInputBorder(
                                       borderSide:
                                           BorderSide(color: Colors.white)),
-                                  labelText: AppTitle.totalAmountField,
+                                  labelText: AppText.totalAmountField,
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -438,7 +437,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                               ),
                             ),
                             const SizedBox(height: 15),
-                            appText(title: 'Items', fontSize: 18),
+                            appTitle(title: 'Items'),
                             const SizedBox(height: 15),
 
                             //Item section
@@ -453,7 +452,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                         enabledBorder: const OutlineInputBorder(
                                             borderSide: BorderSide(
                                                 color: Colors.white)),
-                                        labelText: AppTitle.itemField,
+                                        labelText: AppText.itemField,
                                         border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(10),
@@ -464,7 +463,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                 ),
                                 const SizedBox(width: 15),
                                 Button(
-                                  buttonText: AppTitle.addItemButton,
+                                  buttonText: AppText.addItemButton,
                                   //FIX THIS LATER
                                   onTap: _addItems,
 
@@ -497,7 +496,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                     ),
                                   )
                                 : Center(
-                                    child: appText(
+                                    child: appParagraph(
                                       title: "No items found",
                                       fontSize: 17,
                                     ),
@@ -578,10 +577,9 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
         builder: (BuildContext context) {
           return AlertDialog(
             // backgroundColor: AppColors.error,
-            title: appText(
+            title: appTitle(
               title: "INVALID DATE & TIME",
               color: AppColors.info,
-              fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
             actions: [
@@ -614,10 +612,9 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
             builder: (BuildContext context) {
               return AlertDialog(
                 // backgroundColor: AppColors.error,
-                title: appText(
+                title: appTitle(
                   title: "PLEASE SELECT AN INVOICE TYPE",
                   color: AppColors.info,
-                  fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
                 actions: [
@@ -684,9 +681,8 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      appText(
-                        title: AppTitle.itemSetupTitle,
-                        fontSize: 25,
+                      appTitle(
+                        title: AppText.itemSetupTitle,
                         fontWeight: FontWeight.bold,
                       ),
                       const SizedBox(height: 10),
@@ -695,14 +691,14 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                       TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return AppTitle.noItemCodeError;
+                            return AppText.noItemCodeError;
                           } if(int.tryParse(value) == null) {
-                            return AppTitle.itemCodeDescription;
+                            return AppText.itemCodeDescription;
                           }
                           return null;
                         },
                         decoration: InputDecoration(
-                          labelText: AppTitle.itemCodeField,
+                          labelText: AppText.itemCodeField,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -714,13 +710,13 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                       TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return AppTitle.invalidItemNameError;
+                            return AppText.invalidItemNameError;
                           }
                           return null;
                         },
                         controller: itemNameController,
                         decoration: InputDecoration(
-                          labelText: AppTitle.itemField,
+                          labelText: AppText.itemField,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -732,14 +728,14 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                       TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return AppTitle.priceIsEmptyError;
+                            return AppText.priceIsEmptyError;
                           }
                           return null;
                         },
                         controller: priceController,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
-                          labelText: AppTitle.priceField,
+                          labelText: AppText.priceField,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -768,7 +764,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
 
                       // Tax Inclusive Checkbox
                       CheckboxListTile(
-                        title: appText(title: "Tax Inclusive?"),
+                        title: appParagraph(title: "Tax Inclusive?"),
                         value: isTaxInclusive,
                         onChanged: (_) {},
                       ),
@@ -788,7 +784,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
 
                       // Taxable Checkbox
                       CheckboxListTile(
-                        title: appText(title: "Taxable?"),
+                        title: appParagraph(title: "Taxable?"),
                         value: isTaxable,
                         onChanged: (_) {},
                       ),
@@ -833,7 +829,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
 
                       // Discount Checkbox
                       CheckboxListTile(
-                        title: appText(title: "Apply Discount"),
+                        title: appParagraph(title: "Apply Discount"),
                         value: isDiscount,
                         onChanged: (_) {},
                       ),
@@ -1057,7 +1053,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                 child: const Text('Close'),
               ),
               Button(
-                buttonText: AppTitle.addClientButton,
+                buttonText: AppText.addClientButton,
                 onTap: () {
                   _addPartner();
                   Navigator.pop(context);

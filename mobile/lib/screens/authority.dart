@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:inventra/widgets/app_text.dart';
+import 'package:inventra/widgets/titles.dart';
 
 class AuthorityPage extends StatefulWidget {
   const AuthorityPage({super.key});
@@ -12,7 +12,7 @@ class _AuthorityPageState extends State<AuthorityPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: Center(child: 
-    appText(title: "We are currently under development", fontSize: 30, fontWeight: FontWeight.bold,),
+    appParagraph(title: "We are currently under development", fontSize: 30, fontWeight: FontWeight.bold,),
     ),
   );
   }

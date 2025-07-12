@@ -3,9 +3,9 @@
 // import 'package:inventra/widgets/app_text.dart';
 
 import 'package:flutter/material.dart';
-import 'package:inventra/config/app_titles.dart';
+import 'package:inventra/config/app_text.dart';
 import 'package:inventra/services/item_service.dart';
-import 'package:inventra/widgets/app_text.dart';
+import 'package:inventra/widgets/titles.dart';
 
 class ItemsPage extends StatefulWidget {
   const ItemsPage({super.key});
@@ -58,7 +58,7 @@ class _ItemsPageState extends State {
                     child: Column(
                       children: [
                         Center(
-                          child: appText(title: "HELLO ITEM FUCKERS"),
+                          child: appTitle(title: "HELLO ITEM FUCKERS"),
                         ),
                         const SizedBox(height: 25), 
                         
@@ -75,7 +75,7 @@ class _ItemsPageState extends State {
                           ),
                           validator: (value) {
                             if(value == null || value.isEmpty) {
-                              return AppTitle.noItemCodeError;
+                              return AppText.noItemCodeError;
                             }
                             return null;
                           },
@@ -95,7 +95,7 @@ class _ItemsPageState extends State {
                           ),
                           validator: (value) {
                             if(value == null || value.isEmpty) {
-                              return AppTitle.invalidItemNameError;
+                              return AppText.invalidItemNameError;
                             }
                             return null;
                           },
@@ -132,7 +132,7 @@ class _ItemsPageState extends State {
                           ),
                           validator: (value) {
                             if(value == null || value.isEmpty) {
-                              return AppTitle.priceIsEmptyError;
+                              return AppText.priceIsEmptyError;
                             }
                             return null;
                           },
@@ -186,7 +186,7 @@ class _ItemsPageState extends State {
                           children: [
                             CheckboxListTile(
                               contentPadding: EdgeInsets.zero, // Remove default padding
-                              title: appText(title: "isTaxable", color: Colors.black),
+                              title: appParagraph(title: "isTaxable", color: Colors.black),
                               value: isTaxable, 
                               onChanged: (bool? value) => {
                                 setState(() {
@@ -196,7 +196,7 @@ class _ItemsPageState extends State {
                             ),
                             CheckboxListTile(
                               contentPadding: EdgeInsets.zero, // Remove default padding
-                              title: appText(title: "isTaxInclusive", color: Colors.black),
+                              title: appParagraph(title: "isTaxInclusive", color: Colors.black),
                               value: isTaxInclusive, 
                               onChanged: (bool? value) => {
                                 setState(() {
@@ -245,7 +245,7 @@ class _ItemsPageState extends State {
                             onPressed: () {
                               addItems();
                             }, 
-                            child: appText(title: AppTitle.addItemButton, color: Colors.black)
+                            child: appParagraph(title: AppText.addItemButton, color: Colors.black)
                           ),
                         ),
                         const SizedBox(height: 30), // Added bottom padding
@@ -319,7 +319,7 @@ class _ItemsPageState extends State {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: appText(title: 'Error: $e')),
+            SnackBar(content: appParagraph(title: 'Error: $e')),
           );
         }
       }

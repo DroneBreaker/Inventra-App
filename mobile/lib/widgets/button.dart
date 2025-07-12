@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:inventra/widgets/app_text.dart';
+import 'package:inventra/widgets/titles.dart';
 
 class Button extends StatelessWidget {
   final String buttonText;
@@ -32,7 +32,7 @@ class Button extends StatelessWidget {
             icon!,
             const SizedBox(width: 8,)
           ],
-          appText(title: buttonText, color: colors, fontSize: fontSize,fontWeight: FontWeight.bold,)
+          appParagraph(title: buttonText, color: colors, fontWeight: FontWeight.bold,)
         ],
     ),);
     // return MaterialButton(

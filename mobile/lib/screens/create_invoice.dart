@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:inventra/config/app_colors.dart';
-import 'package:inventra/widgets/app_text.dart';
+import 'package:inventra/widgets/titles.dart';
 import 'package:inventra/widgets/button.dart';
 
 class CreateInvoice extends StatefulWidget {
@@ -353,12 +353,12 @@ Widget buildClientSelection() {
                           builder: (FormFieldState<String> state) {
                             return Column(
                               children: [
-                                appText(title: "INVOICE FUCKERS"),
+                                appTitle(title: "INVOICE FUCKERS"),
                                 SizedBox(height: 10,),
                             
 
                                 // Document Type
-                                appText(title: "Select Document Type", fontSize: 17,),
+                                appTitle(title: "Select Document Type",),
                                 SizedBox(height: 10,),
 
                                 
@@ -625,7 +625,7 @@ Widget buildClientSelection() {
                                     onPressed: () {
                                     // handleInvoice();
                                     }, 
-                                    child: appText(title: "Submit", fontSize: 17, color: Colors.black,)
+                                    child: appParagraph(title: "Submit", fontSize: 17, color: Colors.black,)
                                   ),
                                 ),
                                 SizedBox(height: 20,),

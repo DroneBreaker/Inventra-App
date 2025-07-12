@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:inventra/widgets/app_text.dart';
+import 'package:inventra/widgets/titles.dart';
 
 class CreateAdvanceIncome extends StatefulWidget {
   const CreateAdvanceIncome({super.key});
@@ -91,7 +91,7 @@ class _CreateAdvanceIncomeState extends State<CreateAdvanceIncome> {
                       Center
                       (
                         child: 
-                          appText(title: "ADVANCE INVOICE FUCKERS")
+                          appTitle(title: "ADVANCE INVOICE FUCKERS")
                       ),
                       SizedBox(height: 20,),
           
@@ -209,7 +209,7 @@ class _CreateAdvanceIncomeState extends State<CreateAdvanceIncome> {
                             items: statusOptions.map((String option) {
                               return DropdownMenuItem(
                                 value: option,
-                                child: appText(title: option,),
+                                child: appTitle(title: option,),
                               );
                             }).toList(),
                             onChanged: (String? newValue) {
@@ -264,7 +264,7 @@ class _CreateAdvanceIncomeState extends State<CreateAdvanceIncome> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.grey
                               ),
-                              child: appText(title: "Submit", color: Colors.white, fontSize: 18,),)
+                              child: appTitle(title: "Submit", color: Colors.white,),)
                           )
                       
           

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:inventra/widgets/app_text.dart';
+import 'package:inventra/widgets/titles.dart';
 
 class ExportPage extends StatefulWidget {
   const ExportPage({super.key});
@@ -14,7 +14,7 @@ class _ExportPageState extends State<ExportPage> {
     return Scaffold(
       body: SafeArea(
         child: Center(
-          child: appText(title: "EXPORT PAGE IS UNDER CONSTRUCTION"),
+          child: appTitle(title: "EXPORT PAGE IS UNDER CONSTRUCTION"),
         ),
       ),
     );
