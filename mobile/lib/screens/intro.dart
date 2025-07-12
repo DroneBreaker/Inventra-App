@@ -25,7 +25,7 @@ class _IntroPageState extends State<IntroPage> {
               padding: const EdgeInsets.only(top: 380.0),
               child: Column(
                 children: [
-                  Center(child: AppText(title: "INVENTRA", fontSize: 45, colors: Colors.grey,),),
+                  Center(child: appText(title: "INVENTRA", fontSize: 45, color: Colors.grey,),),
                   Padding(
                     padding: const EdgeInsets.only(left: 30.0, top: 235, right: 30),
                     child: Row(

@@ -12,7 +12,7 @@ class _CustomerPageState extends State<CustomerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: Center(
-      child: AppText(title: "CUSTOMERS PAGE"),
+      child: appText(title: "CUSTOMERS PAGE"),
     ),);
   }
 }

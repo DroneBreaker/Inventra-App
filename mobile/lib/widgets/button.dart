@@ -32,7 +32,7 @@ class Button extends StatelessWidget {
             icon!,
             const SizedBox(width: 8,)
           ],
-          AppText(title: buttonText, colors: colors, fontSize: fontSize,fontWeight: FontWeight.bold,)
+          appText(title: buttonText, color: colors, fontSize: fontSize,fontWeight: FontWeight.bold,)
         ],
     ),);
     // return MaterialButton(

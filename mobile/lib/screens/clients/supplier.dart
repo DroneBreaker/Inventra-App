@@ -14,7 +14,7 @@ class _SupplierPageState extends State<SupplierPage> {
     return Scaffold(
       body: SafeArea(
         child: Center(
-          child: AppText(title: "SUPPLIER PAGE UNDER CONSTRUCTION.."),
+          child: appText(title: "SUPPLIER PAGE UNDER CONSTRUCTION.."),
         ),
       ),
     );

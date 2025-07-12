@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:inventra/constants/app_colors.dart';
-import 'package:inventra/constants/app_titles.dart';
+import 'package:inventra/config/app_colors.dart';
 import 'package:inventra/widgets/app_text.dart';
 import 'package:inventra/widgets/button.dart';
 
@@ -354,12 +353,12 @@ Widget buildClientSelection() {
                           builder: (FormFieldState<String> state) {
                             return Column(
                               children: [
-                                AppText(title: "INVOICE FUCKERS"),
+                                appText(title: "INVOICE FUCKERS"),
                                 SizedBox(height: 10,),
                             
 
                                 // Document Type
-                                AppText(title: "Select Document Type", fontSize: 17,),
+                                appText(title: "Select Document Type", fontSize: 17,),
                                 SizedBox(height: 10,),
 
                                 
@@ -626,7 +625,7 @@ Widget buildClientSelection() {
                                     onPressed: () {
                                     // handleInvoice();
                                     }, 
-                                    child: AppText(title: "Submit", fontSize: 17, colors: Colors.black,)
+                                    child: appText(title: "Submit", fontSize: 17, color: Colors.black,)
                                   ),
                                 ),
                                 SizedBox(height: 20,),

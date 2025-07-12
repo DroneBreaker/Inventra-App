@@ -14,7 +14,7 @@ class _AllItemsPageState extends State<AllItemsPage> {
     return SafeArea(
       child: Scaffold(
         body: Center(
-          child: AppText(title: "ITEMS PAGE IS UNDER CONSTRUCTION", fontSize: 18,),
+          child: appText(title: "ITEMS PAGE IS UNDER CONSTRUCTION", fontSize: 18,),
         ),
       ),
     );

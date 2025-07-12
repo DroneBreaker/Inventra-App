@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:inventra/constants/app_colors.dart';
-import 'package:inventra/constants/app_titles.dart';
+import 'package:inventra/config/app_colors.dart';
+import 'package:inventra/config/app_titles.dart';
 import 'package:inventra/screens/auth/login.dart';
 import 'package:inventra/services/api_service.dart';
 import 'package:inventra/widgets/app_text.dart';
@@ -42,7 +42,7 @@ class _RegisterPageState extends State<RegisterPage> {
     if(passwordController.text != confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: AppText(title: "Passwords do not match!"),
+          content: Text("Passwords do not match!"),
           backgroundColor: AppColors.error,
         )
       );
@@ -82,7 +82,7 @@ class _RegisterPageState extends State<RegisterPage> {
         // Registration successful
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: AppText(title: responseData['message'] ?? 'Registration succcessful'),
+            content: appText(title: responseData['message'] ?? 'Registration succcessful'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -105,7 +105,7 @@ class _RegisterPageState extends State<RegisterPage> {
       } else {
         // Registration failed
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: AppText(title: responseData['error'] ?? "Registration failed"),
+          SnackBar(content: appText(title: responseData['error'] ?? "Registration failed"),
           backgroundColor: AppColors.error,
           ),
         );
@@ -113,7 +113,7 @@ class _RegisterPageState extends State<RegisterPage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: AppText(title: "Error: ${e.toString()}"),
+          content: appText(title: "Error: ${e.toString()}"),
           backgroundColor: AppColors.error,
         ),
       );
@@ -148,7 +148,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    Center(child: AppText(title: AppTitle.registerTitle, fontSize: 30,),),
+                    Center(child: appText(title: AppTitle.registerTitle, fontSize: 30,),),
                     const SizedBox(height: 20,),
           
                     
@@ -391,7 +391,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        AppText(title: AppTitle.hasAccount, fontSize: 18, colors: Colors.grey,),
+                        appText(title: AppTitle.hasAccount, fontSize: 18, color: Colors.grey,),
                         Button(buttonText: AppTitle.loginButton, fontSize: 18, colors: Colors.black, onTap: () {
                           Navigator.pushReplacement(
                             context, 
@@ -412,7 +412,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         onPressed: () {
                           handleRegister();
                         },
-                        child: AppText(title: AppTitle.registerButton, colors: Colors.black, fontSize: 20,),
+                        child: appText(title: AppTitle.registerButton, color: Colors.black, fontSize: 20,),
                       ),
                     ),
                     SizedBox(height: 20,),

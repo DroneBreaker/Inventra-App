@@ -14,7 +14,7 @@ class _ExportPageState extends State<ExportPage> {
     return Scaffold(
       body: SafeArea(
         child: Center(
-          child: AppText(title: "EXPORT PAGE IS UNDER CONSTRUCTION"),
+          child: appText(title: "EXPORT PAGE IS UNDER CONSTRUCTION"),
         ),
       ),
     );

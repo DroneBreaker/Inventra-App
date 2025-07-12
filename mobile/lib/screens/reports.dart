@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:inventra/constants/app_titles.dart';
+import 'package:inventra/config/app_titles.dart';
 import 'package:inventra/widgets/app_text.dart';
 
 class ReportPage extends StatefulWidget {
@@ -35,7 +35,7 @@ class _ReportPageState extends State<ReportPage> with SingleTickerProviderStateM
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        title: const AppText(title: AppTitle.reportHeader),
+        title: appText(title: AppTitle.reportHeader),
         actions: [
           IconButton(
             icon: const Icon(Icons.file_download),

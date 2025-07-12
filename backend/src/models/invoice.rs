@@ -43,7 +43,7 @@ pub enum InvoiceFlags {
     Invoice,
     Purchase,
     PartialRefund,
-    FullRefund,
+    FullRefund, 
     PurchaseReturn,
     CreditNote,
 }

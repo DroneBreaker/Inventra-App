@@ -38,9 +38,6 @@ class ItemService {
   }) async {
     try {
       final token = await _getToken();
-      if (token == null) {
-        throw Exception('No authentication token found');
-      }
 
       final response = await http.post(
         Uri.parse('$baseUrl/items'),

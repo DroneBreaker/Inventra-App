@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:inventra/constants/app_colors.dart';
-import 'package:inventra/constants/routes.dart';
+import 'package:inventra/config/app_colors.dart';
+import 'package:inventra/config/routes.dart';
 import 'package:inventra/widgets/app_text.dart';
 
 Widget buildCategories() {
@@ -62,7 +62,7 @@ Widget _buildCategoryItem(
           child: Icon(icon, color: color ?? Color.fromRGBO(56, 255, 67, 0.6), size: 27,),
         ),
         const SizedBox(height: 6),
-        Center(child: AppText(title: label)),
+        Center(child: appText(title: label)),
       ],
     ),
   );

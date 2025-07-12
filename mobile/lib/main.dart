@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:inventra/constants/routes.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:inventra/config/routes.dart';
 import 'package:inventra/screens/auth/register.dart';
 import 'package:inventra/screens/auth/login.dart';
 // import 'package:inventra/screens/clients/export.dart';
@@ -31,32 +32,40 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      initialRoute: RouteNames.intro,
-      routes: {
-        RouteNames.login: (context) => const LoginPage(),
-        RouteNames.register: (context) => const RegisterPage(),
-        RouteNames.home: (context) => const MainWrapper(),
-        RouteNames.invoices: (context) => const InvoicePage(),
-        RouteNames.reports: (context) => ReportPage(),
-        RouteNames.menu: (context) => MenuPage(),
-        RouteNames.createInvoice: (context) => const CreateInvoice(),
-        RouteNames.advanceInvoice: (context) => const AdvanceInvoiceWrapper(),
-        RouteNames.customers: (context) => const CustomerWrapper(),
-        // RouteNames.suppliers: (context) => SupplierPage(),
-        // RouteNames.exports: (context) => ExportPage(),
-        RouteNames.items: (context) => const ItemWrapper(),
-        RouteNames.allItems: (context) => const AllItemsPage(),
-      RouteNames.income: (context) => const IncomeWrapper(),
-        RouteNames.expenses: (context) => const ExpensesPage(),
-        RouteNames.users: (context) => const UserManagementPage(),
+    return ScreenUtilInit(
+      designSize: const Size(412, 864),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          initialRoute: RouteNames.intro,
+          // onGenerateRoute: GenerateRoute.onGenerateRoute,
+          routes: {
+            RouteNames.login: (context) => const LoginPage(),
+            RouteNames.register: (context) => const RegisterPage(),
+            RouteNames.home: (context) => const MainWrapper(),
+            RouteNames.invoices: (context) => const InvoicePage(),
+            RouteNames.reports: (context) => ReportPage(),
+            RouteNames.menu: (context) => MenuPage(),
+            RouteNames.createInvoice: (context) => const CreateInvoice(),
+            RouteNames.advanceInvoice: (context) => const AdvanceInvoiceWrapper(),
+            RouteNames.customers: (context) => const CustomerWrapper(),
+            // RouteNames.suppliers: (context) => SupplierPage(),
+            // RouteNames.exports: (context) => ExportPage(),
+            RouteNames.items: (context) => const ItemWrapper(),
+            RouteNames.allItems: (context) => const AllItemsPage(),
+          RouteNames.income: (context) => const IncomeWrapper(),
+            RouteNames.expenses: (context) => const ExpensesPage(),
+            RouteNames.users: (context) => const UserManagementPage(),
+          },
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+            useMaterial3: true,
+          ),
+          home: const IntroPage(),
+        );  
       },
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: const IntroPage(),
     );
   }
 }

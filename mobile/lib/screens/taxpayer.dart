@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:inventra/constants/app_colors.dart';
-import 'package:inventra/constants/app_titles.dart';
-import 'package:inventra/services/item_service.dart';
+import 'package:inventra/config/app_colors.dart';
+import 'package:inventra/config/app_titles.dart';
 import 'package:inventra/widgets/app_text.dart';
 import 'package:inventra/widgets/button.dart';
 import 'package:intl/intl.dart';
@@ -185,12 +184,12 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                       return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const AppText(
+                            appText(
                               title: AppTitle.taxpayerTitle,
                               fontSize: 25,
                             ),
                             const SizedBox(height: 20.0),
-                            const AppText(
+                            appText(
                               title: AppTitle.invoiceDate,
                               fontSize: 18,
                             ),
@@ -259,7 +258,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                     icon: const Icon(Icons.timer))
                               ],
                             ),
-                            const AppText(
+                            appText(
                               title: AppTitle.documentType,
                               fontSize: 18,
                             ),
@@ -439,7 +438,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                               ),
                             ),
                             const SizedBox(height: 15),
-                            const AppText(title: 'Items', fontSize: 18),
+                            appText(title: 'Items', fontSize: 18),
                             const SizedBox(height: 15),
 
                             //Item section
@@ -497,8 +496,8 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                       },
                                     ),
                                   )
-                                : const Center(
-                                    child: AppText(
+                                : Center(
+                                    child: appText(
                                       title: "No items found",
                                       fontSize: 17,
                                     ),
@@ -579,9 +578,9 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
         builder: (BuildContext context) {
           return AlertDialog(
             // backgroundColor: AppColors.error,
-            title: const AppText(
+            title: appText(
               title: "INVALID DATE & TIME",
-              colors: AppColors.info,
+              color: AppColors.info,
               fontSize: 18,
               fontWeight: FontWeight.w600,
             ),
@@ -615,9 +614,9 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
             builder: (BuildContext context) {
               return AlertDialog(
                 // backgroundColor: AppColors.error,
-                title: const AppText(
+                title: appText(
                   title: "PLEASE SELECT AN INVOICE TYPE",
-                  colors: AppColors.info,
+                  color: AppColors.info,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
@@ -685,7 +684,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const AppText(
+                      appText(
                         title: AppTitle.itemSetupTitle,
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
@@ -769,7 +768,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
 
                       // Tax Inclusive Checkbox
                       CheckboxListTile(
-                        title: const AppText(title: "Tax Inclusive?"),
+                        title: appText(title: "Tax Inclusive?"),
                         value: isTaxInclusive,
                         onChanged: (_) {},
                       ),
@@ -789,7 +788,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
 
                       // Taxable Checkbox
                       CheckboxListTile(
-                        title: const AppText(title: "Taxable?"),
+                        title: appText(title: "Taxable?"),
                         value: isTaxable,
                         onChanged: (_) {},
                       ),
@@ -834,7 +833,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
 
                       // Discount Checkbox
                       CheckboxListTile(
-                        title: const AppText(title: "Apply Discount"),
+                        title: appText(title: "Apply Discount"),
                         value: isDiscount,
                         onChanged: (_) {},
                       ),

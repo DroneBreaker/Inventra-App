@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:inventra/constants/app_titles.dart';
+import 'package:inventra/config/app_titles.dart';
 import 'package:inventra/widgets/app_text.dart';
 
 class CreateCustomerPage extends StatefulWidget {
@@ -40,7 +40,7 @@ class _CreateCustomerPage extends State<CreateCustomerPage> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      AppText(title: "CUSTOMER FUCKERS"),
+                      appText(title: "CUSTOMER FUCKERS"),
                       SizedBox(height: 20,),
             
 
@@ -99,7 +99,7 @@ class _CreateCustomerPage extends State<CreateCustomerPage> {
                         items: clientType.map((String option) {
                           return DropdownMenuItem(
                             value: option,
-                            child: AppText(title: option)
+                            child: appText(title: option)
                           );
                         }).toList(), 
                         onChanged: (String? newValue) {
@@ -137,7 +137,7 @@ class _CreateCustomerPage extends State<CreateCustomerPage> {
                           onPressed: () {
                             // addClient();
                           }, 
-                          child: AppText(title: AppTitle.addClientButton, fontSize: 18,)
+                          child: appText(title: AppTitle.addClientButton, fontSize: 18,)
                         )
                       )
                     ],

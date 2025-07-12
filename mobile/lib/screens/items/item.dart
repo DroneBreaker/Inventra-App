@@ -3,7 +3,7 @@
 // import 'package:inventra/widgets/app_text.dart';
 
 import 'package:flutter/material.dart';
-import 'package:inventra/constants/app_titles.dart';
+import 'package:inventra/config/app_titles.dart';
 import 'package:inventra/services/item_service.dart';
 import 'package:inventra/widgets/app_text.dart';
 
@@ -58,7 +58,7 @@ class _ItemsPageState extends State {
                     child: Column(
                       children: [
                         Center(
-                          child: AppText(title: "HELLO ITEM FUCKERS"),
+                          child: appText(title: "HELLO ITEM FUCKERS"),
                         ),
                         const SizedBox(height: 25), 
                         
@@ -186,7 +186,7 @@ class _ItemsPageState extends State {
                           children: [
                             CheckboxListTile(
                               contentPadding: EdgeInsets.zero, // Remove default padding
-                              title: AppText(title: "isTaxable", colors: Colors.black),
+                              title: appText(title: "isTaxable", color: Colors.black),
                               value: isTaxable, 
                               onChanged: (bool? value) => {
                                 setState(() {
@@ -196,7 +196,7 @@ class _ItemsPageState extends State {
                             ),
                             CheckboxListTile(
                               contentPadding: EdgeInsets.zero, // Remove default padding
-                              title: AppText(title: "isTaxInclusive", colors: Colors.black),
+                              title: appText(title: "isTaxInclusive", color: Colors.black),
                               value: isTaxInclusive, 
                               onChanged: (bool? value) => {
                                 setState(() {
@@ -245,7 +245,7 @@ class _ItemsPageState extends State {
                             onPressed: () {
                               addItems();
                             }, 
-                            child: AppText(title: AppTitle.addItemButton, colors: Colors.black)
+                            child: appText(title: AppTitle.addItemButton, color: Colors.black)
                           ),
                         ),
                         const SizedBox(height: 30), // Added bottom padding
@@ -319,7 +319,7 @@ class _ItemsPageState extends State {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: AppText(title: 'Error: $e')),
+            SnackBar(content: appText(title: 'Error: $e')),
           );
         }
       }

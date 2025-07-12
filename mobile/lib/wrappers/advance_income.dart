@@ -11,9 +11,9 @@ class AdvanceIncome extends StatefulWidget {
 class _AdvanceIncomeState extends State<AdvanceIncome> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
-        child: AppText(title: "ADVANCE INVOICE HERE..."),
+        child: appText(title: "ADVANCE INVOICE HERE..."),
       ),
     );
   }

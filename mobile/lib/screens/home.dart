@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:inventra/constants/app_colors.dart';
+import 'package:inventra/config/app_colors.dart';
 import 'package:inventra/widgets/app_text.dart';
 import 'package:inventra/widgets/categories.dart';
 import 'package:inventra/widgets/transaction.dart';
@@ -28,7 +28,7 @@ class _HomePageState extends State<HomePage> {
                     Icon(Icons.notification_add, size: 30, color: Colors.black),
                     Expanded(
                       child: Center(
-                          child: AppText(title: "Droners Inc", colors: Colors.black, fontSize: 20)
+                          child: appText(title: "Droners Inc", color: Colors.black, fontSize: 20)
                         ),
                     ),
                     IconButton(
@@ -54,23 +54,23 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         Column(
                           children: [
-                            AppText(title: "Total Invoices", colors: Colors.black),
-                            AppText(title: "35", fontSize: 30, colors: Colors.black),
-                            AppText(title: "Last 24 hours", colors: Colors.black),
+                            appText(title: "Total Invoices", color: Colors.black),
+                            appText(title: "35", fontSize: 30, color: Colors.black),
+                            appText(title: "Last 24 hours", color: Colors.black),
                           ],
                         ),
                         Column(
                           children: [
-                            AppText(title: "Paid Invoices", colors: Colors.black),
-                            AppText(title: "30", fontSize: 30, colors: Colors.black),
-                            AppText(title: "Last 24 hours", colors: Colors.black),
+                            appText(title: "Paid Invoices", color: Colors.black),
+                            appText(title: "30", fontSize: 30, color: Colors.black),
+                            appText(title: "Last 24 hours", color: Colors.black),
                           ],
                         ),
                         Column(
                           children: [
-                            AppText(title: "Total Invoices", colors: Colors.black),
-                            AppText(title: "35", fontSize: 30, colors: Colors.black),
-                            AppText(title: "Last 24 hours", colors: Colors.black),
+                            appText(title: "Total Invoices", color: Colors.black),
+                            appText(title: "35", fontSize: 30, color: Colors.black),
+                            appText(title: "Last 24 hours", color: Colors.black),
                           ],
                         ),
                       ],
