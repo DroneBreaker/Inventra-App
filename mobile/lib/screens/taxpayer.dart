@@ -270,7 +270,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                 children: flags.map((flag) {
                                   final bool isActive =
                                       activeButton == flag['text'];
-                                  return Button(
+                                  return appButton(
                                       buttonText: flag['text'],
                                       onTap: () {
                                         setState(() {
@@ -281,7 +281,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                         state.didChange(flag['text']);
                                       },
                                       colors: AppColors.buttonPrimary,
-                                      fontSize: 16,
+                                      // fontSize: 16,
                                       icon: isActive
                                           ? Icon(
                                               flag['icon'],
@@ -336,12 +336,12 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                   ),
                                 ),
                                 const SizedBox(width: 15),
-                                Button(
+                                appButton(
                                   buttonText: AppText.addClientButton,
                                   onTap: () {},
                                   // size: const Size(110, 55),
                                   colors: AppColors.buttonPrimary,
-                                  fontSize: 16,
+                                  // fontSize: 16,
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.add),
@@ -462,14 +462,14 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                                   ),
                                 ),
                                 const SizedBox(width: 15),
-                                Button(
+                                appButton(
                                   buttonText: AppText.addItemButton,
                                   //FIX THIS LATER
                                   onTap: _addItems,
 
                                   // size: const Size(110, 55),
                                   colors: AppColors.buttonPrimary,
-                                  fontSize: 17,
+                                  // fontSize: 17,
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.add),
@@ -547,12 +547,12 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                             ),
 
                             Center(
-                              child: Button(
+                              child: appButton(
                                 buttonText: 'Submit Invoice',
                                 onTap: _submitForm,
                                 // size: const Size(160, 55),
                                 colors: AppColors.buttonPrimary,
-                                fontSize: 18,
+                                // fontSize: 18,
                               ),
                             ),
                             const SizedBox(
@@ -583,7 +583,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
               fontWeight: FontWeight.w600,
             ),
             actions: [
-              Button(
+              appButton(
                   buttonText: "Close",
                   colors: AppColors.buttonPrimary,
                   onTap: () {
@@ -618,7 +618,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                   fontWeight: FontWeight.w600,
                 ),
                 actions: [
-                  Button(
+                  appButton(
                       buttonText: "Close",
                       colors: AppColors.buttonPrimary,
                       onTap: () {
@@ -844,9 +844,9 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                   },
                   child: const Text('Close'),
                 ),
-                Button(
+                appButton(
                   buttonText: "Add Item",
-                  fontSize: 17,
+                  // fontSize: 17,
                   onTap: () {
                     // _addItems;
                     Navigator.pop(context);
@@ -1052,7 +1052,7 @@ class _TaxpayerPageState extends State<TaxpayerPage> {
                 },
                 child: const Text('Close'),
               ),
-              Button(
+              appButton(
                 buttonText: AppText.addClientButton,
                 onTap: () {
                   _addPartner();

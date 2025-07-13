@@ -58,4 +58,5 @@ class AppText {
   static const String itemCodeDescription = "Item code must be a number";
   static const String invalidItemNameError = "Please enter your item name";
   static const String priceIsEmptyError = "Please enter your price";
+  static const String invoiceNumberLengthError = "Password should not be less than 6 characters";
 }

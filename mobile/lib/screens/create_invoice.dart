@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
 import 'package:inventra/config/app_colors.dart';
+import 'package:inventra/config/app_text.dart';
+import 'package:inventra/widgets/forms.dart';
 import 'package:inventra/widgets/titles.dart';
 import 'package:inventra/widgets/button.dart';
 
@@ -86,7 +90,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       final String formattedTime = time.format(context);
 
       setState(() {
-        invoiceDateController.text = formattedTime;
+        invoiceTimeController.text = formattedTime;
         selectedInvoiceTime = time;
       });
     }
@@ -369,7 +373,7 @@ Widget buildClientSelection() {
                                       children: flags.map((flag) {
                                         final bool isActive =
                                             activeButton == flag['text'];
-                                        return Button(
+                                        return appButton(
                                             
                                               buttonText: flag['text'],
                                               onTap: () {
@@ -381,7 +385,7 @@ Widget buildClientSelection() {
                                                 state.didChange(flag['text']);
                                               },
                                               colors: AppColors.buttonPrimary,
-                                              fontSize: 16,
+                                              // fontSize: 16,
                                               icon: isActive
                                                   ? Icon(
                                                       flag['icon'],
@@ -410,21 +414,14 @@ Widget buildClientSelection() {
                                       //   fontSize: 16,
                                       // ),
                                 ),
-                                SizedBox(height: 20,),
+                                Gap(20.h),
                             
                             
                                 // Invoice Number TextForm field
-                                TextFormField(
-                                  controller: invoiceNumberController,
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10)
-                                    ),
-                                    hintText: "Invoice Number"
-                                  ),
+                                appInput(placeholder: "Invoice Number", textEditingController: invoiceNumberController, 
+                                  errorMsg: AppText.invoiceNumberError, errorLengthMsg: AppText.invoiceNumberLengthError
                                 ),
-                                SizedBox(height: 20,),
+                                Gap(20.h),
                             
                             
                                 // Username TextForm field
@@ -439,21 +436,12 @@ Widget buildClientSelection() {
                                     hintText: "Username"
                                   ),
                                 ),
-                                SizedBox(height: 20,),
+                                Gap(20.h),
                             
                             
                                 // Client TextForm field
-                                TextFormField(
-                                  controller: clientNameController,
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10)
-                                    ),
-                                    hintText: "Client Name"
-                                  ),
-                                ),
-                                SizedBox(height: 20,),
+                                appInput(placeholder: "Client Name", textEditingController: clientNameController),
+                                Gap(20.h),
                             
                             
                                 // Client TIN
@@ -468,36 +456,23 @@ Widget buildClientSelection() {
                                     hintText: "Client TIN"
                                   ),
                                 ),
-                                SizedBox(height: 20,),
+                                Gap(20.h),
                             
                             
                                 // Invoice Date TextForm field
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: Form(
-                                        child: TextFormField(
-                                            controller: invoiceDateController,
-                                            keyboardType: TextInputType.datetime,
-                                            decoration: InputDecoration(
-                                              border: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(10)
-                                              ),
-                                              contentPadding: EdgeInsets.only(top: 40, left: 20),
-                                              hintText: "Invoice Date"
-                                            ),
-                                            onChanged: (value) {
-                                              print('Invoice Date: $value');
-                                            },
-                                          ),
-                                      ),
+                                      child: appInput(placeholder: "Invoice Date", textEditingController: 
+                                      invoiceDateController, textInputType: TextInputType.datetime, onTap: (value) => print('Invoice Time: $value')
+                                    ),
                                     ),
                                     IconButton(onPressed: () => _selectInvoiceDate(context), 
                                       icon: Icon(Icons.calendar_month, size: 30,)
                                     )
                                   ],
                                 ),
-                                SizedBox(height: 20,),
+                                Gap(20.h),
                             
                             
                                 // Invoice Time TextForm field
@@ -505,20 +480,9 @@ Widget buildClientSelection() {
                                   children: [
                                     Expanded(
                                       child: Form(
-                                        child: TextFormField(
-                                            controller: invoiceTimeController,
-                                            keyboardType: TextInputType.datetime,
-                                            decoration: InputDecoration(
-                                              border: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(10)
-                                              ),
-                                              contentPadding: EdgeInsets.only(top: 40, left: 20),
-                                              hintText: "Invoice Time"
-                                            ),
-                                            onChanged: (value) {
-                                              print('Invoice Time: $value');
-                                            },
-                                          ),
+                                        child: appInput(placeholder: "Invoice Time", textEditingController: invoiceTimeController, 
+                                          onTap: (value) => print('Invoice Time: $value')
+                                        )
                                       ),
                                     ),
                                     IconButton(onPressed: () => _selectInvoiceTime(context), 
@@ -526,7 +490,36 @@ Widget buildClientSelection() {
                                     )
                                   ],
                                 ),
-                                SizedBox(height: 20,),
+                                Gap(20.h),
+
+
+
+
+
+                      //           Row(
+                      //   children: [
+                      //     Expanded(
+                      //       child: Form(
+                      //         child: TextFormField(
+                      //           controller: dateReceivedController,
+                      //           keyboardType: TextInputType.datetime,
+                      //           decoration: InputDecoration(
+                      //             border: OutlineInputBorder(
+                      //               borderRadius: BorderRadius.circular(10)
+                      //             ),
+                      //             contentPadding: EdgeInsets.only(top: 40, left: 20),
+                      //             hintText: "Date Received"
+                      //           ),
+                      //           onChanged: (value) {
+                      //             print('Date Received: $value');
+                      //           },
+                      //         ),
+                      //       ),
+                      //     ),
+                      //     Gap(15.w),
+                      //     IconButton(onPressed: () => _selectDateReceived(context), icon: Icon(Icons.calendar_month, size: 30,))
+                      //   ],
+                      // ),
                             
                             
                                 // Due Date TextForm field
@@ -541,7 +534,7 @@ Widget buildClientSelection() {
                                               border: OutlineInputBorder(
                                                 borderRadius: BorderRadius.circular(10)
                                               ),
-                                              contentPadding: EdgeInsets.only(top: 40, left: 20),
+                                              contentPadding: EdgeInsets.only(left: 20),
                                               hintText: "Due Date"
                                             ),
                                             onChanged: (value) {
@@ -555,7 +548,7 @@ Widget buildClientSelection() {
                                     )
                                   ],
                                 ),
-                                SizedBox(height: 20,),
+                                Gap(20.h),
                             
                             
                                 // Total VAT TextForm field
@@ -585,7 +578,7 @@ Widget buildClientSelection() {
                                     hintText: "Total Amount"
                                   ),
                                 ),
-                                SizedBox(height: 20,),
+                                Gap(20.h),
                             
                             
                                 // Invoice Status Dropdown
@@ -611,7 +604,7 @@ Widget buildClientSelection() {
                                     }
                                   },
                                 ),
-                                SizedBox(height: 20,),
+                                Gap(20.h),
                             
                             
                                 // Button
@@ -620,15 +613,15 @@ Widget buildClientSelection() {
                                   height: 60,
                                   child: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.grey[400]
+                                      backgroundColor: Colors.orange[400]
                                     ),
                                     onPressed: () {
                                     // handleInvoice();
                                     }, 
-                                    child: appParagraph(title: "Submit", fontSize: 17, color: Colors.black,)
+                                    child: appParagraph(title: "Submit", fontSize: 17, color: AppColors.white,)
                                   ),
                                 ),
-                                SizedBox(height: 20,),
+                               Gap(40.h),
                               ],
                             );
                           }),

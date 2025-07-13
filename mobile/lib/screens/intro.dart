@@ -31,13 +31,13 @@ class _IntroPageState extends State<IntroPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Button(buttonText: "Sign In", fontSize: 20, colors: Colors.grey, onTap: () {
+                        appButton(buttonText: "Sign In", colors: Colors.grey, onTap: () {
                           Navigator.pushReplacement(
                             context, 
                             MaterialPageRoute(builder: (context) => const LoginPage())
                           );
                         }),
-                        Button(buttonText: "Sign Up", fontSize: 20, colors: Colors.grey, onTap: () {
+                        appButton(buttonText: "Sign Up", colors: Colors.grey, onTap: () {
                           Navigator.pushReplacement(
                           context, 
                           MaterialPageRoute(builder: (context) => const RegisterPage()),

@@ -62,7 +62,7 @@ Widget _buildCategoryItem(
           child: Icon(icon, color: color ?? Color.fromRGBO(56, 255, 67, 0.6), size: 27,),
         ),
         const SizedBox(height: 6),
-        Center(child: appTitle(title: label)),
+        Center(child: appParagraph(title: label)),
       ],
     ),
   );

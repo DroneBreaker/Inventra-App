@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
+import 'package:inventra/widgets/forms.dart';
 import 'package:inventra/widgets/titles.dart';
 
 class CreateAdvanceIncome extends StatefulWidget {
@@ -93,51 +96,22 @@ class _CreateAdvanceIncomeState extends State<CreateAdvanceIncome> {
                         child: 
                           appTitle(title: "ADVANCE INVOICE FUCKERS")
                       ),
-                      SizedBox(height: 20,),
+                      Gap(20.h),
           
           
                       // Client ID TExtForm field
-                      TextFormField(
-                        controller: clientIDController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10)
-                          ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 20),
-                          hintText: "Client ID"
-                        ),
-                      ),
-                      SizedBox(height: 20),
+                      appInput(placeholder: "Client ID", textEditingController: clientIDController),
+                      Gap(20.h),
           
           
                       // Amount TextForm field
-                      TextFormField(
-                        controller: amountController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10)
-                          ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 20),
-                          hintText: "Amount"
-                        ),
-                      ),
-                      SizedBox(height: 20,),
+                      appInput(placeholder: "Amount", textEditingController: amountController, textInputType: TextInputType.number),
+                      Gap(20.h),
           
           
                       // Description TextForm field
-                      TextFormField(
-                        controller: descriptionController,
-                        maxLines: 4,
-                        keyboardType: TextInputType.multiline,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10)
-                          ),
-                          contentPadding: EdgeInsets.only(top: 40, left: 20),
-                          hintText: "Description"
-                        ),
-                      ),
-                      SizedBox(height: 20,),
+                      appInput(placeholder: "Description", textEditingController: descriptionController, maxLines: 4),
+                      Gap(20.h),
           
           
                       // Date received TextForm field
@@ -152,7 +126,7 @@ class _CreateAdvanceIncomeState extends State<CreateAdvanceIncome> {
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10)
                                   ),
-                                  contentPadding: EdgeInsets.only(top: 40, left: 20),
+                                  contentPadding: EdgeInsets.only(left: 20),
                                   hintText: "Date Received"
                                 ),
                                 onChanged: (value) {
@@ -161,11 +135,11 @@ class _CreateAdvanceIncomeState extends State<CreateAdvanceIncome> {
                               ),
                             ),
                           ),
-                          SizedBox(width: 15,),
+                          Gap(15.w),
                           IconButton(onPressed: () => _selectDateReceived(context), icon: Icon(Icons.calendar_month, size: 30,))
                         ],
                       ),
-                      SizedBox(height: 20,),
+                      Gap(20.h),
           
           
                       // Expected Delivery Date TextForm field
@@ -180,7 +154,7 @@ class _CreateAdvanceIncomeState extends State<CreateAdvanceIncome> {
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10)
                                     ),
-                                    contentPadding: EdgeInsets.only(top: 40, left: 20),
+                                    contentPadding: EdgeInsets.only(left: 20),
                                     hintText: "Expected Delivery"
                                   ),
                                   onChanged: (value) {
@@ -194,48 +168,17 @@ class _CreateAdvanceIncomeState extends State<CreateAdvanceIncome> {
                           )
                         ],
                       ),
-                      SizedBox(height: 20,),
+                      Gap(20.h),
           
           
                       // Status TextForm field
-                      DropdownButtonFormField(
-                            value: selectedStatusOptions,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              labelText: 'Status',
-                            ),
-                            items: statusOptions.map((String option) {
-                              return DropdownMenuItem(
-                                value: option,
-                                child: appTitle(title: option,),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
-                              if(newValue != null) {
-                                setState(() {
-                                  selectedStatusOptions = newValue;
-                                });
-                              }
-                            },
-                          ),
-                          SizedBox(height: 20,),
+                          appDropdown(selectedValue: selectedStatusOptions, items: statusOptions),
+                          Gap(20.h),
           
           
                           // Amount TextForm field
-                          TextFormField(
-                            controller: appliedAmountController,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10)
-                              ),
-                              contentPadding: EdgeInsets.only(top: 40, left: 20),
-                              hintText: "Applied Amount"
-                            ),
-                          ),
-                          SizedBox(height: 20,),
+                          appInput(placeholder: "Applied Amount", textEditingController: amountController, textInputType: TextInputType.number),
+                          Gap(20.h),
 
 
                           // Related Invoices
@@ -262,9 +205,9 @@ class _CreateAdvanceIncomeState extends State<CreateAdvanceIncome> {
                                 // handleAdvanceIncome();
                               }, 
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.grey
+                                backgroundColor: Colors.orange
                               ),
-                              child: appTitle(title: "Submit", color: Colors.white,),)
+                              child: appParagraph(title: "Submit", color: Colors.white,),)
                           )
                       
           

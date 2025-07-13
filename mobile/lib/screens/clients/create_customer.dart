@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
+import 'package:inventra/config/app_colors.dart';
 import 'package:inventra/config/app_text.dart';
+import 'package:inventra/widgets/forms.dart';
 import 'package:inventra/widgets/titles.dart';
 
 class CreateCustomerPage extends StatefulWidget {
@@ -28,8 +32,10 @@ class _CreateCustomerPage extends State<CreateCustomerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: null,
+      extendBodyBehindAppBar: true,
       body: SafeArea(
-        child: SingleChildScrollView(
+        // child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.only(top: 150.0),
             child: SizedBox(
@@ -41,91 +47,32 @@ class _CreateCustomerPage extends State<CreateCustomerPage> {
                   child: Column(
                     children: [
                       appTitle(title: "CUSTOMER FUCKERS"),
-                      SizedBox(height: 20,),
+                      Gap(20.h),
             
 
                       // Customer Name TextForm field
-                      TextFormField(
-                        controller: customerNameTextController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10)
-                          ),
-                          contentPadding: EdgeInsets.only(left: 20),
-                          hintText: "Customer Name"
-                        ),
-                      ),
-                      SizedBox(height: 20,),
+                      appInput(placeholder: "Customer Name", textEditingController: customerNameTextController),
+                      Gap(20.h),
 
 
                       // Customer TIN TextForm field
-                      TextFormField(
-                        controller: customerTINTextController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10)
-                          ),
-                          contentPadding: EdgeInsets.only(left: 20),
-                          hintText: "Customer TIN"
-                        ),
-                      ),
-                      SizedBox(height: 20,),
+                      appInput(placeholder: "Customer TIN", textEditingController: customerTINTextController),
+                      Gap(20.h),
 
 
                       // Customer Email TextForm field
-                      TextFormField(
-                        controller: emailTextController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10)
-                          ),
-                          contentPadding: EdgeInsets.only(left: 20),
-                          hintText: "Email"
-                        ),
-                      ),
-                      SizedBox(height: 20,),
+                      appInput(placeholder: "Email", textEditingController: emailTextController, textInputType: TextInputType.emailAddress),
+                      Gap(20.h),
 
 
                       // Client Type
-                      DropdownButtonFormField(
-                        value: selectedClientType,
-                        decoration: InputDecoration(
-                          labelText: 'Client Type',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10)
-                          )
-                        ),
-                        items: clientType.map((String option) {
-                          return DropdownMenuItem(
-                            value: option,
-                            child: appTitle(title: option)
-                          );
-                        }).toList(), 
-                        onChanged: (String? newValue) {
-                          if (newValue != null) {
-                            setState(() {
-                              selectedClientType = newValue;
-                            });
-                          }
-                        }
-                      ),
-                      SizedBox(height: 20,),
+                      appDropdown(selectedValue: selectedClientType, items: clientType,),
+                      Gap(20.h),
 
 
                       // Customer Phone TextForm field
-                      TextFormField(
-                        controller: phoneTextController,
-                        keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10)
-                          ),
-                          contentPadding: EdgeInsets.only(left: 20),
-                          hintText: "Phone Number"
-                        ),
-                      ),
-                      SizedBox(height: 20,),
+                      appInput(placeholder: "Phone Number", textEditingController: phoneTextController, textInputType: TextInputType.phone),
+                      Gap(20.h),
 
 
                       // Button
@@ -133,11 +80,13 @@ class _CreateCustomerPage extends State<CreateCustomerPage> {
                         width: double.infinity,
                         height: 60,
                         child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange
+                          ),
                           onPressed: () {
                             // addClient();
                           }, 
-                          child: appTitle(title: AppText.addClientButton)
+                          child: appTitle(title: AppText.addClientButton, color: AppColors.white)
                         )
                       )
                     ],
@@ -146,7 +95,7 @@ class _CreateCustomerPage extends State<CreateCustomerPage> {
               ),
             ),
           ),
-        )
+        // )
       ),
     );
   }

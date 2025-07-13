@@ -24,7 +24,8 @@ pub struct Item {
 pub enum ItemCategory {
     RegularVAT,
     Rent,
-    Exempt
+    Exempt,
+    NonVAT
 }
 
 #[derive(Debug, Serialize, Deserialize, sqlx::Type)]
@@ -40,6 +41,7 @@ impl std::fmt::Display for ItemCategory {
             ItemCategory::RegularVAT => write!(f, "Regular VAT"),
             ItemCategory::Rent => write!(f, "Rent"),
             ItemCategory::Exempt => write!(f, "Exempt"),
+            ItemCategory::NonVAT => write!(f, "Non VAT"),
         }
     }
 }

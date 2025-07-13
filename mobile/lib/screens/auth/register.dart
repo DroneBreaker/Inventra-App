@@ -7,6 +7,7 @@ import 'package:inventra/config/app_colors.dart';
 import 'package:inventra/config/app_text.dart';
 import 'package:inventra/screens/auth/login.dart';
 import 'package:inventra/services/api_service.dart';
+import 'package:inventra/widgets/forms.dart';
 import 'package:inventra/widgets/titles.dart';
 import 'package:inventra/widgets/button.dart';
 
@@ -150,7 +151,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     height: 640.h,
                     width: 412.w,
                     decoration: BoxDecoration(
-                      color: Colors.black,
+                      color: Colors.white,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(30.r),
                         topRight: Radius.circular(30.r)
@@ -165,179 +166,59 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     child: Padding(
                       padding: const EdgeInsets.only(top: 20.0, left: 20, right: 20),
-                      child: Form(
-                        key: _formKey,
-                        child: SingleChildScrollView(
+                      child: SingleChildScrollView(
                           child: Column(
                             children: [
-                              Center(child: appTitle(title: AppText.registerTitle, color: AppColors.white),),
+                              Center(child: appTitle(title: AppText.registerTitle, color: Colors.black),),
                               Gap(20.h),
                                    
                               
                               // First Name TextForm field
-                              TextFormField(
-                                controller: firstNameController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10)
-                                  ),
-                                  contentPadding: const EdgeInsets.only(left: 20),
-                                  labelText: "First Name",
-                                  labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
-                                ),
-                                validator: (value) {
-                                  if(value == null || value.isEmpty) {
-                                    return AppText.noUsernameError;
-                                  }
-                                  if(value.length < 6) {
-                                    return AppText.usernameLengthError;
-                                  }
-                                  return null;
-                                }
+                              appInput(placeholder: "First Name", textEditingController: firstNameController, 
+                                errorMsg: AppText.noUsernameError, errorLengthMsg: AppText.usernameLengthError
                               ),
-                              const SizedBox(height: 20,),
+                              Gap(20.h),
                                       
                                       
                               //  Last Name TextForm field
-                              TextFormField(
-                                controller: lastNameController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10)
-                                  ),
-                                  contentPadding: const EdgeInsets.only(left: 20),
-                                  labelText: "Last Name",
-                                  labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
-                                ),
-                                validator: (value) {
-                                  if(value == null || value.isEmpty) {
-                                    return AppText.companyTINError;
-                                  }
-                                  if(value.length < 6) {
-                                    return AppText.validCompanyTINError;
-                                  }
-                                  return null;
-                                }
-                              ),
-                              const SizedBox(height: 20,),
+                              appInput(placeholder: "Last Name", textEditingController: lastNameController, 
+                                errorMsg: AppText.noUsernameError, errorLengthMsg: AppText.usernameLengthError),
+                              Gap(20.h),
                                       
                                       
                               // Email TextForm field
-                              TextFormField(
-                                controller: emailController,
-                                keyboardType: TextInputType.emailAddress,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10)
-                                  ),
-                                  contentPadding: const EdgeInsets.only(left: 20),
-                                  labelText: "Email",
-                                  labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
-                                ),
-                                validator: (value) {
-                                  if(value == null || value.isEmpty) {
-                                    return AppText.noPasswordError;
-                                  }
-                                  if(value.length < 6) {
-                                    return AppText.passwordLengthError;
-                                  }
-                                  return null;
-                                },
+                              appInput(placeholder: "Email", textEditingController: emailController, textInputType: TextInputType.emailAddress,
+                                errorMsg: AppText.noPasswordError, errorLengthMsg: AppText.passwordLengthError
                               ),
-                              const SizedBox(height: 20,),
+                              Gap(20.h),
                                       
                                       
                               // Username TextForm field
-                              TextFormField(
-                                controller: usernameController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10)
-                                  ),
-                                  contentPadding: const EdgeInsets.only(left: 20),
-                                  labelText: "Username",
-                                  labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
-                                ),
-                                validator: (value) {
-                                  if(value == null || value.isEmpty) {
-                                    return AppText.noPasswordError;
-                                  }
-                                  if(value.length < 6) {
-                                    return AppText.passwordLengthError;
-                                  }
-                                  return null;
-                                },
+                              appInput(placeholder: "Usename", textEditingController: usernameController, 
+                                errorMsg: AppText.noUsernameError, errorLengthMsg: AppText.usernameLengthError
                               ),
-                              const SizedBox(height: 20,),
+                              Gap(20.h),
                                       
                                       
                               // Company Name TextForm field
-                              TextFormField(
-                                controller: companyNameController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10)
-                                  ),
-                                  contentPadding: const EdgeInsets.only(left: 20),
-                                  labelText: "Company Name",
-                                  labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
-                                ),
-                                validator: (value) {
-                                  if(value == null || value.isEmpty) {
-                                    return AppText.companyNameError;
-                                  }
-                                  return null;
-                                },
+                              appInput(placeholder: "Company Name", textEditingController: companyNameController, 
+                                errorMsg: AppText.companyNameError, errorLengthMsg: AppText.companyNameError
                               ),
-                              
-                              const SizedBox(height: 20,),
-                                      
+                              Gap(20.h),
+
+
                               // Company ID TextForm field
-                              TextFormField(
-                                controller: companyIDController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10)
-                                  ),
-                                  contentPadding: const EdgeInsets.only(left: 20),
-                                  labelText: "Company ID",
-                                  labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
-                                ),
-                                validator: (value) {
-                                  if(value == null || value.isEmpty) {
-                                    return AppText.companyIDError;
-                                  }
-                                  if(value.length < 6) {
-                                    return AppText.validCompanyIDError;
-                                  }
-                                  return null;
-                                },
+                              appInput(placeholder: "Company ID", textEditingController: companyNameController, 
+                                errorMsg: AppText.companyIDError, errorLengthMsg: AppText.validCompanyIDError
                               ),
                               const SizedBox(height: 20,),
                                       
                                       
                               // Company TIN Textform field
-                              TextFormField(
-                                controller: companyTINController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10)
-                                  ),
-                                  contentPadding: const EdgeInsets.only(left: 20),
-                                  labelText: "Company TIN",
-                                  labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
-                                ),
-                                validator: (value) {
-                                  if(value == null || value.isEmpty) {
-                                    return AppText.companyTINError;
-                                  }
-                                  if(value.length < 6) {
-                                    return AppText.validCompanyTINError;
-                                  }
-                                  return null;
-                                },
+                              appInput(placeholder: "Company TIN", textEditingController: companyNameController, 
+                                errorMsg: AppText.companyTINError, errorLengthMsg: AppText.validCompanyTINError
                               ),
-                              const SizedBox(height: 20,),
+                              Gap(20.h),
                                       
                                       
                               // Role
@@ -372,7 +253,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                   ),
                                   contentPadding: const EdgeInsets.only(left: 20),
                                   labelText: "Password",
-                                  labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
                                 ),
                                 validator: (value) {
                                   if(value == null || value.isEmpty) {
@@ -397,7 +277,6 @@ class _RegisterPageState extends State<RegisterPage> {
                                   ),
                                   contentPadding: const EdgeInsets.only(left: 20),
                                   labelText: "Confirm Password",
-                                  labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
                                 ),
                                 validator: (value) {
                                   if(value == null || value.isEmpty) {
@@ -409,20 +288,10 @@ class _RegisterPageState extends State<RegisterPage> {
                                   return null;
                                 },
                               ),
-                              SizedBox(height: 10,),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  appParagraph(title: AppText.hasAccount, fontSize: 18, color: Colors.grey,),
-                                  Button(buttonText: AppText.loginButton, fontSize: 18, colors: Colors.black, onTap: () {
-                                    Navigator.pushReplacement(
-                                      context, 
-                                      MaterialPageRoute(builder: (context) => LoginPage())
-                                    );
-                                  })
-                                ],
-                              ),
-                              SizedBox(height: 15,),
+                              Gap(20.h),
+
+
+                              // Button
                               SizedBox(
                                 width: double.infinity,
                                 height: 60,
@@ -434,17 +303,34 @@ class _RegisterPageState extends State<RegisterPage> {
                                   onPressed: () {
                                     handleRegister();
                                   },
-                                  child: appTitle(title: AppText.registerButton, color: Colors.black),
+                                  child: appTitle(title: AppText.registerButton, color: AppColors.white),
                                 ),
                               ),
-                              SizedBox(height: 20,),
+                              Gap(10.h),
+
+
+                              // 
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  appParagraph(title: AppText.hasAccount, fontSize: 18, color: Colors.grey,),
+                                  appButton(buttonText: AppText.loginButton, colors: Colors.black, onTap: () {
+                                    Navigator.pushReplacement(
+                                      context, 
+                                      MaterialPageRoute(builder: (context) => LoginPage())
+                                    );
+                                  })
+                                ],
+                              ),
+                              Gap(70.h)
+
+
                             ],
                           ),
                         ),
                       ),
                     )
                                     ),
-                  ),
               ]
                         ),
             ),

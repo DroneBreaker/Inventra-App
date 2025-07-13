@@ -50,29 +50,33 @@ class _HomePageState extends State<HomePage> {
                     borderRadius: BorderRadius.circular(10)
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8, top: 20),
+                    padding: const EdgeInsets.only(left: 6.0, right: 6, top: 30),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Column(
                           children: [
-                            appTitle(title: "Total Invoices", color: Colors.black),
+                            appParagraph(title: "Total Invoices", color: Colors.black),
                             appTitle(title: "35", color: Colors.black),
-                            appTitle(title: "Last 24 hours", color: Colors.black),
+                            appParagraph(title: "Last 24 hours", color: Colors.black),
                           ],
                         ),
+                        Gap(4.w),
+
                         Column(
                           children: [
-                            appTitle(title: "Paid Invoices", color: Colors.black),
+                            appParagraph(title: "Paid Invoices", color: Colors.black),
                             appTitle(title: "30", color: Colors.black),
-                            appTitle(title: "Last 24 hours", color: Colors.black),
+                            appParagraph(title: "Last 24 hours", color: Colors.black),
                           ],
                         ),
+
+                        Gap(4.w),
                         Column(
                           children: [
-                            appTitle(title: "Total Invoices", color: Colors.black),
+                            appParagraph(title: "Total Invoices", color: Colors.black),
                             appTitle(title: "35", color: Colors.black),
-                            appTitle(title: "Last 24 hours", color: Colors.black),
+                            appParagraph(title: "Last 24 hours", color: Colors.black),
                           ],
                         ),
                       ],

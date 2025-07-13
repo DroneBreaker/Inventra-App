@@ -3,8 +3,12 @@
 // import 'package:inventra/widgets/app_text.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
+import 'package:inventra/config/app_colors.dart';
 import 'package:inventra/config/app_text.dart';
 import 'package:inventra/services/item_service.dart';
+import 'package:inventra/widgets/forms.dart';
 import 'package:inventra/widgets/titles.dart';
 
 class ItemsPage extends StatefulWidget {
@@ -26,7 +30,8 @@ class _ItemsPageState extends State {
   final itemCategoryOptions = [
     "RegularVAT",
     "Rent",
-    "Exempt"
+    "Exempt",
+    "NonVAT"
   ];
   String selectedItemCategory = "RegularVAT";
 
@@ -63,81 +68,27 @@ class _ItemsPageState extends State {
                         const SizedBox(height: 25), 
                         
                         // ItemCode TextForm field
-                        TextFormField(
-                          controller: itemCodeController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)
-                            ),
-                            contentPadding: const EdgeInsets.only(left: 20),
-                            labelText: "Item Code"
-                          ),
-                          validator: (value) {
-                            if(value == null || value.isEmpty) {
-                              return AppText.noItemCodeError;
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 20), 
+                        appInput(placeholder: "Item Code", textEditingController: itemCodeController, 
+                          errorMsg: AppText.noItemCodeError, textInputType: TextInputType.number),
+                        Gap(20.h), 
 
 
                         // Item Name TextForm field
-                        TextFormField(
-                          controller: itemNameController,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)
-                            ),
-                            contentPadding: const EdgeInsets.only(left: 20),
-                            labelText: "Item Name"
-                          ),
-                          validator: (value) {
-                            if(value == null || value.isEmpty) {
-                              return AppText.invalidItemNameError;
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 20), 
+                        appInput(placeholder: "Item Name", textEditingController: itemNameController, errorMsg: AppText.invalidItemNameError),
+                        Gap(20.h), 
 
 
                         // Item Description TextForm field
-                        TextFormField(
-                          controller: itemDescriptionController,
-                          keyboardType: TextInputType.multiline,
-                          maxLines: 5,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)
-                            ),
-                            contentPadding: const EdgeInsets.only(left: 20, top: 30),
-                            labelText: "Item Description"
-                          ),
-                        ),
-                        const SizedBox(height: 20), // Increased spacing
+                        appInput(placeholder: "Item Description", textEditingController: itemDescriptionController, 
+                          textInputType: TextInputType.multiline, maxLines: 5),
+                        Gap(20.h), // Increased spacing
 
 
                         // Price TextForm field
-                        TextFormField(
-                          controller: priceController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)
-                            ),
-                            contentPadding: const EdgeInsets.only(left: 20),
-                            labelText: "Price"
-                          ),
-                          validator: (value) {
-                            if(value == null || value.isEmpty) {
-                              return AppText.priceIsEmptyError;
-                            }
-                            return null;
-                          },
+                        appInput(placeholder: "Price", textEditingController: priceController, 
+                          textInputType: TextInputType.number, errorLengthMsg: AppText.priceIsEmptyError
                         ),
-                        const SizedBox(height: 20), 
+                        Gap(20.h), 
 
 
                         // // CompanyTIN TextForm field
@@ -156,29 +107,8 @@ class _ItemsPageState extends State {
 
 
                         // Item Category Dropdown
-                        DropdownButtonFormField(
-                          value: selectedItemCategory,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            labelText: 'Item Category',
-                          ),
-                          items: itemCategoryOptions.map((String option) {
-                            return DropdownMenuItem(
-                              value: option,
-                              child: Text(option),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            if(newValue != null) {
-                              setState(() {
-                                selectedItemCategory = newValue;
-                              });
-                            }
-                          },
-                        ),
-                        const SizedBox(height: 20), 
+                        appDropdown(selectedValue: selectedItemCategory, items: itemCategoryOptions),
+                        Gap(20.h), 
 
 
                         // Checkboxes in a Column instead of Row to prevent overflow
@@ -206,49 +136,28 @@ class _ItemsPageState extends State {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20), // Increased spacing
+                        Gap(20.h), // Increased spacing
 
 
                         // TourismCST Dropdown
-                        DropdownButtonFormField(
-                          value: selectedTourismCSTOption,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            labelText: 'Item Category',
-                          ),
-                          items: tourismCSTOptions.map((String option) {
-                            return DropdownMenuItem(
-                              value: option,
-                              child: Text(option),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            if(newValue != null) {
-                              setState(() {
-                                selectedTourismCSTOption = newValue;
-                              });
-                            }
-                          },
-                        ),
-                        const SizedBox(height: 20), 
+                        appDropdown(selectedValue: selectedTourismCSTOption, items: tourismCSTOptions),
+                        Gap(20.h), 
 
                        // Increased spacing
                         SizedBox(
                           width: double.infinity,
-                          height: 50,
+                          height: 60,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey
+                              backgroundColor: Colors.orange
                             ),
                             onPressed: () {
                               addItems();
                             }, 
-                            child: appParagraph(title: AppText.addItemButton, color: Colors.black)
+                            child: appParagraph(title: AppText.addItemButton, color: AppColors.white)
                           ),
                         ),
-                        const SizedBox(height: 30), // Added bottom padding
+                        Gap(50.h), // Added bottom padding
                       ],
                     ),
                   ),
@@ -402,236 +311,3 @@ class _ItemsPageState extends State {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// class ItemsPage extends StatefulWidget {
-//   const ItemsPage({super.key});
-
-//   @override
-//   State<ItemsPage> createState() => _ItemsPageState();
-// }
-
-// class _ItemsPageState extends State<ItemsPage> {
-//   final TextEditingController itemCodeController = TextEditingController();
-//   final TextEditingController itemNameController = TextEditingController();
-//   final TextEditingController itemDescriptionController = TextEditingController();
-//   final TextEditingController priceController = TextEditingController();
-//   final TextEditingController companyTINController = TextEditingController();
-
-//   // ITEM CATERGORY
-//   final selectedItemCategory = "Regular VAT";
-//   final itemCategoryOptions = [
-//     "Regular VAT",
-//     "Rent",
-//     "Exempt"
-//   ];
-
-//   // TAX INCLUSIVE
-//   bool isTaxable = false;
-//   bool isTaxInclusive = true;
-  
-//   final _formKey = GlobalKey<FormState>();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//         body: SafeArea(
-//           child: SingleChildScrollView(
-//             child: Padding(
-//               padding: const EdgeInsets.only(top: 60.0),
-//               child: SizedBox(
-//                 height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top,
-//                 child: Padding(
-//                   padding: const EdgeInsets.only(left: 20.0, right: 20),
-//                   child: Form(
-//                     key: _formKey,
-//                     child: Column(
-//                       children: [
-//                         Center(
-//                           child: AppText(title: "HELLO ITEM FUCKERS"),
-//                         ),
-//                         SizedBox(height: 15,),
-//                         TextFormField(
-//                           controller: itemCodeController,
-//                           keyboardType: TextInputType.number,
-//                           decoration: InputDecoration(
-//                             border: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(10)
-//                             ),
-//                             contentPadding: const EdgeInsets.only(left: 20),
-//                             labelText: "Item Code"
-//                           ),
-//                           validator: (value) {
-//                             if(value == null || value.isEmpty) {
-//                               return AppTitle.noItemCodeError;
-//                             }
-//                           },
-//                         ),
-//                         SizedBox(height: 15,),
-//                         // Item Name TextForm  field
-//                         TextFormField(
-//                           controller: itemNameController,
-//                           decoration: InputDecoration(
-//                             border: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(10)
-//                             ),
-//                             contentPadding: const EdgeInsets.only(left: 20),
-//                             labelText: "Item Name"
-//                           ),
-//                           validator: (value) {
-//                             if(value == null || value.isEmpty) {
-//                               return AppTitle.invalidItemNameError;
-//                             }
-//                           },
-//                         ),
-//                         SizedBox(height: 15,),
-//                         // Item Desscription TextForm field
-//                         TextFormField(
-//                           controller: itemDescriptionController,
-//                           keyboardType: TextInputType.multiline,
-//                           maxLines: 5,
-//                           decoration: InputDecoration(
-//                             border: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(10)
-//                             ),
-//                             contentPadding: const EdgeInsets.only(left: 20),
-//                             labelText: "Item Description"
-//                           ),
-//                         ),
-//                         SizedBox(height: 15,),
-//                         // Price TextForm field
-//                         TextFormField(
-//                           controller: priceController,
-//                           keyboardType: TextInputType.number,
-//                           decoration: InputDecoration(
-//                             border: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(10)
-//                             ),
-//                             contentPadding: const EdgeInsets.only(left: 20),
-//                             labelText: "Price"
-//                           ),
-//                           validator: (value) {
-//                             if(value == null || value.isEmpty) {
-//                               return AppTitle.priceIsEmptyError;
-//                             }
-//                           },
-//                         ),
-//                         SizedBox(height: 15,),
-//                         // CompanyTIN TextForm field
-//                         TextFormField(
-//                           enabled: false,
-//                           controller: companyTINController,
-//                           decoration: InputDecoration(
-//                             border: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(10)
-//                             ),
-//                             contentPadding: const EdgeInsets.only(left: 20),
-//                             labelText: "Company TIN"
-//                           ),
-//                         ),
-//                         const SizedBox(height: 15),
-//                         // Item Category Dropdown
-//                         DropdownButtonFormField<String>(
-//                           value: selectedItemCategory,
-//                           decoration: InputDecoration(
-//                             border: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(10),
-//                             ),
-//                             labelText: 'Item Category',
-//                           ),
-//                           items: itemCategoryOptions.map((String option) {
-//                             return DropdownMenuItem<String>(
-//                               value: option,
-//                               child: Text(option),
-//                             );
-//                           }).toList(),
-//                           onChanged: (_) {},
-//                         ),
-//                         SizedBox(height: 15,),
-//                         Row(
-//                           children: [
-//                             CheckboxListTile(
-//                               title: AppText(title: "isTaxable", colors: Colors.black,),
-//                               value: isTaxable, 
-//                               onChanged: (bool? value) => {
-//                                 setState(() {
-//                                   isTaxable = value ?? !isTaxable;
-//                                 })
-//                               }
-//                             ),
-//                             CheckboxListTile(
-//                               title: AppText(title: "isTaxInclusive", colors: Colors.black,),
-//                               value: isTaxInclusive, 
-//                               onChanged: (bool? value) => {
-//                                 setState(() {
-//                                   isTaxInclusive = value ?? !isTaxInclusive;
-//                                 })
-//                               }
-//                             ),
-//                           ],
-//                         ),
-//                         SizedBox(height: 15,),
-//                         // Remarks TextForm field
-//                         TextFormField(
-//                           controller: itemDescriptionController,
-//                           keyboardType: TextInputType.multiline,
-//                           maxLines: 4,
-//                           decoration: InputDecoration(
-//                             border: OutlineInputBorder(
-//                               borderRadius: BorderRadius.circular(10)
-//                             ),
-//                             contentPadding: const EdgeInsets.only(left: 20),
-//                             labelText: "Remarks"
-//                           ),
-//                         ),
-//                         SizedBox(height: 15,),
-//                         SizedBox(
-//                           width: double.infinity,
-//                           height: 50,
-//                           child: ElevatedButton(
-//                             style: ElevatedButton.styleFrom(
-//                               backgroundColor: Colors.grey
-//                             ),
-//                             onPressed: () {
-//                               // addItems();
-//                             }, 
-//                             child: AppText(title: AppTitle.addItemButton, colors: Colors.black,)
-//                           ),
-//                         )
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           ),
-//         ),
-//     );
-//   }
-// }

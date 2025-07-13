@@ -6,6 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:inventra/config/app_colors.dart';
 import 'package:inventra/config/app_text.dart';
 import 'package:inventra/screens/auth/register.dart';
+import 'package:inventra/widgets/forms.dart';
 import 'package:inventra/wrappers/main_wrapper.dart';
 import 'package:inventra/services/api_service.dart';
 import 'package:inventra/widgets/titles.dart';
@@ -58,127 +59,93 @@ class _LoginPageState extends State<LoginPage> {
                     topRight: Radius.circular(30.r)
                   ),
                 ),
-                child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                      child: Form(
-                        key: _formKey,
+                child: Form(
+                  key: _formKey,
+                  child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                         child: Column(
-                          children: [
-                            Center(child: appTitle(title: AppText.loginTitle),),
-                            const SizedBox(height: 20,),
-                              
-                              
-                            // Username TextForm field
-                            TextFormField(
-                              controller: usernameController,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10)
-                                ),
-                                contentPadding: const EdgeInsets.only(left: 20),
-                                labelText: "Username",
-                                labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
+                            children: [
+                              Gap(40.h),
+                              Center(child: appTitle(title: AppText.loginTitle),),
+                              Gap(50.h),
+                                
+                                
+                              // Username TextForm field
+                              appInput(placeholder: "Username", textEditingController: usernameController, 
+                              errorMsg: AppText.noUsernameError, errorLengthMsg: AppText.usernameLengthError),
+                              Gap(20.h),
+                                
+                                
+                              // Company TIN TextForm field
+                              appInput(placeholder: "Company TIN", textEditingController: companyTINController, 
+                                errorMsg: AppText.companyTINError, errorLengthMsg: AppText.validCompanyTINError
                               ),
-                              validator: (value) {
-                                if(value == null || value.isEmpty) {
-                                  return AppText.noUsernameError;
-                                }
-                                if(value.length < 6) {
-                                  return AppText.usernameLengthError;
-                                }
-                                return null;
-                              }
-                            ),
-                            Gap(20.h),
-                              
-                              
-                            // Company TIN TextForm field
-                            TextFormField(
-                              controller: companyTINController,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10)
+                              Gap(20.h),
+                                
+                                
+                              // Password TextForm field
+                              TextFormField(
+                                obscureText: true,
+                                controller: passwordController,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10)
+                                  ),
+                                  contentPadding: const EdgeInsets.only(left: 20),
+                                  labelText: "Password",
+                                  labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
                                 ),
-                                contentPadding: const EdgeInsets.only(left: 20),
-                                labelText: "Company TIN",
-                                labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
+                                validator: (value) {
+                                  if(value == null || value.isEmpty) {
+                                    return AppText.noPasswordError;
+                                  }
+                                  if(value.length < 6) {
+                                    return AppText.passwordLengthError;
+                                  }
+                                  return null;
+                                },
                               ),
-                              validator: (value) {
-                                if(value == null || value.isEmpty) {
-                                  return AppText.companyTINError;
-                                }
-                                if(value.length < 6) {
-                                  return AppText.validCompanyTINError;
-                                }
-                                return null;
-                              }
-                            ),
-                            Gap(20.h),
-                              
-                              
-                            // Password TextForm field
-                            TextFormField(
-                              obscureText: true,
-                              controller: passwordController,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10)
-                                ),
-                                contentPadding: const EdgeInsets.only(left: 20),
-                                labelText: "Password",
-                                labelStyle: TextStyle(color: Colors.grey, fontSize: 18)
+                              Gap(40.h),
+                                
+                                
+                              // Button
+                              SizedBox(
+                                width: double.infinity,
+                                height: 60,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    handleLogin();
+                                  }, 
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.grey
+                                  ),
+                                  child: appTitle(title: AppText.loginButton, color: Colors.white),)
                               ),
-                              validator: (value) {
-                                if(value == null || value.isEmpty) {
-                                  return AppText.noPasswordError;
-                                }
-                                if(value.length < 6) {
-                                  return AppText.passwordLengthError;
-                                }
-                                return null;
-                              },
-                            ),
-                            Gap(20.h),
-                              
-                              
-                            // Button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 60,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  handleLogin();
-                                }, 
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.grey
-                                ),
-                                child: appTitle(title: AppText.loginButton, color: Colors.white),)
-                            ),
-
-
-                            // 
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                appTitle(title: AppText.noAccount, color: Colors.grey,),
-                              
-                                Button(buttonText: AppText.createAccount, colors: Colors.grey, fontSize: 18, onTap: () {
-                                    Navigator.pushReplacement(
-                                      context, 
-                                      MaterialPageRoute(builder: (context) => RegisterPage())
-                                    );
-                                  }),
-                              ],
-                            ),
-                            // const SizedBox(height: 20,),
-                              
-                              
-                          ],
+                  
+                  
+                              // Account Section
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  appParagraph(title: AppText.noAccount, color: Colors.grey,),
+                                
+                                  appButton(buttonText: AppText.createAccount, colors: Colors.grey, onTap: () {
+                                      Navigator.pushReplacement(
+                                        context, 
+                                        MaterialPageRoute(builder: (context) => RegisterPage())
+                                      );
+                                    }),
+                                ],
+                              ),
+                              // const SizedBox(height: 20,),
+                                
+                                
+                            ],
+                          ),
                         ),
-                      ),
+                ),
                     ),
                 ),
-              ),
             ]
           ),
         ),
