@@ -24,6 +24,7 @@ async fn main() -> std::io::Result<()> {
                 web::scope("/api")
                     .configure(routes::user_routes::init)
                     .configure(routes::item_routes::init) 
+                    .configure(routes::client_routes::init)
             )
     }) 
     // .bind(("127.0.0.1", 8080))?

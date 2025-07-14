@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:inventra/config/app_colors.dart';
 import 'package:inventra/config/app_text.dart';
+import 'package:inventra/services/customer_service.dart';
 import 'package:inventra/widgets/forms.dart';
 import 'package:inventra/widgets/titles.dart';
 
@@ -84,7 +85,7 @@ class _CreateCustomerPage extends State<CreateCustomerPage> {
                             backgroundColor: Colors.orange
                           ),
                           onPressed: () {
-                            // addClient();
+                            addCustomers();
                           }, 
                           child: appTitle(title: AppText.addClientButton, color: AppColors.white)
                         )
@@ -98,5 +99,64 @@ class _CreateCustomerPage extends State<CreateCustomerPage> {
         // )
       ),
     );
+  }
+
+  // Function to add customers
+  Future<void> addCustomers() async {
+    if(_formKey.currentState!.validate()) {
+      try {
+        // Create the customer object
+        final response = await CustomerService.addCustomer(
+          clientName: customerNameTextController.text,
+          clientTIN: customerTINTextController.text,
+          clientEmail: emailTextController.text,
+          clientType: selectedClientType ?? "Customer",
+          clientPhone: phoneTextController.text,
+        );
+
+        // Hide loading indicator
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+        if (response['success'] == true) {
+          // Show success message
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(content: Text(response['message'])),
+          // );
+
+          
+          // Clear the form
+          _formKey.currentState!.reset();
+          setState(() {
+            selectedClientType = "Customer";
+          });
+
+          // Try to get customer data from response
+          final customerData = response['data'] ?? response['customer'];
+          
+          if (customerData != null) {
+            print('About to show modal with data: $customerData');
+          } else {
+            print('No customer data found in response');
+            // Fallback to SnackBar if no customer data
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(response['message'] ?? 'Customer created successfully')),
+            );
+          }
+            
+        } else {
+          // Error
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(response['message'])),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: appParagraph(title: 'Error: $e')),
+          );
+        }
+      }
+    }
+    // print("Customer added");
   }
 }

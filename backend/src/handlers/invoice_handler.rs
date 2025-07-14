@@ -1,171 +1,172 @@
-// use actix_web::{web, HttpRequest, HttpResponse, Responder, Result};
-// use actix_web_httpauth::extractors::bearer::BearerAuth;
-// use serde::{Deserialize, Serialize};
-// use serde_json::json;
-// use sqlx::{MySqlPool, Row};
-// use uuid::Uuid;
-// use chrono::{DateTime, Utc};
-// use rust_decimal::Decimal;
+use actix_web::{web, HttpRequest, HttpResponse, Responder, Result};
+use actix_web_httpauth::extractors::bearer::BearerAuth;
+use serde::{Deserialize, Serialize};
+use serde_json::json;
+use sqlx::{MySqlPool, Row};
+use uuid::Uuid;
+use chrono::{DateTime, Utc};
+use rust_decimal::Decimal;
 
-// use crate::{models::invoice::{Invoice, InvoiceFlags, InvoiceItem, InvoiceStatus}, utils::jwt::validate_jwt};
+use crate::{models::invoice::{Invoice, InvoiceFlags, InvoiceItem, InvoiceStatus}, utils::jwt::validate_jwt};
 
-// #[derive(Debug, Deserialize)]
-// pub struct CreateInvoiceRequest {
-//     pub flag: InvoiceFlags,
-//     pub invoice_number: String,
-//     pub username: String,
-//     pub client_name: String,
-//     pub client_tin: String,
-//     pub invoice_date: DateTime<Utc>,
-//     pub invoice_time: DateTime<Utc>,
-//     pub due_date: DateTime<Utc>,
-//     pub total_amount: Decimal, 
-//     pub items: Vec<CreateInvoiceItemRequest>,
-//     pub created_at: DateTime<Utc>
-// }
+#[derive(Debug, Deserialize)]
+pub struct CreateInvoiceRequest {
+    pub flag: InvoiceFlags,
+    pub invoice_number: String,
+    pub username: String,
+    pub client_name: String,
+    pub client_tin: String,
+    pub invoice_date: DateTime<Utc>,
+    pub invoice_time: DateTime<Utc>,
+    pub due_date: DateTime<Utc>,
+    pub total_vat: Decimal,
+    pub total_amount: Decimal, 
+    pub items: Vec<CreateInvoiceItemRequest>,
+    pub created_at: DateTime<Utc>
+}
 
-// #[derive(Debug, Deserialize)]
-// pub struct CreateInvoiceItemRequest {
-//     pub item_code: String,
-//     pub quantity: i32,
-//     pub unit_price: Decimal,
-//     pub total_vat: Decimal,
-//     pub total_levy: Decimal,
-//     pub total_discount: Decimal,
-//     pub line_total: Decimal,
-// }
+#[derive(Debug, Deserialize)]
+pub struct CreateInvoiceItemRequest {
+    pub item_code: String,
+    pub quantity: i32,
+    pub unit_price: Decimal,
+    pub total_vat: Decimal,
+    pub total_levy: Decimal,
+    pub total_discount: Decimal,
+    pub line_total: Decimal,
+}
 
-// #[derive(Debug, Deserialize)]
-// pub struct UpdateInvoiceRequest {
-//     pub flag: Option<InvoiceFlags>,
-//     pub invoice_number: Option<String>,
-//     pub username: Option<String>,
-//     pub client_name: Option<String>,
-//     pub client_tin: Option<String>,
-//     pub invoice_date: Option<DateTime<Utc>>,
-//     pub invoice_time: Option<DateTime<Utc>>,
-//     pub due_date: Option<DateTime<Utc>>,
-//     pub status: Option<InvoiceStatus>,
-//     pub items: Option<Vec<CreateInvoiceItemRequest>>,
-// }
+#[derive(Debug, Deserialize)]
+pub struct UpdateInvoiceRequest {
+    pub flag: Option<InvoiceFlags>,
+    pub invoice_number: Option<String>,
+    pub username: Option<String>,
+    pub client_name: Option<String>,
+    pub client_tin: Option<String>,
+    pub invoice_date: Option<DateTime<Utc>>,
+    pub invoice_time: Option<DateTime<Utc>>,
+    pub due_date: Option<DateTime<Utc>>,
+    pub status: Option<InvoiceStatus>,
+    pub items: Option<Vec<CreateInvoiceItemRequest>>,
+}
 
-// #[derive(Debug, Serialize)]
-// pub struct InvoiceResponse {
-//     pub invoice: Invoice,
-//     pub items: Vec<InvoiceItem>,
-// }
+#[derive(Debug, Serialize)]
+pub struct InvoiceResponse {
+    pub invoice: Invoice,
+    pub items: Vec<InvoiceItem>,
+}
 
-// #[derive(Debug, Deserialize)]
-// pub struct InvoiceQueryParams {
-//     pub page: Option<i64>,
-//     pub limit: Option<i64>,
-//     pub status: Option<InvoiceStatus>,
-//     pub flag: Option<InvoiceFlags>,
-//     pub start_date: Option<DateTime<Utc>>,
-//     pub end_date: Option<DateTime<Utc>>,
-// }
+#[derive(Debug, Deserialize)]
+pub struct InvoiceQueryParams {
+    pub page: Option<i64>,
+    pub limit: Option<i64>,
+    pub status: Option<InvoiceStatus>,
+    pub flag: Option<InvoiceFlags>,
+    pub start_date: Option<DateTime<Utc>>,
+    pub end_date: Option<DateTime<Utc>>,
+}
 
 
-// pub async fn create_invoice(db: web::Data<MySqlPool>, req: web::Json<CreateInvoiceRequest>, credentials: BearerAuth) -> impl Responder {
-//     let claims = match validate_jwt(credentials.token()) {
-//         Ok(claims) => claims,
-//         Err(e) => {
-//             eprintln!("JWT validation failed: {:?}", e);
-//             return HttpResponse::Unauthorized().json(json!({
-//                 "error": "Invalid token",
-//                 "details": e.to_string()
-//             }));
-//         }
-//     };
+pub async fn create_invoice(db: web::Data<MySqlPool>, req: web::Json<CreateInvoiceRequest>, credentials: BearerAuth) -> impl Responder {
+    let claims = match validate_jwt(credentials.token()) {
+        Ok(claims) => claims,
+        Err(e) => {
+            eprintln!("JWT validation failed: {:?}", e);
+            return HttpResponse::Unauthorized().json(json!({
+                "error": "Invalid token",
+                "details": e.to_string()
+            }));
+        }
+    };
 
-//     // Create IDs and timestamps
-//     let invoice_id = Uuid::new_v4().to_string();
-//     let now = Utc::now();
+    // Create IDs and timestamps
+    let invoice_id = Uuid::new_v4().to_string();
+    let now = Utc::now();
 
-//     // Calculate totals
-//     let mut total_vat = Decimal::ZERO;
-//     let mut total_amount = Decimal::ZERO;
+    // Calculate totals
+    let mut total_vat = Decimal::ZERO;
+    let mut total_amount = Decimal::ZERO;
 
-//     for item in &req.items {
-//         let line_total = item.unit_price * Decimal::from(item.quantity)
-//             - item.total_discount
-//             + item.total_vat;
-//         total_vat += item.total_vat;
-//         total_amount += line_total;
-//     }
+    for item in &req.items {
+        let line_total = item.unit_price * Decimal::from(item.quantity)
+            - item.total_discount
+            + item.total_vat;
+        total_vat += item.total_vat;
+        total_amount += line_total;
+    }
 
-//     // Insert into `invoices` table
-//     let insert_invoice_result = sqlx::query!(
-//         r#"
-//         INSERT INTO invoices (
-//             id, flag, invoice_number, username, company_tin, client_name, client_tin, 
-//             invoice_date, invoice_time, due_date, total_amount, created_at
-//         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-//         "#,
-//         invoice_id,
-//         req.flag.to_string(),
-//         req.invoice_number,
-//         req.username,
-//         claims.tin,
-//         req.client_name,
-//         req.client_tin,
-//         req.invoice_date,
-//         req.invoice_time,
-//         req.due_date,
-//         // InvoiceStatus::Draft.to_string(),
-//         // total_vat,
-//         total_amount,
-//         now,
-//     )
-//     .execute(db.get_ref())
-//     .await;
+    // Insert into `invoices` table
+    let insert_invoice_result = sqlx::query!(
+        r#"
+        INSERT INTO invoices (
+            id, flag, invoice_number, username, company_tin, client_name, client_tin, 
+            invoice_date, invoice_time, due_date, total_amount, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        "#,
+        invoice_id,
+        req.flag.to_string(),
+        req.invoice_number,
+        req.username,
+        claims.tin,
+        req.client_name,
+        req.client_tin,
+        req.invoice_date,
+        req.invoice_time,
+        req.due_date,
+        // InvoiceStatus::Draft.to_string(),
+        // total_vat,
+        total_amount,
+        now,
+    )
+    .execute(db.get_ref())
+    .await;
 
-//     if let Err(e) = insert_invoice_result {
-//         eprintln!("Insert invoice error: {:?}", e);
-//         return HttpResponse::InternalServerError().json(json!({ "error": "Could not create invoice" }));
-//     }
+    if let Err(e) = insert_invoice_result {
+        eprintln!("Insert invoice error: {:?}", e);
+        return HttpResponse::InternalServerError().json(json!({ "error": "Could not create invoice" }));
+    }
 
-//     // Insert invoice items
-//     for item in &req.items {
-//         let item_id = Uuid::new_v4().to_string();
-//         let line_total = item.unit_price * Decimal::from(item.quantity)
-//             - item.total_discount
-//             + item.total_vat;
+    // Insert invoice items
+    for item in &req.items {
+        let item_id = Uuid::new_v4().to_string();
+        let line_total = item.unit_price * Decimal::from(item.quantity)
+            - item.total_discount
+            + item.total_vat;
 
-//         let insert_item_result = sqlx::query!(
-//             r#"
-//             INSERT INTO invoice_items (
-//                 id, invoice_id, item_code, quantity, unit_price,
-//                 total_vat, total_levy, total_discount, line_total
-//             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-//             "#,
-//             item_id,
-//             invoice_id,
-//             item.item_code,
-//             item.quantity,
-//             item.unit_price,
-//             item.total_vat,
-//             item.total_levy,
-//             item.total_discount,
-//             line_total
-//         )
-//         .execute(db.get_ref())
-//         .await;
+        let insert_item_result = sqlx::query!(
+            r#"
+            INSERT INTO invoice_items (
+                id, invoice_id, item_code, quantity, unit_price,
+                total_vat, total_levy, total_discount, line_total
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            "#,
+            item_id,
+            invoice_id,
+            item.item_code,
+            item.quantity,
+            item.unit_price,
+            item.total_vat,
+            item.total_levy,
+            item.total_discount,
+            line_total
+        )
+        .execute(db.get_ref())
+        .await;
 
-//         if let Err(e) = insert_item_result {
-//             eprintln!("Insert item error: {:?}", e);
-//             return HttpResponse::InternalServerError().json(json!({
-//                 "error": "Could not insert invoice item"
-//             }));
-//         }
-//     }
+        if let Err(e) = insert_item_result {
+            eprintln!("Insert item error: {:?}", e);
+            return HttpResponse::InternalServerError().json(json!({
+                "error": "Could not insert invoice item"
+            }));
+        }
+    }
 
-//     // Respond with success
-//     HttpResponse::Ok().json(json!({
-//         "message": "Invoice created successfully",
-//         "invoice_id": invoice_id
-//     }))
-// }
+    // Respond with success
+    HttpResponse::Ok().json(json!({
+        "message": "Invoice created successfully",
+        "invoice_id": invoice_id
+    }))
+}
 
 
 // // Get invoice by ID handler

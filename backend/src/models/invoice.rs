@@ -19,7 +19,7 @@ pub struct Invoice {
     pub total_vat: Decimal, 
     #[sqlx(default)]
     pub total_amount: Decimal,
-    pub status: InvoiceStatus,
+    // pub status: InvoiceStatus,
     pub items: Vec<InvoiceItem>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,

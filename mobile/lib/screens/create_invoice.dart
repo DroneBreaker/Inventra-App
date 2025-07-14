@@ -7,6 +7,8 @@ import 'package:inventra/config/app_text.dart';
 import 'package:inventra/widgets/forms.dart';
 import 'package:inventra/widgets/titles.dart';
 import 'package:inventra/widgets/button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class CreateInvoice extends StatefulWidget {
   const CreateInvoice({super.key});
@@ -123,7 +125,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     "Exempt"
   ];
   
-// Enhanced client management
+  // Enhanced client management
   List<Map<String, dynamic>> clients = [
     {'name': 'John Doe', 'tin': 'TIN001'},
     {'name': 'Jane Smith', 'tin': 'TIN002'},
@@ -170,27 +172,35 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   ];
 
 
-// Add this to your _CreateInvoiceState class
+  // Add this to your _CreateInvoiceState class
+
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      usernameController.text = prefs.getString('username') ?? '';
+    });
+  }
 
 
 
-@override
-void initState() {
-  super.initState();
-  // Initialize filtered clients
-  filteredClients = List.from(clients);
-  
-  // Add listener to client name controller
-  clientNameController.addListener(_onClientNameChanged);
-}
+  @override
+  void initState() {
+    super.initState();
+    // Initialize filtered clients
+    filteredClients = List.from(clients);
+    _loadUserData();
+    
+    // Add listener to client name controller
+    clientNameController.addListener(_onClientNameChanged);
+  }
 
-@override
-void dispose() {
-  clientNameController.removeListener(_onClientNameChanged);
-  super.dispose();
-}
+  @override
+  void dispose() {
+    clientNameController.removeListener(_onClientNameChanged);
+    super.dispose();
+  }
 
-void _onClientNameChanged() {
+  void _onClientNameChanged() {
   final query = clientNameController.text.toLowerCase();
   
   setState(() {
@@ -219,7 +229,7 @@ void _onClientNameChanged() {
   });
 }
 
-void _selectClient(Map<String, dynamic> client) {
+  void _selectClient(Map<String, dynamic> client) {
   setState(() {
     selectedClientData = client;
     clientNameController.text = client['name'];
@@ -228,8 +238,8 @@ void _selectClient(Map<String, dynamic> client) {
   });
 }
 
-// Replace your existing Client Name and Client TIN TextFormFields with this:
-Widget buildClientSelection() {
+  // Replace your existing Client Name and Client TIN TextFormFields with this:
+  Widget buildClientSelection() {
   return Column(
     children: [
       // Client Name with dropdown
@@ -321,8 +331,8 @@ Widget buildClientSelection() {
   );
 }
 
-// In your build method, replace the existing Client Name and Client TIN sections with:
-// _buildClientSelection(),
+  // In your build method, replace the existing Client Name and Client TIN sections with:
+  // _buildClientSelection(),
 
 
   @override
@@ -582,29 +592,29 @@ Widget buildClientSelection() {
                             
                             
                                 // Invoice Status Dropdown
-                                DropdownButtonFormField(
-                                  value: selectedInvoiceStatus,
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    labelText: 'Invoice Status',
-                                  ),
-                                  items: invoiceStatus.map((String option) {
-                                    return DropdownMenuItem(
-                                      value: option,
-                                      child: Text(option),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    if(newValue != null) {
-                                      setState(() {
-                                        selectedItemCategory = newValue;
-                                      });
-                                    }
-                                  },
-                                ),
-                                Gap(20.h),
+                                // DropdownButtonFormField(
+                                //   value: selectedInvoiceStatus,
+                                //   decoration: InputDecoration(
+                                //     border: OutlineInputBorder(
+                                //       borderRadius: BorderRadius.circular(10),
+                                //     ),
+                                //     labelText: 'Invoice Status',
+                                //   ),
+                                //   items: invoiceStatus.map((String option) {
+                                //     return DropdownMenuItem(
+                                //       value: option,
+                                //       child: Text(option),
+                                //     );
+                                //   }).toList(),
+                                //   onChanged: (String? newValue) {
+                                //     if(newValue != null) {
+                                //       setState(() {
+                                //         selectedItemCategory = newValue;
+                                //       });
+                                //     }
+                                //   },
+                                // ),
+                                // Gap(20.h),
                             
                             
                                 // Button
