@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n            INSERT INTO invoice_items (\n                id, invoice_id, item_code, quantity, unit_price,\n                total_vat, total_levy, total_discount, line_total\n            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 9
+    },
+    "nullable": []
+  },
+  "hash": "2048a5577c002a3b055e62e6e02bfccad5ee3c578ef519ece82bc943dc5e248e"
+}

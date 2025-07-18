@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        UPDATE clients\n        SET client_name = ?, client_email = ?, client_tin = ?, client_phone = ?, client_type = ?, updated_at = ?\n        WHERE id = ? AND company_tin = ? AND deleted_at IS NULL\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 8
+    },
+    "nullable": []
+  },
+  "hash": "90691444daafbda8a6d1e09e1249bf43a172ebedcf79888ab67d31451d5299d5"
+}

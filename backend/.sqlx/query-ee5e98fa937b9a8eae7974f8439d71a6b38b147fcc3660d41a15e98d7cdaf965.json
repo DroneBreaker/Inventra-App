@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        INSERT INTO incomes (\n            id, \n            amount, \n            source, \n            description, \n            date, \n            client_id, \n            invoice_id, \n            advance_income_id, \n            category, \n            created_at, \n            updated_at\n        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 11
+    },
+    "nullable": []
+  },
+  "hash": "ee5e98fa937b9a8eae7974f8439d71a6b38b147fcc3660d41a15e98d7cdaf965"
+}

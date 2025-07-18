@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        UPDATE users\n        SET first_name = ?, last_name = ?, email = ?, username = ?,\n            company_name = ?, company_id = ?, company_tin = ?, role = ?, updated_at = ?\n        WHERE company_tin = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 10
+    },
+    "nullable": []
+  },
+  "hash": "ea44c4d3f4c719bf5f3a4a7df607e47ff787cd41640f2f15f408906316bc9171"
+}

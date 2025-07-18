@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n            INSERT INTO clients \n                (id, client_name, client_email, client_tin, client_phone, company_tin, client_type, \n                created_at, updated_at)\n            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 9
+    },
+    "nullable": []
+  },
+  "hash": "dbe79dc0d093d5b98d77aa4a0ff523ce0419c5e14078691aefaea079537cc63f"
+}

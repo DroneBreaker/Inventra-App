@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n                INSERT INTO companies (id, company_name, tin, created_at, updated_at)\n                VALUES (?, ?, ?, ?, ?)\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "fdd20d1515cfa89c4768345e81e30ddef6c07e8f4a517c5a88f712d690229034"
+}

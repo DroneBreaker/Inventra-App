@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        INSERT INTO invoices (\n            id, flag, invoice_number, username, company_tin, client_name, client_tin, \n            invoice_date, invoice_time, due_date, total_amount, created_at\n        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 12
+    },
+    "nullable": []
+  },
+  "hash": "e11588853acf938cfe416e531067cb13e0090473f76d7895860e960f94812ef1"
+}

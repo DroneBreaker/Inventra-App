@@ -1,0 +1,124 @@
+{
+  "db_name": "MySQL",
+  "query": "\n                SELECT \n                    id, \n                    amount, \n                    source as \"source: IncomeSource\", \n                    description, \n                    date as \"date: DateTime<Utc>\",\n                    client_id, \n                    invoice_id, \n                    advance_income_id, \n                    category, \n                    created_at as \"created_at: DateTime<Utc>\",\n                    updated_at as \"updated_at: DateTime<Utc>\"\n                FROM incomes \n                WHERE id = ?\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": {
+          "type": "String",
+          "flags": "NOT_NULL | PRIMARY_KEY | NO_DEFAULT_VALUE",
+          "max_size": 144
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "amount",
+        "type_info": {
+          "type": "Float",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "max_size": 12
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "source: IncomeSource",
+        "type_info": {
+          "type": "String",
+          "flags": "NOT_NULL | ENUM",
+          "max_size": 96
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "description",
+        "type_info": {
+          "type": "Blob",
+          "flags": "NOT_NULL | BLOB | NO_DEFAULT_VALUE",
+          "max_size": 262140
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "date: DateTime<Utc>",
+        "type_info": {
+          "type": "Datetime",
+          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
+          "max_size": 23
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "client_id",
+        "type_info": {
+          "type": "String",
+          "flags": "MULTIPLE_KEY",
+          "max_size": 104
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "invoice_id",
+        "type_info": {
+          "type": "String",
+          "flags": "MULTIPLE_KEY",
+          "max_size": 144
+        }
+      },
+      {
+        "ordinal": 7,
+        "name": "advance_income_id",
+        "type_info": {
+          "type": "String",
+          "flags": "",
+          "max_size": 144
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "category",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "max_size": 1020
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "created_at: DateTime<Utc>",
+        "type_info": {
+          "type": "Datetime",
+          "flags": "BINARY",
+          "max_size": 23
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "updated_at: DateTime<Utc>",
+        "type_info": {
+          "type": "Datetime",
+          "flags": "BINARY",
+          "max_size": 23
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true
+    ]
+  },
+  "hash": "8206e9d7c6d219c69fea716ff702ca9d8a8cf98a171461c64c3822ad690ec822"
+}
