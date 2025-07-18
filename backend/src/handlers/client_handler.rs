@@ -43,7 +43,6 @@ pub async fn get_clients(db: web::Data<MySqlPool>, credentials: BearerAuth) -> i
                 client_type, created_at, updated_at, deleted_at
             FROM clients 
             WHERE company_tin = ? AND deleted_at IS NULL
-            ORDER BY created_at DESC
         "#,
     )
     .bind(&claims.tin)
