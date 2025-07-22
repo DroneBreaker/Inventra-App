@@ -367,6 +367,7 @@ dependencies = [
  "env_logger",
  "futures-util",
  "jsonwebtoken",
+ "log",
  "rust_decimal",
  "serde",
  "serde_json",
