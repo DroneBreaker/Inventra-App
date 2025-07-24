@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 Widget appInput({required String placeholder, TextInputType? textInputType, required TextEditingController 
-  textEditingController, String? errorMsg, String? errorLengthMsg, Function(String)? onTap, int? maxLines
+  textEditingController, String? errorMsg, String? errorLengthMsg, Function(String)? onTap, int? maxLines,
+  Icon? icon
 }) {
   return TextFormField(
       controller: textEditingController,
@@ -12,6 +13,7 @@ Widget appInput({required String placeholder, TextInputType? textInputType, requ
           borderRadius: BorderRadius.circular(10)
         ),
         contentPadding: EdgeInsets.only(left: 20,),
+        prefixIcon: icon,
         hintText: placeholder,
       ),
       validator: (value) {
