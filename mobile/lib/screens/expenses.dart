@@ -146,8 +146,8 @@ class _ExpensesPageState extends State<ExpensesPage> with SingleTickerProviderSt
             // debugPrint("FAB Pressed: Opening Add Expense Sheet");
             _showAddExpenseSheet();
           },
-          icon: const Icon(Icons.add),
-          label: const Text("Add Expense"),
+          icon: const Icon(Icons.add, color: AppColors.white),
+          label: appParagraph(title: "Add Expense", color: AppColors.white),
           backgroundColor: Colors.blueAccent,
         ),
       ),
@@ -163,7 +163,7 @@ class _ExpensesPageState extends State<ExpensesPage> with SingleTickerProviderSt
                 onTap: () => Navigator.pop(context),
                 child: const Icon(Icons.arrow_back, size: 30),
               ),
-              const SizedBox(height: 20),
+              Gap(20.h),
 
               /// Total Expense Card
               Container(

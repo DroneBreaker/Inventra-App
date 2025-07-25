@@ -110,7 +110,7 @@ class _IncomePageState extends State<IncomePage> with SingleTickerProviderStateM
         onPressed: () {
           _showAddIncomeSheet();
         },
-        icon: const Icon(Icons.add),
+        icon: const Icon(Icons.add, color: AppColors.white),
         label: appParagraph(title: "Add Income", color: AppColors.white),
         backgroundColor: Colors.green,
       ),

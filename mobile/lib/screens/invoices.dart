@@ -80,7 +80,7 @@ class _InvoicePageState extends State<InvoicePage>
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Invoices"),
+        title: Center(child: appTitle(title: "Invoices", color: AppColors.white, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.blue,
         bottom: TabBar(
           controller: _tabController,
@@ -95,7 +95,7 @@ class _InvoicePageState extends State<InvoicePage>
             MaterialPageRoute(builder: (_) => const CreateInvoice()),
           );
         },
-        icon: const Icon(Icons.add),
+        icon: const Icon(Icons.add, color: AppColors.white,),
         label: appParagraph(title: "Add Invoice", color: AppColors.white),
         backgroundColor: AppColors.buttonSecondary,
       ),
