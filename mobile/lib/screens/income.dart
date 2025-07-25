@@ -5,21 +5,20 @@ import 'package:inventra/config/app_colors.dart';
 import 'package:inventra/widgets/forms.dart';
 import 'package:inventra/widgets/titles.dart';
 
-class ExpensesPage extends StatefulWidget {
-  const ExpensesPage({super.key});
+class IncomePage extends StatefulWidget {
+  const IncomePage({super.key});
 
   @override
-  State<ExpensesPage> createState() => _ExpensesPageState();
+  State<IncomePage> createState() => _IncomePageState();
 }
 
-class _ExpensesPageState extends State<ExpensesPage> with SingleTickerProviderStateMixin {
+class _IncomePageState extends State<IncomePage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _slideAnimation;
 
+  final TextEditingController amountController = TextEditingController();
+  final TextEditingController sourceController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _amountController = TextEditingController();
-  final TextEditingController _categoryController = TextEditingController();
-  DateTime _selectedDate = DateTime.now();
 
   @override
   void initState() {
@@ -42,13 +41,12 @@ class _ExpensesPageState extends State<ExpensesPage> with SingleTickerProviderSt
   @override
   void dispose() {
     _controller.dispose();
-    _amountController.dispose();
-    _categoryController.dispose();
     super.dispose();
   }
 
-  /// Show Add Expense Bottom Sheet
-  void _showAddExpenseSheet() {
+  /// Show Add Income Modal
+  void _showAddIncomeSheet() {
+    // debugPrint("Add Income Button Pressed"); // Debug print
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -65,73 +63,42 @@ class _ExpensesPageState extends State<ExpensesPage> with SingleTickerProviderSt
           ),
           child: Form(
             key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Center(
-                  child: appParagraph(
-                    title: "Add Expense",
-                    fontWeight: FontWeight.bold
-                    // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              child: Column(
+                children: [
+                  Center(
+                    child: appParagraph(
+                      title: "Add Income",
+                      fontWeight: FontWeight.bold
+                      // style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                ),
-                Gap(10.h),
-                appInput(placeholder: "Amount", textEditingController: _amountController, errorMsg: "Please enter an amount",
-                  icon: const Icon(Icons.attach_money), textInputType: TextInputType.number,
-                ),
-                Gap(10.h),
-                appInput(placeholder: "Category", textEditingController: _categoryController, errorMsg: "Please enter a category",
-                  icon: const Icon(Icons.category),
-                ),
-                ListTile(contentPadding: EdgeInsets.zero, title: const Text("Date"),
-                  subtitle: Text("${_selectedDate.toLocal()}".split(' ')[0]),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.calendar_today),
-                    onPressed: _pickDate,
+                  appInput(placeholder: "Amount", textEditingController: amountController, textInputType: TextInputType.number,
+                    icon: Icon(Icons.attach_money), errorMsg: "Please enter an amount"
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
+                  Gap(10.h),
+                  appInput(placeholder: "Source", textEditingController: sourceController, icon: Icon(Icons.work_outline), 
+                    errorMsg: "Please enter an amount"
+                  ),
+                  Gap(10.h),
+                  ElevatedButton(
+                    onPressed: () {
                       Navigator.pop(context);
-                      _saveExpense();
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    minimumSize: const Size(double.infinity, 48),
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Income added!")),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      minimumSize: const Size(double.infinity, 48),
+                    ),
+                    child: appParagraph(title: "Save Income", color: AppColors.white),
                   ),
-                  child: appParagraph(title: "Save Expense", color: AppColors.white),
-                ),
-                Gap(15.h)
-              ],
+                  Gap(15.h),
+                ],
+              ),
             ),
-          ),
         );
       },
-    );
-  }
-
-  /// Date Picker
-  Future<void> _pickDate() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
-  }
-
-  /// Placeholder Save Function
-  void _saveExpense() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Expense saved!")),
     );
   }
 
@@ -139,17 +106,13 @@ class _ExpensesPageState extends State<ExpensesPage> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 30.0),
-        child: FloatingActionButton.extended(
-          onPressed: () {
-            // debugPrint("FAB Pressed: Opening Add Expense Sheet");
-            _showAddExpenseSheet();
-          },
-          icon: const Icon(Icons.add),
-          label: const Text("Add Expense"),
-          backgroundColor: Colors.blueAccent,
-        ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          _showAddIncomeSheet();
+        },
+        icon: const Icon(Icons.add),
+        label: appParagraph(title: "Add Income", color: AppColors.white),
+        backgroundColor: Colors.green,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: SafeArea(
@@ -158,27 +121,26 @@ class _ExpensesPageState extends State<ExpensesPage> with SingleTickerProviderSt
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// Back Button
               GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: const Icon(Icons.arrow_back, size: 30),
               ),
               const SizedBox(height: 20),
 
-              /// Total Expense Card
+              // Total Income Card
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF4facfe), Color(0xFF00f2fe)],
+                    colors: [Color(0xFF00b09b), Color(0xFF96c93d)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.blueAccent.withOpacity(0.3),
+                      color: Colors.green.withOpacity(0.3),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     ),
@@ -188,12 +150,12 @@ class _ExpensesPageState extends State<ExpensesPage> with SingleTickerProviderSt
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
                     Text(
-                      "Total Expenses",
+                      "Total Income",
                       style: TextStyle(color: Colors.white, fontSize: 18),
                     ),
                     SizedBox(height: 10),
                     Text(
-                      "₵ 12,340.00",
+                      "₵ 18,500.00",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 28,
@@ -205,7 +167,7 @@ class _ExpensesPageState extends State<ExpensesPage> with SingleTickerProviderSt
               ),
               const SizedBox(height: 20),
 
-              /// Expense List with Slide Animation
+              // Income List
               Expanded(
                 child: ListView.builder(
                   itemCount: 5,
@@ -217,14 +179,13 @@ class _ExpensesPageState extends State<ExpensesPage> with SingleTickerProviderSt
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: ListTile(
-                          leading: const Icon(Icons.shopping_cart,
-                              color: Colors.blue),
-                          title: Text("Expense Item ${index + 1}"),
-                          subtitle: const Text("12th July 2025"),
+                          leading: const Icon(Icons.monetization_on, color: Colors.green),
+                          title: Text("Income Source ${index + 1}"),
+                          subtitle: const Text("15th July 2025"),
                           trailing: const Text(
-                            "₵ 250.00",
+                            "₵ 1,200.00",
                             style: TextStyle(
-                              color: Colors.red,
+                              color: Colors.green,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

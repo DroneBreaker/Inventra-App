@@ -14,7 +14,7 @@ import 'package:inventra/screens/invoices.dart';
 import 'package:inventra/screens/user.dart';
 import 'package:inventra/wrappers/advance_invoice_wrapper.dart';
 import 'package:inventra/wrappers/customer_wrapper.dart';
-import 'package:inventra/wrappers/income_wrapper.dart';
+import 'package:inventra/screens/income.dart';
 import 'package:inventra/wrappers/item_wrapper.dart';
 import 'package:inventra/screens/items/all_items.dart';
 import 'package:inventra/screens/menu.dart';
@@ -55,7 +55,8 @@ class MyApp extends StatelessWidget {
             // RouteNames.exports: (context) => ExportPage(),
             RouteNames.items: (context) => const ItemWrapper(),
             RouteNames.allItems: (context) => const AllItemsPage(),
-          RouteNames.income: (context) => const IncomeWrapper(),
+          // RouteNames.income: (context) => const IncomeWrapper(),
+            RouteNames.income: (context) => const IncomePage(),
             RouteNames.expenses: (context) => const ExpensesPage(),
             RouteNames.users: (context) => const UserManagementPage(),
           },
