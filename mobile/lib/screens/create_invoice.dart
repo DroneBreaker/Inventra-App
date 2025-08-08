@@ -8,6 +8,9 @@ import 'package:inventra/widgets/forms.dart';
 import 'package:inventra/widgets/titles.dart';
 import 'package:inventra/widgets/button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 
 class CreateInvoice extends StatefulWidget {
@@ -435,17 +438,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                             
                             
                                 // Username TextForm field
-                                TextFormField(
-                                  controller: usernameController,
-                                  enabled: false,
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10)
-                                    ),
-                                    hintText: "Username"
-                                  ),
-                                ),
+                                appInput(placeholder: "Username", textEditingController: usernameController, isEnabled: false),
                                 Gap(20.h),
                             
                             
@@ -455,17 +448,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                             
                             
                                 // Client TIN
-                                TextFormField(
-                                  controller: clientTINController,
-                                  enabled: false,
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10)
-                                    ),
-                                    hintText: "Client TIN"
-                                  ),
-                                ),
+                                appInput(placeholder: "Client TIN", textEditingController: clientTINController, isEnabled: false),
                                 Gap(20.h),
                             
                             
@@ -562,32 +545,12 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                             
                             
                                 // Total VAT TextForm field
-                                TextFormField(
-                                  controller: totalVATController,
-                                  enabled: false,
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10)
-                                    ),
-                                    hintText: "Total VAT"
-                                  ),
-                                ),
-                                SizedBox(height: 20,),
+                                appInput(placeholder: "Total VAT", textEditingController: totalVATController, isEnabled: false),
+                                Gap(20.h),
                             
                             
                                 // Total Amount TextForm field
-                                TextFormField(
-                                  controller: totalAmountController,
-                                  enabled: false,
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.only(left: 20),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10)
-                                    ),
-                                    hintText: "Total Amount"
-                                  ),
-                                ),
+                                appInput(placeholder: "Total Amount", textEditingController: totalAmountController, isEnabled: false),
                                 Gap(20.h),
                             
                             
@@ -626,7 +589,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                                       backgroundColor: Colors.orange[400]
                                     ),
                                     onPressed: () {
-                                    // handleInvoice();
+                                      handleInvoice();
                                     }, 
                                     child: appParagraph(title: "Submit", fontSize: 17, color: AppColors.white,)
                                   ),
@@ -645,5 +608,315 @@ class _CreateInvoiceState extends State<CreateInvoice> {
           // ),
         )
     );
+  }
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  void handleInvoice() async {
+    // Validate form
+    if (!_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please fill all required fields correctly'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Additional validation for required fields
+    if (!_validateRequiredFields()) {
+      return;
+    }
+
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
+
+      // Prepare invoice data
+      final invoiceData = await _prepareInvoiceData();
+
+      // Send to API
+      final response = await _sendInvoiceToAPI(invoiceData);
+
+      // Hide loading indicator
+      Navigator.of(context).pop();
+
+      if (response['success'] == true) {
+        // Success - show success message and navigate back
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Invoice created successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        
+        // Clear form or navigate back
+        _clearForm();
+        Navigator.of(context).pop();
+      } else {
+        // Handle API error
+        _showErrorDialog(response['message'] ?? 'Failed to create invoice');
+      }
+    } catch (e) {
+      // Hide loading indicator if still showing
+      Navigator.of(context).pop();
+      
+      // Handle network or other errors
+      _showErrorDialog('Network error: ${e.toString()}');
+    }
+  }
+
+  bool _validateRequiredFields() {
+    List<String> missingFields = [];
+
+    if (selectedFlag == null || selectedFlag!.isEmpty) {
+      missingFields.add('Invoice Type');
+    }
+    if (invoiceNumberController.text.trim().isEmpty) {
+      missingFields.add('Invoice Number');
+    }
+    if (clientNameController.text.trim().isEmpty) {
+      missingFields.add('Client Name');
+    }
+    if (invoiceDateController.text.trim().isEmpty) {
+      missingFields.add('Invoice Date');
+    }
+    if (invoiceTimeController.text.trim().isEmpty) {
+      missingFields.add('Invoice Time');
+    }
+    if (dueDateController.text.trim().isEmpty) {
+      missingFields.add('Due Date');
+    }
+
+    if (missingFields.isNotEmpty) {
+      _showErrorDialog('Please fill the following required fields:\n• ${missingFields.join('\n• ')}');
+      return false;
+    }
+
+    // Validate dates
+    if (selectedInvoiceDate == null) {
+      _showErrorDialog('Please select a valid invoice date');
+      return false;
+    }
+
+    if (selectedDueDate == null) {
+      _showErrorDialog('Please select a valid due date');
+      return false;
+    }
+
+    if (selectedDueDate!.isBefore(selectedInvoiceDate!)) {
+      _showErrorDialog('Due date cannot be before invoice date');
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<Map<String, dynamic>> _prepareInvoiceData() async {
+    final uuid = const Uuid();
+    final prefs = await SharedPreferences.getInstance();
+
+    // Convert flag text to enum value
+    String flagValue = _convertFlagToEnum(selectedFlag!);
+
+    // Combine date and time for invoice_time
+    DateTime invoiceDateTime = DateTime(
+      selectedInvoiceDate!.year,
+      selectedInvoiceDate!.month,
+      selectedInvoiceDate!.day,
+      selectedInvoiceTime?.hour ?? 0,
+      selectedInvoiceTime?.minute ?? 0,
+    );
+
+    // Prepare invoice data matching your Rust model
+    final invoiceData = {
+      "id": uuid.v4(),
+      "flag": flagValue,
+      "invoice_number": invoiceNumberController.text.trim(),
+      "username": usernameController.text.trim(),
+      "company_tin": prefs.getString('company_tin') ?? "C000713911X", // Get from SharedPreferences or config
+      "client_name": clientNameController.text.trim(),
+      "client_tin": clientTINController.text.trim().isEmpty ? "000000000" : clientTINController.text.trim(),
+      "invoice_date": selectedInvoiceDate!.toUtc().toIso8601String(),
+      "invoice_time": invoiceDateTime.toUtc().toIso8601String(),
+      "due_date": selectedDueDate!.toUtc().toIso8601String(),
+      "total_vat": _parseDecimal(totalVATController.text),
+      "total_amount": _parseDecimal(totalAmountController.text),
+      "items": [], // You'll need to add items collection logic
+      "created_at": DateTime.now().toUtc().toIso8601String(),
+      "updated_at": DateTime.now().toUtc().toIso8601String(),
+    };
+
+    return invoiceData;
+  }
+
+  String _convertFlagToEnum(String flag) {
+    switch (flag) {
+      case 'Invoice':
+        return 'Invoice';
+      case 'Purchase':
+        return 'Purchase';
+      case 'Refund':
+        return 'PartialRefund'; // You might want to add logic to determine Partial vs Full
+      case 'Credit Note':
+        return 'CreditNote';
+      default:
+        return 'Invoice';
+    }
+  }
+
+  double _parseDecimal(String value) {
+    if (value.trim().isEmpty) return 0.0;
+    try {
+      return double.parse(value.trim());
+    } catch (e) {
+      return 0.0;
+    }
+  }
+
+  Future<Map<String, dynamic>> _sendInvoiceToAPI(Map<String, dynamic> invoiceData) async {
+    const String baseUrl = 'https://vsdcstaging.vat-gh.com/vsdc/api/v1/taxpayer';
+    const String reference = 'C000713911X-002';
+    const String securityKey = 'IWhnuThonHN9VY1xuQO5VV/s5/PR2v3bcdDr0SmAwiI3JjMSK39WpXsmSU9wEwqv';
+    
+    final String endpoint = '$baseUrl/$reference/invoice';
+
+    try {
+      final response = await http.post(
+        Uri.parse(endpoint),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $securityKey', // or however the security key should be sent
+          'X-Security-Key': securityKey, // Alternative header format if needed
+        },
+        body: json.encode(invoiceData),
+      );
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final responseData = json.decode(response.body);
+        return {
+          'success': true,
+          'data': responseData,
+          'message': 'Invoice created successfully'
+        };
+      } else {
+        String errorMessage = 'Failed to create invoice';
+        try {
+          final errorData = json.decode(response.body);
+          errorMessage = errorData['message'] ?? errorData['error'] ?? errorMessage;
+        } catch (e) {
+          errorMessage = 'HTTP ${response.statusCode}: ${response.reasonPhrase}';
+        }
+        
+        return {
+          'success': false,
+          'message': errorMessage,
+          'statusCode': response.statusCode
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Network error: ${e.toString()}'
+      };
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _clearForm() {
+    // Clear all controllers
+    invoiceNumberController.clear();
+    clientNameController.clear();
+    clientTINController.clear();
+    invoiceDateController.clear();
+    invoiceTimeController.clear();
+    dueDateController.clear();
+    totalVATController.clear();
+    totalAmountController.clear();
+
+    // Reset state variables
+    setState(() {
+      selectedFlag = null;
+      activeButton = '';
+      selectedInvoiceDate = null;
+      selectedDueDate = null;
+      selectedInvoiceTime = null;
+      selectedClientData = null;
+      showClientDropdown = false;
+    });
+  }
+
+  // Helper method to validate invoice number format (add your own logic)
+  bool _isValidInvoiceNumber(String invoiceNumber) {
+    // Add your invoice number validation logic here
+    // For example, check format, uniqueness, etc.
+    return invoiceNumber.trim().isNotEmpty && invoiceNumber.trim().length >= 3;
+  }
+
+  // Helper method to validate TIN format
+  bool _isValidTIN(String tin) {
+    // Add your TIN validation logic here
+    if (tin.trim().isEmpty) return true; // Optional field
+    return tin.trim().length >= 9; // Example validation
   }
 }

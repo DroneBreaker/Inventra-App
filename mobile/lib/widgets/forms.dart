@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 Widget appInput({required String placeholder, TextInputType? textInputType, required TextEditingController 
   textEditingController, String? errorMsg, String? errorLengthMsg, Function(String)? onTap, int? maxLines,
-  Icon? icon
+  Icon? icon, bool? isEnabled 
 }) {
   return TextFormField(
       controller: textEditingController,
+      enabled: isEnabled,
       keyboardType: textInputType,
       maxLines: maxLines,
       decoration: InputDecoration(
