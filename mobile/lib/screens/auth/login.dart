@@ -49,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
               Positioned(
                 bottom: 0,
                 child: Container(
-                  height: 640.h,
+                  height: 540.h,
                   width: 412.w,
                 // height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top,
                 decoration: BoxDecoration(

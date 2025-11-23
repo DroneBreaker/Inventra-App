@@ -756,7 +756,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   }
 
   Future<Map<String, dynamic>> _prepareInvoiceData() async {
-    final uuid = const Uuid();
+    // final uuid = const Uuid();
     final prefs = await SharedPreferences.getInstance();
 
     // Convert flag text to enum value
@@ -773,13 +773,13 @@ class _CreateInvoiceState extends State<CreateInvoice> {
 
     // Prepare invoice data matching your Rust model
     final invoiceData = {
-      "id": uuid.v4(),
+      // "id": uuid.v4(),
       "flag": flagValue,
       "invoice_number": invoiceNumberController.text.trim(),
       "username": usernameController.text.trim(),
       "company_tin": prefs.getString('company_tin') ?? "C000713911X", // Get from SharedPreferences or config
       "client_name": clientNameController.text.trim(),
-      "client_tin": clientTINController.text.trim().isEmpty ? "000000000" : clientTINController.text.trim(),
+      "client_tin": clientTINController.text.trim().isEmpty ? "0000000000" : clientTINController.text.trim(),
       "invoice_date": selectedInvoiceDate!.toUtc().toIso8601String(),
       "invoice_time": invoiceDateTime.toUtc().toIso8601String(),
       "due_date": selectedDueDate!.toUtc().toIso8601String(),

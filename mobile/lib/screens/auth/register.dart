@@ -208,14 +208,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
 
                               // Company ID TextForm field
-                              appInput(placeholder: "Company ID", textEditingController: companyNameController, 
+                              appInput(placeholder: "Company ID", textEditingController: companyIDController, 
                                 errorMsg: AppText.companyIDError, errorLengthMsg: AppText.validCompanyIDError
                               ),
                               const SizedBox(height: 20,),
                                       
                                       
                               // Company TIN Textform field
-                              appInput(placeholder: "Company TIN", textEditingController: companyNameController, 
+                              appInput(placeholder: "Company TIN", textEditingController: companyTINController, 
                                 errorMsg: AppText.companyTINError, errorLengthMsg: AppText.validCompanyTINError
                               ),
                               Gap(20.h),
