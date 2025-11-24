@@ -11,7 +11,7 @@ type User struct {
 	CompanyID   string
 	CompanyTIN  string
 	CompanyName string
-	Company     Company
+	Company     Company `gorm:"foreignKey:CompanyTIN;references:TIN" json:"-"`
 	Password    string
 	Role        Role
 	CreatedAt   time.Time

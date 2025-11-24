@@ -1,7 +1,11 @@
 package services
 
 import (
+	"errors"
+
 	"github.com/DroneBreaker/Inventra-App/internal/models"
+	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -24,17 +28,44 @@ func (s *UserService) GetAll(companyID string) ([]models.User, error) {
 	return user, nil
 }
 
-// Create users
-// func (s *UserService) Create(user *models.User) error {
-// 	if user.ID == "" {
-// 		// user.ID = uuid.New().String()
-// 	}
-// }
+// CREATE USERS
+func (s *UserService) CreateUser(user *models.User) error {
+	// Hash password
+	hashed, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	user.Password = string(hashed)
 
-// Get users by ID
-func (s *UserService) GetByID(id string) (*models.User, error) {
+	// UUID
+	user.ID = uuid.New().String()
+
+	// Check company exists
+	var company models.Company
+	if err := s.DB.Where("tin = ?", user.CompanyTIN).First(&company).Error; err != nil {
+		return errors.New("company not found")
+	}
+	user.CompanyName = company.CompanyName
+
+	return s.DB.Create(user).Error
+}
+
+// GET USER
+func (s *UserService) GetUserByID(id string, companyTIN string) (*models.User, error) {
 	var user models.User
-	err := s.DB.Preload("Company").First(&user, id).Error
-
+	err := s.DB.Where("id = ? AND company_tin = ?", id, companyTIN).First(&user).Error
 	return &user, err
+}
+
+// UPDATE USERS
+func (s *UserService) UpdateUser(id string, companyTIN string, updates map[string]interface{}) error {
+	return s.DB.Model(&models.User{}).
+		Where("id = ? AND company_tin = ?", id, companyTIN).
+		Updates(updates).Error
+}
+
+// DELETE USERS
+func (s *UserService) DeleteUser(id string, companyTIN string) error {
+	return s.DB.Where("id = ? AND company_tin = ?", id, companyTIN).
+		Delete(&models.User{}).Error
 }

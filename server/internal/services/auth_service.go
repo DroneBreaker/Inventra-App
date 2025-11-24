@@ -6,6 +6,7 @@ import (
 
 	"github.com/DroneBreaker/Inventra-App/internal/models"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -29,7 +30,7 @@ func (s *AuthService) Register(data models.RegisterDTO) error {
 	hashed, _ := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
 
 	user := models.User{
-		// ID:          uuid.New().String(),
+		ID:          uuid.New().String(),
 		FirstName:   data.FirstName,
 		LastName:    data.LastName,
 		Email:       data.Email,

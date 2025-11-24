@@ -30,8 +30,13 @@ class _MenuPageState extends State<MenuPage> {
       data: _darkMode 
           ? ThemeData.dark().copyWith(
               primaryColor: Colors.blueAccent,
-              cardColor: Colors.grey[850],
+              cardColor: Colors.grey[450],
               dividerColor: Colors.grey[700], // Added for footer border
+              // iconButtonTheme: IconButtonThemeData(
+              //    style: ButtonStyle(
+              //     iconColor: WidgetStateColor.
+              //    )
+              // )
             )
           : ThemeData.light().copyWith(
               primaryColor: Colors.blueAccent,
@@ -163,7 +168,7 @@ class _MenuPageState extends State<MenuPage> {
                       onChanged: (value) => setState(() => _darkMode = value),
                     ),
                     IconButton(
-                      icon: Icon(Icons.logout),
+                      icon: Icon(Icons.logout, color: _darkMode ? Colors.grey[350] : Colors.black87,),
                       onPressed: () {},
                       tooltip: 'Logout',
                     ),
