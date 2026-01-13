@@ -12,7 +12,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-
 class CreateInvoice extends StatefulWidget {
   const CreateInvoice({super.key});
 
@@ -23,12 +22,11 @@ class CreateInvoice extends StatefulWidget {
 class _CreateInvoiceState extends State<CreateInvoice> {
   final TextEditingController invoiceNumberController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
-  final TextEditingController clientNameController =
-      TextEditingController();
+  final TextEditingController clientNameController = TextEditingController();
   final TextEditingController clientTINController = TextEditingController();
   final TextEditingController invoiceDateController = TextEditingController();
   final TextEditingController invoiceTimeController = TextEditingController();
-  final TextEditingController dueDateController= TextEditingController();
+  final TextEditingController dueDateController = TextEditingController();
   final TextEditingController totalVATController = TextEditingController();
   final TextEditingController totalAmountController = TextEditingController();
   final TextEditingController itemCodeController = TextEditingController();
@@ -66,7 +64,6 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     }
   }
 
-
   // Due Date picker
   Future<void> _selectDueDate(BuildContext context) async {
     final DateTime? date = await showDatePicker(
@@ -87,8 +84,10 @@ class _CreateInvoiceState extends State<CreateInvoice> {
 
   // Time picker
   Future<void> _selectInvoiceTime(BuildContext context) async {
-    final TimeOfDay? time =
-        await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    final TimeOfDay? time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
 
     if (time != null) {
       // Format the TimeOfDay manually to 'HH:mm'
@@ -122,12 +121,8 @@ class _CreateInvoiceState extends State<CreateInvoice> {
 
   // CLIENT OPTIONS
   String selectedClient = "Customer";
-  final List<String> clientOptions = [
-    'Customer',
-    'Supplier',
-    "Exempt"
-  ];
-  
+  final List<String> clientOptions = ['Customer', 'Supplier', "Exempt"];
+
   // Enhanced client management
   List<Map<String, dynamic>> clients = [
     {'name': 'John Doe', 'tin': 'TIN001'},
@@ -138,31 +133,25 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   List<Map<String, dynamic>> filteredClients = [];
   bool showClientDropdown = false;
   Map<String, dynamic>? selectedClientData;
-  
 
   // FLAG OPTIONS
   String? selectedFlag;
-  final List<Map<String, dynamic>> flags = [
-    {
-      'text': 'Invoice',
-      'icon': Icons.receipt_long,
-    },
-
-    {
-      'text': 'Purchase',
-      'icon': Icons.shopping_cart,
-    },
-
-    {
-      'text': 'Refund',
-      'icon': Icons.assignment_return,
-    },
-
-    {
-      'text': 'Credit Note',
-      'icon': Icons.note,
-    },
+  final List<String> flags = [
+    "Invoice",
+    "Purchase",
+    "Refund",
+    "Credit Note",
+    "Debit Note",
   ];
+  // final List<Map<String, dynamic>> flags = [
+  //   {'text': 'Invoice', 'icon': Icons.receipt_long},
+
+  //   {'text': 'Purchase', 'icon': Icons.shopping_cart},
+
+  //   {'text': 'Refund', 'icon': Icons.assignment_return},
+
+  //   {'text': 'Credit Note', 'icon': Icons.note},
+  // ];
 
   // INVOICE STATUS OPTIONS
   String selectedInvoiceStatus = "Draft";
@@ -174,7 +163,6 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     "Canceled",
   ];
 
-
   // Add this to your _CreateInvoiceState class
 
   Future<void> _loadUserData() async {
@@ -184,15 +172,13 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     });
   }
 
-
-
   @override
   void initState() {
     super.initState();
     // Initialize filtered clients
     filteredClients = List.from(clients);
     _loadUserData();
-    
+
     // Add listener to client name controller
     clientNameController.addListener(_onClientNameChanged);
   }
@@ -204,139 +190,142 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   }
 
   void _onClientNameChanged() {
-  final query = clientNameController.text.toLowerCase();
-  
-  setState(() {
-    if (query.isEmpty) {
-      filteredClients = List.from(clients);
-      showClientDropdown = false;
-      selectedClientData = null;
-      clientTINController.clear();
-    } else {
-      filteredClients = clients.where((client) {
-        return client['name'].toLowerCase().contains(query);
-      }).toList();
-      showClientDropdown = filteredClients.isNotEmpty;
-      
-      // Check if current text exactly matches a client name
-      final exactMatch = clients.firstWhere(
-        (client) => client['name'].toLowerCase() == query,
-        orElse: () => {},
-      );
-      
-      if (exactMatch.isNotEmpty && selectedClientData?['name'] != exactMatch['name']) {
-        selectedClientData = exactMatch;
-        clientTINController.text = exactMatch['tin'];
+    final query = clientNameController.text.toLowerCase();
+
+    setState(() {
+      if (query.isEmpty) {
+        filteredClients = List.from(clients);
+        showClientDropdown = false;
+        selectedClientData = null;
+        clientTINController.clear();
+      } else {
+        filteredClients =
+            clients.where((client) {
+              return client['name'].toLowerCase().contains(query);
+            }).toList();
+        showClientDropdown = filteredClients.isNotEmpty;
+
+        // Check if current text exactly matches a client name
+        final exactMatch = clients.firstWhere(
+          (client) => client['name'].toLowerCase() == query,
+          orElse: () => {},
+        );
+
+        if (exactMatch.isNotEmpty &&
+            selectedClientData?['name'] != exactMatch['name']) {
+          selectedClientData = exactMatch;
+          clientTINController.text = exactMatch['tin'];
+        }
       }
-    }
-  });
-}
+    });
+  }
 
   void _selectClient(Map<String, dynamic> client) {
-  setState(() {
-    selectedClientData = client;
-    clientNameController.text = client['name'];
-    clientTINController.text = client['tin'];
-    showClientDropdown = false;
-  });
-}
+    setState(() {
+      selectedClientData = client;
+      clientNameController.text = client['name'];
+      clientTINController.text = client['tin'];
+      showClientDropdown = false;
+    });
+  }
 
   // Replace your existing Client Name and Client TIN TextFormFields with this:
   Widget buildClientSelection() {
-  return Column(
-    children: [
-      // Client Name with dropdown
-      Stack(
-        children: [
-          TextFormField(
-            controller: clientNameController,
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.only(left: 20),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10)
+    return Column(
+      children: [
+        // Client Name with dropdown
+        Stack(
+          children: [
+            TextFormField(
+              controller: clientNameController,
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.only(left: 20),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                hintText: "Client Name",
+                suffixIcon:
+                    clientNameController.text.isNotEmpty
+                        ? IconButton(
+                          onPressed: () {
+                            clientNameController.clear();
+                            clientTINController.clear();
+                            setState(() {
+                              showClientDropdown = false;
+                              selectedClientData = null;
+                            });
+                          },
+                          icon: Icon(Icons.clear),
+                        )
+                        : Icon(Icons.search),
               ),
-              hintText: "Client Name",
-              suffixIcon: clientNameController.text.isNotEmpty
-                  ? IconButton(
-                      onPressed: () {
-                        clientNameController.clear();
-                        clientTINController.clear();
-                        setState(() {
-                          showClientDropdown = false;
-                          selectedClientData = null;
-                        });
-                      },
-                      icon: Icon(Icons.clear),
-                    )
-                  : Icon(Icons.search),
+              onTap: () {
+                if (clientNameController.text.isNotEmpty) {
+                  setState(() {
+                    showClientDropdown = true;
+                  });
+                }
+              },
             ),
-            onTap: () {
-              if (clientNameController.text.isNotEmpty) {
-                setState(() {
-                  showClientDropdown = true;
-                });
-              }
-            },
-          ),
-          
-          // Dropdown suggestions
-          if (showClientDropdown && filteredClients.isNotEmpty)
-            Positioned(
-              top: 60,
-              left: 0,
-              right: 0,
-              child: Material(
-                elevation: 4,
-                borderRadius: BorderRadius.circular(10),
-                child: Container(
-                  constraints: BoxConstraints(maxHeight: 200),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.white,
-                  ),
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: filteredClients.length,
-                    itemBuilder: (context, index) {
-                      final client = filteredClients[index];
-                      return ListTile(
-                        title: Text(client['name']),
-                        subtitle: Text('TIN: ${client['tin']}'),
-                        onTap: () => _selectClient(client),
-                        dense: true,
-                      );
-                    },
+
+            // Dropdown suggestions
+            if (showClientDropdown && filteredClients.isNotEmpty)
+              Positioned(
+                top: 60,
+                left: 0,
+                right: 0,
+                child: Material(
+                  elevation: 4,
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    constraints: BoxConstraints(maxHeight: 200),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                    ),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: filteredClients.length,
+                      itemBuilder: (context, index) {
+                        final client = filteredClients[index];
+                        return ListTile(
+                          title: Text(client['name']),
+                          subtitle: Text('TIN: ${client['tin']}'),
+                          onTap: () => _selectClient(client),
+                          dense: true,
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
-        ],
-      ),
-      
-      SizedBox(height: 20),
-      
-      // Client TIN (auto-populated)
-      TextFormField(
-        controller: clientTINController,
-        enabled: false,
-        decoration: InputDecoration(
-          contentPadding: EdgeInsets.only(left: 20),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10)
-          ),
-          hintText: "Client TIN",
-          filled: true,
-          fillColor: selectedClientData != null ? Colors.green.shade50 : Colors.grey.shade100,
+          ],
         ),
-      ),
-    ],
-  );
-}
+
+        SizedBox(height: 20),
+
+        // Client TIN (auto-populated)
+        TextFormField(
+          controller: clientTINController,
+          enabled: false,
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.only(left: 20),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            hintText: "Client TIN",
+            filled: true,
+            fillColor:
+                selectedClientData != null
+                    ? Colors.green.shade50
+                    : Colors.grey.shade100,
+          ),
+        ),
+      ],
+    );
+  }
 
   // In your build method, replace the existing Client Name and Client TIN sections with:
   // _buildClientSelection(),
-
 
   @override
   Widget build(BuildContext context) {
@@ -344,307 +333,336 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Stack(
-                children: [
-                  Positioned(
-                    top: 10,
-                    left: 8,
-                    child: IconButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      icon: Icon(Icons.arrow_back, size: 40,)
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20.0, right: 20, top: 70),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          FormField<String>(validator: (value) {
-                            if (selectedFlag == null) {
-                              return 'Please select an invoice type';
-                            }
-                            return null;
-                          }, 
-                          builder: (FormFieldState<String> state) {
-                            return Column(
-                              children: [
-                                appTitle(title: "INVOICE FUCKERS"),
-                                SizedBox(height: 10,),
-                            
+            children: [
+              Positioned(
+                top: 10,
+                left: 8,
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  icon: Icon(Icons.arrow_back, size: 40),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0, right: 20, top: 70),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      FormField<String>(
+                        validator: (value) {
+                          if (selectedFlag == null) {
+                            return 'Please select an invoice type';
+                          }
+                          return null;
+                        },
+                        builder: (FormFieldState<String> state) {
+                          return Column(
+                            children: [
+                              appTitle(title: "INVOICE FUCKERS"),
+                              SizedBox(height: 10),
 
-                                // Document Type
-                                appTitle(title: "Select Document Type",),
-                                SizedBox(height: 10,),
+                              // Document Type
+                              appTitle(title: "Select Document Type"),
+                              SizedBox(height: 10),
 
-                                
-                                // INVOICE FLAGS
-                                Wrap(
-                                      spacing: 25.0,
-                                      runSpacing: 12.0,
-                                      children: flags.map((flag) {
-                                        final bool isActive =
-                                            activeButton == flag['text'];
-                                        return appButton(
-                                            
-                                              buttonText: flag['text'],
-                                              onTap: () {
-                                                setState(() {
-                                                  activeButton = flag['text'];
-                                                  selectedFlag = flag['text'];
-                                                });
-                                                                      
-                                                state.didChange(flag['text']);
-                                              },
-                                              colors: AppColors.buttonPrimary,
-                                              // fontSize: 16,
-                                              icon: isActive
-                                                  ? Icon(
-                                                      flag['icon'],
-                                                      color: Colors.amber,
-                                                      size: 25,
-                                                    )
-                                                  : null);
-                                      }).toList()
-                            
-                                      // Button(
-                                      //   buttonText: "Purchase",
-                                      //   onTap: () {},
-                                      //   colors: Colors.white,
-                                      //   fontSize: 16,
-                                      // ),
-                                      // Button(
-                                      //   buttonText: "Refund",
-                                      //   onTap: () {},
-                                      //   colors: Colors.white,
-                                      //   fontSize: 16,
-                                      // ),
-                                      // Button(
-                                      //   buttonText: "Credit Note",
-                                      //   onTap: () {},
-                                      //   colors: Colors.white,
-                                      //   fontSize: 16,
-                                      // ),
+                              // INVOICE FLAGS
+                              // Wrap(
+                              //   spacing: 25.0,
+                              //   runSpacing: 12.0,
+                              //   children:
+                              //       flags.map((flag) {
+                              //         final bool isActive =
+                              //             activeButton == flag['text'];
+                              //         return appButton(
+                              //           buttonText: flag['text'],
+                              //           onTap: () {
+                              //             setState(() {
+                              //               activeButton = flag['text'];
+                              //               selectedFlag = flag['text'];
+                              //             });
+
+                              //             state.didChange(flag['text']);
+                              //           },
+                              //           colors: AppColors.buttonPrimary,
+                              //           // fontSize: 16,
+                              //           icon:
+                              //               isActive
+                              //                   ? Icon(
+                              //                     flag['icon'],
+                              //                     color: Colors.amber,
+                              //                     size: 25,
+                              //                   )
+                              //                   : null,
+                              //         );
+                              //       }).toList(),
+
+                              //   // Button(
+                              //   //   buttonText: "Purchase",
+                              //   //   onTap: () {},
+                              //   //   colors: Colors.white,
+                              //   //   fontSize: 16,
+                              //   // ),
+                              //   // Button(
+                              //   //   buttonText: "Refund",
+                              //   //   onTap: () {},
+                              //   //   colors: Colors.white,
+                              //   //   fontSize: 16,
+                              //   // ),
+                              //   // Button(
+                              //   //   buttonText: "Credit Note",
+                              //   //   onTap: () {},
+                              //   //   colors: Colors.white,
+                              //   //   fontSize: 16,
+                              //   // ),
+                              // ),
+                              Gap(20.h),
+
+                              // Invoice Number TextForm field
+                              appInput(
+                                placeholder: "Invoice Number",
+                                textEditingController: invoiceNumberController,
+                                errorMsg: AppText.invoiceNumberError,
+                                errorLengthMsg:
+                                    AppText.invoiceNumberLengthError,
+                              ),
+                              Gap(20.h),
+
+                              // Flag Dropdown
+                              DropdownButtonFormField(
+                                value: selectedFlag,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  labelText: 'Invoice Type',
                                 ),
-                                Gap(20.h),
-                            
-                            
-                                // Invoice Number TextForm field
-                                appInput(placeholder: "Invoice Number", textEditingController: invoiceNumberController, 
-                                  errorMsg: AppText.invoiceNumberError, errorLengthMsg: AppText.invoiceNumberLengthError
-                                ),
-                                Gap(20.h),
-                            
-                            
-                                // Username TextForm field
-                                appInput(placeholder: "Username", textEditingController: usernameController, isEnabled: false),
-                                Gap(20.h),
-                            
-                            
-                                // Client TextForm field
-                                appInput(placeholder: "Client Name", textEditingController: clientNameController),
-                                Gap(20.h),
-                            
-                            
-                                // Client TIN
-                                appInput(placeholder: "Client TIN", textEditingController: clientTINController, isEnabled: false),
-                                Gap(20.h),
-                            
-                            
-                                // Invoice Date TextForm field
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: appInput(placeholder: "Invoice Date", textEditingController: 
-                                      invoiceDateController, textInputType: TextInputType.datetime, onTap: (value) => print('Invoice Time: $value')
+                                items:
+                                    flags.map((String option) {
+                                      return DropdownMenuItem(
+                                        value: option,
+                                        child: Text(option),
+                                      );
+                                    }).toList(),
+                                onChanged: (String? newValue) {
+                                  if (newValue != null) {
+                                    setState(() {
+                                      selectedFlag = newValue;
+                                    });
+                                  }
+                                },
+                              ),
+                              Gap(20.h),
+
+                              // Username TextForm field
+                              appInput(
+                                placeholder: "Username",
+                                textEditingController: usernameController,
+                                isEnabled: false,
+                              ),
+                              Gap(20.h),
+
+                              // Client TextForm field
+                              appInput(
+                                placeholder: "Client Name",
+                                textEditingController: clientNameController,
+                              ),
+                              Gap(20.h),
+
+                              // Client TIN
+                              appInput(
+                                placeholder: "Client TIN",
+                                textEditingController: clientTINController,
+                                isEnabled: false,
+                              ),
+                              Gap(20.h),
+
+                              // Invoice Date TextForm field
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: appInput(
+                                      placeholder: "Invoice Date",
+                                      textEditingController:
+                                          invoiceDateController,
+                                      textInputType: TextInputType.datetime,
+                                      onTap:
+                                          (value) =>
+                                              print('Invoice Time: $value'),
                                     ),
-                                    ),
-                                    IconButton(onPressed: () => _selectInvoiceDate(context), 
-                                      icon: Icon(Icons.calendar_month, size: 30,)
-                                    )
-                                  ],
-                                ),
-                                Gap(20.h),
-                            
-                            
-                                // Invoice Time TextForm field
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Form(
-                                        child: appInput(placeholder: "Invoice Time", textEditingController: invoiceTimeController, 
-                                          onTap: (value) => print('Invoice Time: $value')
-                                        )
+                                  ),
+                                  IconButton(
+                                    onPressed:
+                                        () => _selectInvoiceDate(context),
+                                    icon: Icon(Icons.calendar_month, size: 30),
+                                  ),
+                                ],
+                              ),
+                              Gap(20.h),
+
+                              // Invoice Time TextForm field
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Form(
+                                      child: appInput(
+                                        placeholder: "Invoice Time",
+                                        textEditingController:
+                                            invoiceTimeController,
+                                        onTap:
+                                            (value) =>
+                                                print('Invoice Time: $value'),
                                       ),
                                     ),
-                                    IconButton(onPressed: () => _selectInvoiceTime(context), 
-                                      icon: Icon(Icons.calendar_month, size: 30,)
-                                    )
-                                  ],
-                                ),
-                                Gap(20.h),
+                                  ),
+                                  IconButton(
+                                    onPressed:
+                                        () => _selectInvoiceTime(context),
+                                    icon: Icon(Icons.calendar_month, size: 30),
+                                  ),
+                                ],
+                              ),
+                              Gap(20.h),
 
+                              //           Row(
+                              //   children: [
+                              //     Expanded(
+                              //       child: Form(
+                              //         child: TextFormField(
+                              //           controller: dateReceivedController,
+                              //           keyboardType: TextInputType.datetime,
+                              //           decoration: InputDecoration(
+                              //             border: OutlineInputBorder(
+                              //               borderRadius: BorderRadius.circular(10)
+                              //             ),
+                              //             contentPadding: EdgeInsets.only(top: 40, left: 20),
+                              //             hintText: "Date Received"
+                              //           ),
+                              //           onChanged: (value) {
+                              //             print('Date Received: $value');
+                              //           },
+                              //         ),
+                              //       ),
+                              //     ),
+                              //     Gap(15.w),
+                              //     IconButton(onPressed: () => _selectDateReceived(context), icon: Icon(Icons.calendar_month, size: 30,))
+                              //   ],
+                              // ),
 
+                              // Due Date TextForm field
+                              // Row(
+                              //   children: [
+                              //     Expanded(
+                              //       child: Form(
+                              //         child: TextFormField(
+                              //           controller: dueDateController,
+                              //           keyboardType: TextInputType.datetime,
+                              //           decoration: InputDecoration(
+                              //             border: OutlineInputBorder(
+                              //               borderRadius: BorderRadius.circular(
+                              //                 10,
+                              //               ),
+                              //             ),
+                              //             contentPadding: EdgeInsets.only(
+                              //               left: 20,
+                              //             ),
+                              //             hintText: "Due Date",
+                              //           ),
+                              //           onChanged: (value) {
+                              //             print('Due Date: $value');
+                              //           },
+                              //         ),
+                              //       ),
+                              //     ),
+                              //     IconButton(
+                              //       onPressed: () => _selectDueDate(context),
+                              //       icon: Icon(Icons.calendar_month, size: 30),
+                              //     ),
+                              //   ],
+                              // ),
+                              // Gap(20.h),
+                              appInput(
+                                placeholder: "Add Item",
+                                textEditingController: itemNameController,
+                              ),
+                              Gap(20.h),
 
+                              // Total VAT TextForm field
+                              appInput(
+                                placeholder: "Total VAT",
+                                textEditingController: totalVATController,
+                                isEnabled: false,
+                              ),
+                              Gap(20.h),
 
+                              // Total Amount TextForm field
+                              appInput(
+                                placeholder: "Total Amount",
+                                textEditingController: totalAmountController,
+                                isEnabled: false,
+                              ),
+                              Gap(20.h),
 
-                      //           Row(
-                      //   children: [
-                      //     Expanded(
-                      //       child: Form(
-                      //         child: TextFormField(
-                      //           controller: dateReceivedController,
-                      //           keyboardType: TextInputType.datetime,
-                      //           decoration: InputDecoration(
-                      //             border: OutlineInputBorder(
-                      //               borderRadius: BorderRadius.circular(10)
-                      //             ),
-                      //             contentPadding: EdgeInsets.only(top: 40, left: 20),
-                      //             hintText: "Date Received"
-                      //           ),
-                      //           onChanged: (value) {
-                      //             print('Date Received: $value');
-                      //           },
-                      //         ),
-                      //       ),
-                      //     ),
-                      //     Gap(15.w),
-                      //     IconButton(onPressed: () => _selectDateReceived(context), icon: Icon(Icons.calendar_month, size: 30,))
-                      //   ],
-                      // ),
-                            
-                            
-                                // Due Date TextForm field
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Form(
-                                        child: TextFormField(
-                                            controller: dueDateController,
-                                            keyboardType: TextInputType.datetime,
-                                            decoration: InputDecoration(
-                                              border: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(10)
-                                              ),
-                                              contentPadding: EdgeInsets.only(left: 20),
-                                              hintText: "Due Date"
-                                            ),
-                                            onChanged: (value) {
-                                              print('Due Date: $value');
-                                            },
-                                          ),
-                                      ),
-                                    ),
-                                    IconButton(onPressed: () => _selectDueDate(context), 
-                                      icon: Icon(Icons.calendar_month, size: 30,)
-                                    )
-                                  ],
-                                ),
-                                Gap(20.h),
-                            
-                            
-                                // Total VAT TextForm field
-                                appInput(placeholder: "Total VAT", textEditingController: totalVATController, isEnabled: false),
-                                Gap(20.h),
-                            
-                            
-                                // Total Amount TextForm field
-                                appInput(placeholder: "Total Amount", textEditingController: totalAmountController, isEnabled: false),
-                                Gap(20.h),
-                            
-                            
-                                // Invoice Status Dropdown
-                                // DropdownButtonFormField(
-                                //   value: selectedInvoiceStatus,
-                                //   decoration: InputDecoration(
-                                //     border: OutlineInputBorder(
-                                //       borderRadius: BorderRadius.circular(10),
-                                //     ),
-                                //     labelText: 'Invoice Status',
-                                //   ),
-                                //   items: invoiceStatus.map((String option) {
-                                //     return DropdownMenuItem(
-                                //       value: option,
-                                //       child: Text(option),
-                                //     );
-                                //   }).toList(),
-                                //   onChanged: (String? newValue) {
-                                //     if(newValue != null) {
-                                //       setState(() {
-                                //         selectedItemCategory = newValue;
-                                //       });
-                                //     }
-                                //   },
-                                // ),
-                                // Gap(20.h),
-                            
-                            
-                                // Button
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 60,
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.orange[400]
-                                    ),
-                                    onPressed: () {
-                                      handleInvoice();
-                                    }, 
-                                    child: appParagraph(title: "Submit", fontSize: 17, color: AppColors.white,)
+                              // Invoice Status Dropdown
+                              // DropdownButtonFormField(
+                              //   value: selectedInvoiceStatus,
+                              //   decoration: InputDecoration(
+                              //     border: OutlineInputBorder(
+                              //       borderRadius: BorderRadius.circular(10),
+                              //     ),
+                              //     labelText: 'Invoice Status',
+                              //   ),
+                              //   items: invoiceStatus.map((String option) {
+                              //     return DropdownMenuItem(
+                              //       value: option,
+                              //       child: Text(option),
+                              //     );
+                              //   }).toList(),
+                              //   onChanged: (String? newValue) {
+                              //     if(newValue != null) {
+                              //       setState(() {
+                              //         selectedItemCategory = newValue;
+                              //       });
+                              //     }
+                              //   },
+                              // ),
+                              // Gap(20.h),
+
+                              // Button
+                              SizedBox(
+                                width: double.infinity,
+                                height: 60,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange[400],
+                                  ),
+                                  onPressed: () {
+                                    handleInvoice();
+                                  },
+                                  child: appParagraph(
+                                    title: "Submit",
+                                    fontSize: 17,
+                                    color: AppColors.white,
                                   ),
                                 ),
-                               Gap(40.h),
-                              ],
-                            );
-                          }),
-                        ],
+                              ),
+                              Gap(40.h),
+                            ],
+                          );
+                        },
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
+            ],
+          ),
         ),
-          // ),
-        )
+        // ),
+      ),
     );
   }
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   void handleInvoice() async {
     // Validate form
@@ -669,9 +687,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         },
       );
 
@@ -692,7 +708,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
             backgroundColor: Colors.green,
           ),
         );
-        
+
         // Clear form or navigate back
         _clearForm();
         Navigator.of(context).pop();
@@ -703,7 +719,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     } catch (e) {
       // Hide loading indicator if still showing
       Navigator.of(context).pop();
-      
+
       // Handle network or other errors
       _showErrorDialog('Network error: ${e.toString()}');
     }
@@ -732,7 +748,9 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     }
 
     if (missingFields.isNotEmpty) {
-      _showErrorDialog('Please fill the following required fields:\n• ${missingFields.join('\n• ')}');
+      _showErrorDialog(
+        'Please fill the following required fields:\n• ${missingFields.join('\n• ')}',
+      );
       return false;
     }
 
@@ -777,9 +795,14 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       "flag": flagValue,
       "invoice_number": invoiceNumberController.text.trim(),
       "username": usernameController.text.trim(),
-      "company_tin": prefs.getString('company_tin') ?? "C000713911X", // Get from SharedPreferences or config
+      "company_tin":
+          prefs.getString('company_tin') ??
+          "C000713911X", // Get from SharedPreferences or config
       "client_name": clientNameController.text.trim(),
-      "client_tin": clientTINController.text.trim().isEmpty ? "0000000000" : clientTINController.text.trim(),
+      "client_tin":
+          clientTINController.text.trim().isEmpty
+              ? "0000000000"
+              : clientTINController.text.trim(),
       "invoice_date": selectedInvoiceDate!.toUtc().toIso8601String(),
       "invoice_time": invoiceDateTime.toUtc().toIso8601String(),
       "due_date": selectedDueDate!.toUtc().toIso8601String(),
@@ -817,11 +840,15 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     }
   }
 
-  Future<Map<String, dynamic>> _sendInvoiceToAPI(Map<String, dynamic> invoiceData) async {
-    const String baseUrl = 'https://vsdcstaging.vat-gh.com/vsdc/api/v1/taxpayer';
+  Future<Map<String, dynamic>> _sendInvoiceToAPI(
+    Map<String, dynamic> invoiceData,
+  ) async {
+    const String baseUrl =
+        'https://vsdcstaging.vat-gh.com/vsdc/api/v1/taxpayer';
     const String reference = 'C000713911X-002';
-    const String securityKey = 'IWhnuThonHN9VY1xuQO5VV/s5/PR2v3bcdDr0SmAwiI3JjMSK39WpXsmSU9wEwqv';
-    
+    const String securityKey =
+        'IWhnuThonHN9VY1xuQO5VV/s5/PR2v3bcdDr0SmAwiI3JjMSK39WpXsmSU9wEwqv';
+
     final String endpoint = '$baseUrl/$reference/invoice';
 
     try {
@@ -829,7 +856,8 @@ class _CreateInvoiceState extends State<CreateInvoice> {
         Uri.parse(endpoint),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $securityKey', // or however the security key should be sent
+          'Authorization':
+              'Bearer $securityKey', // or however the security key should be sent
           'X-Security-Key': securityKey, // Alternative header format if needed
         },
         body: json.encode(invoiceData),
@@ -840,28 +868,27 @@ class _CreateInvoiceState extends State<CreateInvoice> {
         return {
           'success': true,
           'data': responseData,
-          'message': 'Invoice created successfully'
+          'message': 'Invoice created successfully',
         };
       } else {
         String errorMessage = 'Failed to create invoice';
         try {
           final errorData = json.decode(response.body);
-          errorMessage = errorData['message'] ?? errorData['error'] ?? errorMessage;
+          errorMessage =
+              errorData['message'] ?? errorData['error'] ?? errorMessage;
         } catch (e) {
-          errorMessage = 'HTTP ${response.statusCode}: ${response.reasonPhrase}';
+          errorMessage =
+              'HTTP ${response.statusCode}: ${response.reasonPhrase}';
         }
-        
+
         return {
           'success': false,
           'message': errorMessage,
-          'statusCode': response.statusCode
+          'statusCode': response.statusCode,
         };
       }
     } catch (e) {
-      return {
-        'success': false,
-        'message': 'Network error: ${e.toString()}'
-      };
+      return {'success': false, 'message': 'Network error: ${e.toString()}'};
     }
   }
 
