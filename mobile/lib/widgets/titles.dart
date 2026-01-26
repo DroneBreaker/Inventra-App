@@ -25,23 +25,40 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 //   }
 // }
 
-Widget appTitle({required String title, FontWeight? fontWeight, Color? color}) {
+Widget appTitle({
+  required String title,
+  double? fontSize,
+  FontWeight? fontWeight,
+  Color? color,
+  double? letterSpacing,
+}) {
   return Text(
-    title, style: TextStyle(
-      fontSize: 23.sp,
+    title,
+    style: TextStyle(
+      fontSize: fontSize,
       fontWeight: fontWeight,
+      letterSpacing: letterSpacing,
       // fontFamily: ,
-      color: color
-    )
+      color: color,
+    ),
   );
 }
 
-Widget appParagraph({required String title, double fontSize = 17, FontWeight? fontWeight, Color? color}) {
-  return Text(title, style: TextStyle(
+Widget appParagraph({
+  required String title,
+  double fontSize = 17,
+  FontWeight? fontWeight,
+  Color? color,
+  double? letterSpacing,
+}) {
+  return Text(
+    title,
+    style: TextStyle(
       fontSize: fontSize.sp,
       fontWeight: fontWeight,
       color: color,
+      letterSpacing: letterSpacing,
       // fontFamily: "Actor",
-    )
+    ),
   );
 }

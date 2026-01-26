@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/DroneBreaker/Inventra-App/internal/database"
 	"github.com/DroneBreaker/Inventra-App/internal/handlers"
+	"github.com/DroneBreaker/Inventra-App/internal/middleware"
 	"github.com/DroneBreaker/Inventra-App/internal/services"
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +15,8 @@ func UserRoutes(r *gin.Engine) {
 	userHandler := handlers.NewUserHandler(userService)
 
 	users := r.Group("/users")
+	users.Use(middleware.AuthMiddleware())
+	users.Use(middleware.CompanyScopeMiddleware())
 	{
 		users.POST("/", userHandler.CreateUser)
 		users.GET("/", userHandler.GetUsers)

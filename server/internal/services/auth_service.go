@@ -66,7 +66,7 @@ func (s *AuthService) Login(data models.LoginDTO) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id":     user.ID,
 		"company_id":  user.CompanyID,
-		"company_tin": user.Company.TIN,
+		"company_tin": user.CompanyTIN,
 		// "role": user.Role
 		"exp": time.Now().Add(12 * time.Hour).Unix(),
 	}

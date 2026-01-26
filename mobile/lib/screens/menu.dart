@@ -15,34 +15,47 @@ class _MenuPageState extends State<MenuPage> {
 
   final List<Map<String, dynamic>> _menuItems = [
     {'icon': Icons.dashboard, 'label': 'Home', 'route': RouteNames.home},
-    {'icon': Icons.description, 'label': 'Invoices', 'route': RouteNames.invoices},
+    {
+      'icon': Icons.description,
+      'label': 'Invoices',
+      'route': RouteNames.invoices,
+    },
     {'icon': Icons.people, 'label': 'Customers', 'route': RouteNames.customers},
     {'icon': Icons.assignment, 'label': 'Incomes', 'route': RouteNames.income},
     {'icon': Icons.money, 'label': 'Expenses', 'route': RouteNames.expenses},
-    {'icon': Icons.inventory, 'label': 'Items/Services', 'route': RouteNames.items},
+    {
+      'icon': Icons.inventory,
+      'label': 'Items/Services',
+      'route': RouteNames.items,
+    },
     {'icon': Icons.bar_chart, 'label': 'Reports', 'route': RouteNames.reports},
-    {'icon': Icons.people, 'label': 'User Management', 'route': RouteNames.users},
+    {
+      'icon': Icons.people,
+      'label': 'User Management',
+      'route': RouteNames.users,
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: _darkMode 
-          ? ThemeData.dark().copyWith(
-              primaryColor: Colors.blueAccent,
-              cardColor: Colors.grey[450],
-              dividerColor: Colors.grey[700], // Added for footer border
-              // iconButtonTheme: IconButtonThemeData(
-              //    style: ButtonStyle(
-              //     iconColor: WidgetStateColor.
-              //    )
-              // )
-            )
-          : ThemeData.light().copyWith(
-              primaryColor: Colors.blueAccent,
-              cardColor: Colors.white,
-              dividerColor: Colors.grey[300],
-            ),
+      data:
+          _darkMode
+              ? ThemeData.dark().copyWith(
+                primaryColor: Colors.blueAccent,
+                cardColor: Colors.grey[450],
+                dividerColor: Colors.grey[700], // Added for footer border
+                // iconButtonTheme: IconButtonThemeData(
+                //    style: ButtonStyle(
+                //     iconColor: WidgetStateColor.
+                //    )
+                // )
+              )
+              : ThemeData.light().copyWith(
+                primaryColor: Colors.blueAccent,
+                cardColor: Colors.white,
+                dividerColor: Colors.grey[300],
+              ),
       child: Scaffold(
         body: SafeArea(
           child: Column(
@@ -55,7 +68,7 @@ class _MenuPageState extends State<MenuPage> {
               //     children: [
               //       Expanded(
               //         child: Center(
-              //             child: AppText(title: 
+              //             child: AppText(title:
               //               'Inventra', fontSize: 20, fontWeight: FontWeight.bold,
               //             ),
               //           ),
@@ -64,19 +77,18 @@ class _MenuPageState extends State<MenuPage> {
               //     ],
               //   ),
               // ),
-
               Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Center(
-                  child: appTitle(title: 
-                    'Inventra', fontWeight: FontWeight.bold,
+                  child: appTitle(
+                    title: 'Inventra',
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              SizedBox(height: 10,),
-              
+              SizedBox(height: 10),
 
-              // Stats Bar 
+              // Stats Bar
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Container(
@@ -110,7 +122,7 @@ class _MenuPageState extends State<MenuPage> {
                   ),
                 ),
               ),
-              
+
               // Search (Improved padding)
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
@@ -126,7 +138,7 @@ class _MenuPageState extends State<MenuPage> {
                   ),
                 ),
               ),
-              
+
               // Menu Items (Added bottom padding)
               Expanded(
                 child: Padding(
@@ -143,7 +155,7 @@ class _MenuPageState extends State<MenuPage> {
                   ),
                 ),
               ),
-              
+
               // Footer (Improved border visibility)
               Container(
                 padding: EdgeInsets.symmetric(vertical: 12),
@@ -168,7 +180,10 @@ class _MenuPageState extends State<MenuPage> {
                       onChanged: (value) => setState(() => _darkMode = value),
                     ),
                     IconButton(
-                      icon: Icon(Icons.logout, color: _darkMode ? Colors.grey[350] : Colors.black87,),
+                      icon: Icon(
+                        Icons.logout,
+                        color: _darkMode ? Colors.grey[350] : Colors.black87,
+                      ),
                       onPressed: () {},
                       tooltip: 'Logout',
                     ),
@@ -190,9 +205,10 @@ class _MenuPageState extends State<MenuPage> {
         contentPadding: EdgeInsets.symmetric(horizontal: 16),
         leading: Icon(
           icon,
-          color: isSelected 
-              ? Theme.of(context).primaryColor 
-              : Theme.of(context).iconTheme.color,
+          color:
+              isSelected
+                  ? Theme.of(context).primaryColor
+                  : Theme.of(context).iconTheme.color,
           size: 24,
         ),
         title: Text(
@@ -201,16 +217,17 @@ class _MenuPageState extends State<MenuPage> {
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           ),
         ),
-        trailing: isSelected 
-            ? Container(
-                width: 4,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              )
-            : null,
+        trailing:
+            isSelected
+                ? Container(
+                  width: 4,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                )
+                : null,
         onTap: () {
           setState(() => _selectedItem = label);
           Navigator.pushNamed(context, route);

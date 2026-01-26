@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:inventra/config/app_colors.dart';
 import 'package:inventra/config/routes.dart';
 import 'package:inventra/screens/auth/register.dart';
 import 'package:inventra/screens/auth/login.dart';
@@ -21,11 +22,8 @@ import 'package:inventra/screens/menu.dart';
 import 'package:inventra/screens/reports.dart';
 
 void main() {
-  runApp(
-    const MyApp()
-    );
+  runApp(const MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -49,13 +47,14 @@ class MyApp extends StatelessWidget {
             RouteNames.reports: (context) => ReportPage(),
             RouteNames.menu: (context) => MenuPage(),
             RouteNames.createInvoice: (context) => const CreateInvoice(),
-            RouteNames.advanceInvoice: (context) => const AdvanceInvoiceWrapper(),
+            RouteNames.advanceInvoice:
+                (context) => const AdvanceInvoiceWrapper(),
             RouteNames.customers: (context) => const CustomerWrapper(),
             // RouteNames.suppliers: (context) => SupplierPage(),
             // RouteNames.exports: (context) => ExportPage(),
             RouteNames.items: (context) => const ItemWrapper(),
             RouteNames.allItems: (context) => const AllItemsPage(),
-          // RouteNames.income: (context) => const IncomeWrapper(),
+            // RouteNames.income: (context) => const IncomeWrapper(),
             RouteNames.income: (context) => const IncomePage(),
             RouteNames.expenses: (context) => const ExpensesPage(),
             RouteNames.users: (context) => const UserManagementPage(),
@@ -65,11 +64,10 @@ class MyApp extends StatelessWidget {
             useMaterial3: true,
           ),
           home: const IntroPage(),
-        );  
+        );
       },
     );
   }
 }
-
 
 // mercy black

@@ -1,39 +1,39 @@
 import 'package:flutter/material.dart';
 
-Widget appInput({required String placeholder, TextInputType? textInputType, required TextEditingController 
-  textEditingController, String? errorMsg, String? errorLengthMsg, Function(String)? onTap, int? maxLines,
-  Icon? icon, bool? isEnabled 
+Widget appInput({
+  required String placeholder,
+  TextInputType? textInputType,
+  required TextEditingController textEditingController,
+  String? errorMsg,
+  String? errorLengthMsg,
+  Function(String)? onTap,
+  int? maxLines,
+  Icon? icon,
+  bool? isEnabled,
 }) {
   return TextFormField(
-      controller: textEditingController,
-      enabled: isEnabled,
-      keyboardType: textInputType,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10)
-        ),
-        contentPadding: EdgeInsets.only(left: 20,),
-        prefixIcon: icon,
-        hintText: placeholder,
-      ),
-      validator: (value) {
-        if(value == null || value.isEmpty) {
-          return errorMsg;
-        }
-        if(value.length < 6) {
-          return errorLengthMsg; 
-        }
-        return null;
-      },
-      onChanged: onTap
+    controller: textEditingController,
+    enabled: isEnabled,
+    keyboardType: textInputType,
+    maxLines: maxLines,
+    decoration: InputDecoration(
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+      contentPadding: EdgeInsets.only(left: 20),
+      prefixIcon: icon,
+      hintText: placeholder,
+    ),
+    validator: (value) {
+      if (value == null || value.isEmpty) {
+        return errorMsg;
+      }
+      if (value.length < 6) {
+        return errorLengthMsg;
+      }
+      return null;
+    },
+    onChanged: onTap,
   );
 }
-
-
-
-
-
 
 // Form(
 //                                         child: TextFormField(
@@ -51,29 +51,22 @@ Widget appInput({required String placeholder, TextInputType? textInputType, requ
 //                                             },
 //                                           ),
 
-
-
-
-
-
-
-Widget appDropdown({required String selectedValue, required List<String> items}) {
+Widget appDropdown({
+  required String selectedValue,
+  required List<String> items,
+}) {
   return DropdownButtonFormField(
     value: selectedValue,
     decoration: InputDecoration(
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       labelText: 'Invoice Status',
     ),
-    items: items.map((String option) {
-      return DropdownMenuItem(
-        value: option,
-        child: Text(option),
-      );
-    }).toList(),
+    items:
+        items.map((String option) {
+          return DropdownMenuItem(value: option, child: Text(option));
+        }).toList(),
     onChanged: (String? newValue) {
-      if(newValue != null) {
+      if (newValue != null) {
         setState(() {
           selectedValue = newValue;
         });
@@ -82,8 +75,7 @@ Widget appDropdown({required String selectedValue, required List<String> items})
   );
 }
 
-void setState(Null Function() param0) {
-}
+void setState(Null Function() param0) {}
 
 
 

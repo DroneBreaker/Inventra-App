@@ -6,7 +6,6 @@ import 'package:inventra/config/app_colors.dart';
 import 'package:inventra/config/app_text.dart';
 import 'package:inventra/widgets/forms.dart';
 import 'package:inventra/widgets/titles.dart';
-import 'package:inventra/widgets/button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dart:convert';

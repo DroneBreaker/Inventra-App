@@ -1,6 +1,9 @@
 class AppText {
   //INTRO
   static const String intro = "EVAT SUITE";
+  static const String companyName = "INVENTRA";
+  static const String signIn = "Sign In";
+  static const String signUp = "Sign Up";
   static const String description =
       "E_VAT Suite enhances efficiency and compliance with VAT regulations, making VAT transactions easier and more efficient.";
   static const String loginButton = "Login";
@@ -34,7 +37,6 @@ class AppText {
   static const String itemSetupTitle = "Setup a Product or a service";
   static const String itemCodeField = "Item Code";
 
-
   // REPORT
   static const String reportHeader = "Financial Reports";
 
@@ -44,8 +46,10 @@ class AppText {
   // ERRORS
   static const String noUsernameError = "Please enter your username";
   static const String noPasswordError = "Please enter your password";
-  static const String usernameLengthError = "Username should not be less than 6 characters";
-  static const String passwordLengthError = "Password should not be less than 6 characters";
+  static const String usernameLengthError =
+      "Username should not be less than 6 characters";
+  static const String passwordLengthError =
+      "Password should not be less than 6 characters";
   static const String companyTINError = "Please enter your company TIN";
   static const String companyIDError = "Please enter your company ID";
   static const String companyNameError = "Please enter your company name";
@@ -58,5 +62,6 @@ class AppText {
   static const String itemCodeDescription = "Item code must be a number";
   static const String invalidItemNameError = "Please enter your item name";
   static const String priceIsEmptyError = "Please enter your price";
-  static const String invoiceNumberLengthError = "Password should not be less than 6 characters";
+  static const String invoiceNumberLengthError =
+      "Password should not be less than 6 characters";
 }
