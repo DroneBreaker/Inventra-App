@@ -7,20 +7,21 @@ class CustomerService {
   // static const String baseUrl = "http://192.168.80.147:8080/api";
   static const String baseUrl = "http://10.0.2.2:8080/api";
 
-
   // Helper method to get JWT token from shared preferences
   static Future<String> _getToken() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('jwt_token');
-      
+
       if (token == null || token.isEmpty) {
         throw Exception('No authentication token found. Please log in again.');
       }
-      
+
       return token;
     } catch (e) {
-      throw Exception('Failed to retrieve authentication token: ${e.toString()}');
+      throw Exception(
+        'Failed to retrieve authentication token: ${e.toString()}',
+      );
     }
   }
 
@@ -29,8 +30,8 @@ class CustomerService {
     required String clientName,
     required String clientTIN,
     required String clientEmail,
-    required String clientPhone,
     required String clientType, // customer, supllier, export
+    required String clientPhone,
     String? companyTIN,
   }) async {
     try {
@@ -42,14 +43,16 @@ class CustomerService {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
-        body: jsonEncode({
-          'client_name': clientName,
-          'client_tin': clientTIN,
-          'client_email': clientEmail,
-          'client_phone': clientPhone,
-          'company_tin': companyTIN,
-          'client_type': clientType, // customer, supllier, export
-        }..removeWhere((key, value) => value == null)),
+        body: jsonEncode(
+          {
+            'client_name': clientName,
+            'client_tin': clientTIN,
+            'client_email': clientEmail,
+            'client_phone': clientPhone,
+            'company_tin': companyTIN,
+            'client_type': clientType, // customer, supllier, export
+          }..removeWhere((key, value) => value == null),
+        ),
       );
 
       // // Handle empty responses
@@ -70,14 +73,14 @@ class CustomerService {
         // };
         return responseData;
       } else {
-          throw Exception(responseData['error'] ?? 'Failed to create customer');
+        throw Exception(responseData['error'] ?? 'Failed to create customer');
         // return {
         //   'success': false,
         //   'message': responseData['error'] ?? 'Failed to create customer',
         // };
       }
-    } catch(e) {
-        throw Exception("Customer creation failed: ${e.toString()}");
+    } catch (e) {
+      throw Exception("Customer creation failed: ${e.toString()}");
 
       //  print('Error in addItem: $e');
       //  rethrow;
@@ -88,5 +91,34 @@ class CustomerService {
     //     'message': 'An error occurred: ${e.toString()}',
     //   };
     // }
+  }
+
+  // Search customers
+  static Future<List<Map<String, dynamic>>> searchCustomers(
+    String query,
+  ) async {
+    try {
+      final token = await _getToken();
+
+      // Assuming the API supports a search query parameter
+      // If not, we might need to fetch all and filter locally, but let's try this first
+      final response = await http.get(
+        Uri.parse('$baseUrl/clients?search=$query'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        // Ensure we return a List<Map<String, dynamic>>
+        return List<Map<String, dynamic>>.from(data);
+      } else {
+        // Fallback or empty list on error
+        print('Failed to search customers: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error searching customers: $e');
+      return [];
+    }
   }
 }

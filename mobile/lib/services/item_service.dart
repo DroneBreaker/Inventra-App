@@ -7,20 +7,21 @@ class ItemService {
   // static const String baseUrl = "http://192.168.80.147:8080/api";
   static const String baseUrl = "http://10.0.2.2:8080/api";
 
-
   // Helper method to get JWT token from shared preferences
   static Future<String> _getToken() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('jwt_token');
-      
+
       if (token == null || token.isEmpty) {
         throw Exception('No authentication token found. Please log in again.');
       }
-      
+
       return token;
     } catch (e) {
-      throw Exception('Failed to retrieve authentication token: ${e.toString()}');
+      throw Exception(
+        'Failed to retrieve authentication token: ${e.toString()}',
+      );
     }
   }
 
@@ -45,17 +46,19 @@ class ItemService {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
-        body: jsonEncode({
-          'item_code': itemCode,
-          'item_name': itemName,
-          'item_description': itemDescription,
-          'price': price,
-          'company_tin': companyTIN,
-          'item_category': itemCategory,
-          'is_taxable': isTaxable,
-          'is_tax_inclusive': isTaxInclusive,
-          'tourism_cst_option': tourismCSTOption,
-        }..removeWhere((key, value) => value == null)),
+        body: jsonEncode(
+          {
+            'item_code': itemCode,
+            'item_name': itemName,
+            'item_description': itemDescription,
+            'price': price,
+            'company_tin': companyTIN,
+            'item_category': itemCategory,
+            'is_taxable': isTaxable,
+            'is_tax_inclusive': isTaxInclusive,
+            'tourism_cst_option': tourismCSTOption,
+          }..removeWhere((key, value) => value == null),
+        ),
       );
 
       // // Handle empty responses
@@ -76,14 +79,14 @@ class ItemService {
         // };
         return responseData;
       } else {
-          throw Exception(responseData['error'] ?? 'Failed to create item');
+        throw Exception(responseData['error'] ?? 'Failed to create item');
         // return {
         //   'success': false,
         //   'message': responseData['error'] ?? 'Failed to create item',
         // };
       }
-    } catch(e) {
-        throw Exception("Item creation failed: ${e.toString()}");
+    } catch (e) {
+      throw Exception("Item creation failed: ${e.toString()}");
 
       //  print('Error in addItem: $e');
       //  rethrow;
@@ -94,5 +97,28 @@ class ItemService {
     //     'message': 'An error occurred: ${e.toString()}',
     //   };
     // }
+  }
+
+  // Search items
+  static Future<List<Map<String, dynamic>>> searchItems(String query) async {
+    try {
+      final token = await _getToken();
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/items?search=$query'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return List<Map<String, dynamic>>.from(data);
+      } else {
+        print('Failed to search items: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error searching items: $e');
+      return [];
+    }
   }
 }

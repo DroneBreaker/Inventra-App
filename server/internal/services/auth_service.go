@@ -41,7 +41,7 @@ func (s *AuthService) Register(data models.RegisterDTO) error {
 		CompanyID:   data.CompanyID,
 		CompanyTIN:  data.CompanyTIN,
 		// Company:     company,
-		DeletedAt: time.Now(),
+		// DeletedAt: time.Now(),
 	}
 
 	return s.DB.Create(&user).Error

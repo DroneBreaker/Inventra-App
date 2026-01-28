@@ -4,6 +4,8 @@ import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
 import 'package:inventra/config/app_colors.dart';
 import 'package:inventra/config/app_text.dart';
+import 'package:inventra/services/customer_service.dart';
+import 'package:inventra/services/item_service.dart';
 import 'package:inventra/widgets/forms.dart';
 import 'package:inventra/widgets/titles.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,8 +37,15 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   final TextEditingController quantityController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
   final TextEditingController currencyController = TextEditingController();
+  final TextEditingController exchangeRateController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController contactController = TextEditingController();
+
+  // Item List
+  List<Map<String, dynamic>> addedItems = [];
+  Map<String, dynamic>? selectedItemData;
+  bool showItemDropdown = false;
+  List<Map<String, dynamic>> filteredItems = [];
 
   final _formKey = GlobalKey<FormState>();
 
@@ -116,7 +125,8 @@ class _CreateInvoiceState extends State<CreateInvoice> {
 
   // CURRENCY OPTIONS
   final List<String> currencyOptions = ["GHS", "USD", "EUR", "GBP"];
-  String selectedCurrency = "GHS";
+  // String selectedCurrency = "GHS";
+  String? selectedCurrency;
 
   // CLIENT OPTIONS
   String selectedClient = "Customer";
@@ -128,6 +138,8 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     {'name': 'Jane Smith', 'tin': 'TIN002'},
     {'name': 'Acme Corporation', 'tin': 'TIN003'},
     {'name': 'Tech Solutions Ltd', 'tin': 'TIN004'},
+
+    // CustomerService.baseUrl
   ];
   List<Map<String, dynamic>> filteredClients = [];
   bool showClientDropdown = false;
@@ -174,12 +186,14 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   @override
   void initState() {
     super.initState();
-    // Initialize filtered clients
     filteredClients = List.from(clients);
     _loadUserData();
 
     // Add listener to client name controller
     clientNameController.addListener(_onClientNameChanged);
+
+    // Add listener to item name controller
+    itemNameController.addListener(_onItemNameChanged);
   }
 
   @override
@@ -191,30 +205,27 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   void _onClientNameChanged() {
     final query = clientNameController.text.toLowerCase();
 
-    setState(() {
-      if (query.isEmpty) {
-        filteredClients = List.from(clients);
+    if (query.isEmpty) {
+      setState(() {
+        filteredClients = List.from(clients); // Keep local defaults or clear?
+        // Maybe clear or show defaults if desired, but for API search usually we wait for input
         showClientDropdown = false;
         selectedClientData = null;
         clientTINController.clear();
-      } else {
-        filteredClients =
-            clients.where((client) {
-              return client['name'].toLowerCase().contains(query);
-            }).toList();
-        showClientDropdown = filteredClients.isNotEmpty;
+      });
+      return;
+    }
 
-        // Check if current text exactly matches a client name
-        final exactMatch = clients.firstWhere(
-          (client) => client['name'].toLowerCase() == query,
-          orElse: () => {},
-        );
+    // Call API
+    CustomerService.searchCustomers(query).then((results) {
+      if (mounted) {
+        setState(() {
+          filteredClients = results;
+          showClientDropdown = results.isNotEmpty;
 
-        if (exactMatch.isNotEmpty &&
-            selectedClientData?['name'] != exactMatch['name']) {
-          selectedClientData = exactMatch;
-          clientTINController.text = exactMatch['tin'];
-        }
+          // Optional: Auto-select if exact match?
+          // For now, let user select from dropdown
+        });
       }
     });
   }
@@ -223,13 +234,346 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     setState(() {
       selectedClientData = client;
       clientNameController.text = client['name'];
-      clientTINController.text = client['tin'];
+      clientTINController.text = client['tin'] ?? '';
       showClientDropdown = false;
     });
   }
 
+  // Item Search Logic
+  void _onItemNameChanged() {
+    final query = itemNameController.text.toLowerCase();
+    if (query.isEmpty) {
+      setState(() {
+        filteredItems = [];
+        showItemDropdown = false;
+      });
+      return;
+    }
+
+    // Call API to search items
+    // Debouncing would be good here, but for now direct call
+    ItemService.searchItems(query).then((items) {
+      if (mounted) {
+        setState(() {
+          filteredItems = items;
+          showItemDropdown = items.isNotEmpty;
+        });
+      }
+    });
+  }
+
+  void _selectItem(Map<String, dynamic> item) {
+    setState(() {
+      selectedItemData = item;
+      itemNameController.text = item['item_name'];
+      priceController.text = item['price'].toString();
+      showItemDropdown = false;
+    });
+  }
+
+  void _addItemToList() {
+    if (selectedItemData == null || quantityController.text.isEmpty) {
+      _showErrorDialog('Please select an item and enter quantity');
+      return;
+    }
+
+    final int quantity = int.tryParse(quantityController.text) ?? 1;
+    final double price = double.tryParse(priceController.text) ?? 0.0;
+
+    setState(() {
+      addedItems.add({
+        ...selectedItemData!,
+        'quantity': quantity,
+        'final_price':
+            price, // Allow manual price override if needed, or stick to item price
+      });
+
+      // Clear item fields
+      itemNameController.clear();
+      quantityController.clear();
+      priceController.clear();
+      selectedItemData = null;
+
+      _calculateTotals();
+    });
+  }
+
+  void _removeItem(int index) {
+    setState(() {
+      addedItems.removeAt(index);
+      _calculateTotals();
+    });
+  }
+
+  void _calculateTotals() {
+    double totalVAT = 0.0;
+    double totalAmount = 0.0;
+
+    // CONSTANTS
+    const double VAT_RATE = 0.15;
+    const double NHIL_RATE = 0.025;
+    const double GETFUND_RATE = 0.025;
+    const double CST_RATE = 0.05;
+    const double EXCISE_RATE =
+        0.05; // As per user: "Excise duty amount which is 5% of base price"
+    const double TOURISM_RATE = 0.01;
+
+    for (var item in addedItems) {
+      double basePrice = (item['final_price'] as num).toDouble();
+      int quantity = (item['quantity'] as num).toInt();
+      double rowBaseTotal = basePrice * quantity;
+
+      String? category =
+          item['item_category']
+              as String?; // e.g. "Standard", "CST", "Excise", "Tourism", "Exempt"
+      // User terms: "Regular VAT" (Standard), "Standard with CST", "Standard with EXC_PLASTIC", etc.
+      // We need to map `item_category` or `tourism_cst_option` to logic.
+      // Based on previous code, there was `tourismOrCSTOptions` and `itemCategoryOptions`.
+      // Let's assume the item object has these fields populated correctly from DB.
+
+      // Map item category/options to logic
+      // Assuming 'item_category' holds the main tax type or we check flags
+
+      // Levies (NHIL & GETFUND) - Applied on all except NON VAT (Exempt)
+      double nhil = 0.0;
+      double getfund = 0.0;
+
+      bool isExempt = category?.toLowerCase().contains('exempt') == true;
+
+      if (!isExempt) {
+        nhil = rowBaseTotal * NHIL_RATE;
+        getfund = rowBaseTotal * GETFUND_RATE;
+      }
+
+      double specificTax = 0.0;
+      double vatableAmount =
+          rowBaseTotal; // Default base for VAT is just the price?
+      // User said: "standard item is 15% of the base price" => This implies VAT base is ONLY base price.
+      // "standard with CST is 15% of the (base price + plus CST amount)"
+
+      // Check for specific taxes based on item properties
+      // We might need to look at 'tourism_cst_option' from ItemService response
+      String tourismCst = item['tourism_cst_option'] ?? 'None';
+
+      if (tourismCst == 'CST') {
+        specificTax = rowBaseTotal * CST_RATE;
+        vatableAmount = rowBaseTotal + specificTax;
+      } else if (tourismCst == 'Tourism') {
+        specificTax = rowBaseTotal * TOURISM_RATE;
+        vatableAmount = rowBaseTotal + specificTax;
+      } else if (category?.toUpperCase() == 'EXC_PLASTIC' ||
+          category?.toLowerCase().contains('excise') == true) {
+        specificTax = rowBaseTotal * EXCISE_RATE;
+        vatableAmount = rowBaseTotal + specificTax;
+      } else {
+        // Standard
+        vatableAmount = rowBaseTotal;
+      }
+
+      double vat = 0.0;
+      if (!isExempt) {
+        vat = vatableAmount * VAT_RATE;
+      }
+
+      // Total for this row's contribution to invoice total
+      // Total Amount = Base + SpecificTax + Levies + VAT
+      double rowTotal = rowBaseTotal + specificTax + nhil + getfund + vat;
+
+      totalVAT += vat;
+      totalAmount += rowTotal;
+    }
+
+    totalVATController.text = totalVAT.toStringAsFixed(2);
+    totalAmountController.text = totalAmount.toStringAsFixed(2);
+  }
+
+  Widget _buildItemSelection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        appTitle(title: "Add Items"),
+        SizedBox(height: 10),
+
+        // Item Name Search/Autocomplete
+        Stack(
+          children: [
+            TextFormField(
+              controller: itemNameController,
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.only(left: 20),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                hintText: "Search Item...",
+                suffixIcon:
+                    itemNameController.text.isNotEmpty
+                        ? IconButton(
+                          onPressed: () {
+                            itemNameController.clear();
+                            setState(() {
+                              showItemDropdown = false;
+                              selectedItemData = null;
+                              priceController.clear();
+                            });
+                          },
+                          icon: Icon(Icons.clear),
+                        )
+                        : Icon(Icons.search),
+              ),
+              onTap: () {
+                if (itemNameController.text.isNotEmpty) {
+                  setState(() {
+                    showItemDropdown = true;
+                  });
+                }
+              },
+            ),
+
+            if (showItemDropdown && filteredItems.isNotEmpty)
+              Positioned(
+                top: 60,
+                left: 0,
+                right: 0,
+                child: Material(
+                  elevation: 4,
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    constraints: BoxConstraints(maxHeight: 200),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                    ),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: filteredItems.length,
+                      itemBuilder: (context, index) {
+                        final item = filteredItems[index];
+                        return ListTile(
+                          title: Text(item['item_name']),
+                          subtitle: Text('Price: ${item['price']}'),
+                          onTap: () => _selectItem(item),
+                          dense: true,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+        Gap(10.h),
+
+        if (selectedItemData != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10.0),
+            child: Text(
+              "Selected: ${selectedItemData!['item_name']} - ${selectedItemData!['item_category']}",
+              style: TextStyle(
+                color: Colors.green,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+
+        Row(
+          children: [
+            Expanded(
+              child: appInput(
+                placeholder: "Price",
+                textEditingController: priceController,
+                textInputType: TextInputType.numberWithOptions(decimal: true),
+              ),
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: appInput(
+                placeholder: "Quantity",
+                textEditingController: quantityController,
+                textInputType: TextInputType.number,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 10),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _addItemToList,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+            child: Text("Add Item"),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAddedItemsList() {
+    if (addedItems.isEmpty) return SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 20),
+        appTitle(title: "Items List"),
+        SizedBox(height: 10),
+        ListView.separated(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: addedItems.length,
+          separatorBuilder: (context, index) => SizedBox(height: 10),
+          itemBuilder: (context, index) {
+            final item = addedItems[index];
+            return Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade300),
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item['item_name'],
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          "${item['quantity']} x ${item['final_price']}",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        Text(
+                          "Tax: ${item['item_category'] ?? 'Standard'} / Opt: ${item['tourism_cst_option'] ?? 'None'}",
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: Colors.blueGrey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => _removeItem(index),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
   // Replace your existing Client Name and Client TIN TextFormFields with this:
-  Widget buildClientSelection() {
+  Widget _buildClientSelection() {
     return Column(
       children: [
         // Client Name with dropdown
@@ -267,7 +611,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
               },
             ),
 
-            // Dropdown suggestions
+            // Client Dropdown suggestions
             if (showClientDropdown && filteredClients.isNotEmpty)
               Positioned(
                 top: 60,
@@ -329,6 +673,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.accentDark,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Stack(
@@ -454,6 +799,50 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                               ),
                               Gap(20.h),
 
+                              // Currency Dropdown
+                              DropdownButtonFormField(
+                                value: selectedCurrency,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  labelText: 'Currency',
+                                ),
+                                items:
+                                    currencyOptions.map((String option) {
+                                      return DropdownMenuItem(
+                                        value: option,
+                                        child: Text(option),
+                                      );
+                                    }).toList(),
+                                onChanged: (String? newValue) {
+                                  if (newValue != null) {
+                                    setState(() {
+                                      selectedCurrency = newValue;
+                                    });
+                                  }
+                                },
+                              ),
+                              Gap(20.h),
+
+                              if (selectedCurrency != null &&
+                                  selectedCurrency != 'GHS')
+                                Column(
+                                  children: [
+                                    appInput(
+                                      placeholder: "Exchange Rate",
+                                      textEditingController:
+                                          exchangeRateController,
+                                      textInputType:
+                                          TextInputType.numberWithOptions(
+                                            decimal: true,
+                                          ),
+                                    ),
+                                    Gap(20.h),
+                                  ],
+                                ),
+                              Gap(20.h),
+
                               // Username TextForm field
                               appInput(
                                 placeholder: "Username",
@@ -462,19 +851,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                               ),
                               Gap(20.h),
 
-                              // Client TextForm field
-                              appInput(
-                                placeholder: "Client Name",
-                                textEditingController: clientNameController,
-                              ),
-                              Gap(20.h),
-
-                              // Client TIN
-                              appInput(
-                                placeholder: "Client TIN",
-                                textEditingController: clientTINController,
-                                isEnabled: false,
-                              ),
+                              _buildClientSelection(),
                               Gap(20.h),
 
                               // Invoice Date TextForm field
@@ -581,17 +958,15 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                               //   ],
                               // ),
                               // Gap(20.h),
-                              appInput(
-                                placeholder: "Add Item",
-                                textEditingController: itemNameController,
-                              ),
+                              _buildItemSelection(),
+                              _buildAddedItemsList(),
+                              Gap(20.h),
                               Gap(20.h),
 
                               // Total VAT TextForm field
                               appInput(
                                 placeholder: "Total VAT",
                                 textEditingController: totalVATController,
-                                isEnabled: false,
                               ),
                               Gap(20.h),
 
@@ -700,7 +1075,6 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       Navigator.of(context).pop();
 
       if (response['success'] == true) {
-        // Success - show success message and navigate back
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Invoice created successfully!'),
@@ -855,14 +1229,13 @@ class _CreateInvoiceState extends State<CreateInvoice> {
         Uri.parse(endpoint),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization':
-              'Bearer $securityKey', // or however the security key should be sent
+          'Authorization': 'Bearer $securityKey',
           'X-Security-Key': securityKey, // Alternative header format if needed
         },
         body: json.encode(invoiceData),
       );
 
-      if (response.statusCode >= 200 && response.statusCode < 300) {
+      if (response.statusCode >= 201 && response.statusCode < 300) {
         final responseData = json.decode(response.body);
         return {
           'success': true,
@@ -932,10 +1305,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     });
   }
 
-  // Helper method to validate invoice number format (add your own logic)
   bool _isValidInvoiceNumber(String invoiceNumber) {
-    // Add your invoice number validation logic here
-    // For example, check format, uniqueness, etc.
     return invoiceNumber.trim().isNotEmpty && invoiceNumber.trim().length >= 3;
   }
 
