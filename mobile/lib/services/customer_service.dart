@@ -55,42 +55,16 @@ class CustomerService {
         ),
       );
 
-      // // Handle empty responses
-      // if (response.body.isEmpty) {
-      //   return {
-      //     'success': false,
-      //     'message': 'Empty response from server',
-      //   };
-      // }
-
       final responseData = jsonDecode(response.body);
 
       if (response.statusCode == 201) {
-        // return {
-        //   'success': true,
-        //   'message': 'Customer created successfully',
-        //   'data': responseData,
-        // };
         return responseData;
       } else {
         throw Exception(responseData['error'] ?? 'Failed to create customer');
-        // return {
-        //   'success': false,
-        //   'message': responseData['error'] ?? 'Failed to create customer',
-        // };
       }
     } catch (e) {
       throw Exception("Customer creation failed: ${e.toString()}");
-
-      //  print('Error in addItem: $e');
-      //  rethrow;
     }
-    // } catch (e) {
-    //   return {
-    //     'success': false,
-    //     'message': 'An error occurred: ${e.toString()}',
-    //   };
-    // }
   }
 
   // Search customers

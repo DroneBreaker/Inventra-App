@@ -6,6 +6,7 @@ import 'package:inventra/config/app_colors.dart';
 import 'package:inventra/config/app_text.dart';
 import 'package:inventra/services/customer_service.dart';
 import 'package:inventra/services/item_service.dart';
+import 'package:inventra/widgets/button.dart';
 import 'package:inventra/widgets/forms.dart';
 import 'package:inventra/widgets/titles.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -493,20 +494,25 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                 textInputType: TextInputType.number,
               ),
             ),
+            Gap(10.w),
+            IconButton(
+              onPressed: () => _addItemToList(),
+              icon: Icon(Icons.add),
+            ),
           ],
         ),
-        SizedBox(height: 10),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: _addItemToList,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-            ),
-            child: Text("Add Item"),
-          ),
-        ),
+        // SizedBox(height: 10),
+        // SizedBox(
+        //   width: double.infinity,
+        //   child: ElevatedButton(
+        //     onPressed: _addItemToList,
+        //     style: ElevatedButton.styleFrom(
+        //       backgroundColor: AppColors.primary,
+        //       foregroundColor: Colors.white,
+        //     ),
+        //     child: Text("Add Item"),
+        //   ),
+        // ),
       ],
     );
   }
@@ -959,9 +965,9 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                               // ),
                               // Gap(20.h),
                               _buildItemSelection(),
+                              Gap(20.h),
+
                               _buildAddedItemsList(),
-                              Gap(20.h),
-                              Gap(20.h),
 
                               // Total VAT TextForm field
                               appInput(

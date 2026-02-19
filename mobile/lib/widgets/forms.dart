@@ -54,6 +54,7 @@ Widget appInput({
 Widget appDropdown({
   required String selectedValue,
   required List<String> items,
+  dynamic Function(String?)? onChanged,
 }) {
   return DropdownButtonFormField(
     value: selectedValue,
@@ -65,13 +66,7 @@ Widget appDropdown({
         items.map((String option) {
           return DropdownMenuItem(value: option, child: Text(option));
         }).toList(),
-    onChanged: (String? newValue) {
-      if (newValue != null) {
-        setState(() {
-          selectedValue = newValue;
-        });
-      }
-    },
+    onChanged: onChanged,
   );
 }
 

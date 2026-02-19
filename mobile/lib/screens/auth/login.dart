@@ -46,141 +46,118 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             Positioned(
               bottom: 0,
+              left: 0,
+              right: 0,
               child: Container(
-                height: 540.h,
-                width: 412.w,
-                // height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top,
+                constraints: BoxConstraints(minHeight: 540.h, maxHeight: 650.h),
                 decoration: BoxDecoration(
-                  color: Colors.deepPurple,
-                  // gradient: LinearGradient(
-                  //   colors: [
-                  //     const Color.fromARGB(255, 205, 46, 136),
-                  //     Colors.deepPurple,
-                  //   ],
-                  //   // begin: Alignment.centerRight,
-                  //   // end: Alignment.bottomLeft,
-                  // ),
+                  color: Colors.indigo,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(30.r),
                     topRight: Radius.circular(30.r),
                   ),
                 ),
-                child: Form(
-                  key: _formKey,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 20,
-                    ),
-                    child: Column(
-                      children: [
-                        Gap(30.h),
-                        Center(
-                          child: appTitle(
-                            title: AppText.loginTitle,
-                            fontSize: 25.sp,
-                            letterSpacing: 2,
-                          ),
-                        ),
-                        Gap(50.h),
-
-                        // Username TextForm field
-                        appInput(
-                          placeholder: "Username",
-                          textEditingController: usernameController,
-                          errorMsg: AppText.noUsernameError,
-                          errorLengthMsg: AppText.usernameLengthError,
-                        ),
-                        Gap(20.h),
-
-                        // Company TIN TextForm field
-                        appInput(
-                          placeholder: "Company TIN",
-                          textEditingController: companyTINController,
-                          errorMsg: AppText.companyTINError,
-                          errorLengthMsg: AppText.validCompanyTINError,
-                        ),
-                        Gap(20.h),
-
-                        // Password TextForm field
-                        TextFormField(
-                          obscureText: true,
-                          controller: passwordController,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            contentPadding: const EdgeInsets.only(left: 20),
-                            labelText: "Password",
-                            labelStyle: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 18,
+                child: SingleChildScrollView(
+                  child: Form(
+                    key: _formKey,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 20,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Gap(30.h),
+                          Center(
+                            child: appTitle(
+                              title: AppText.loginTitle,
+                              fontSize: 30.sp,
+                              letterSpacing: 3,
                             ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return AppText.noPasswordError;
-                            }
-                            if (value.length < 6) {
-                              return AppText.passwordLengthError;
-                            }
-                            return null;
-                          },
-                        ),
-                        Gap(40.h),
+                          Gap(50.h),
 
-                        // Button
-                        // SizedBox(
-                        //   width: double.infinity,
-                        //   height: 60,
-                        //   child: ElevatedButton(
-                        //     onPressed: () {
-                        //       handleLogin();
-                        //     },
-                        //     style: ElevatedButton.styleFrom(
-                        //       backgroundColor: Colors.grey,
-                        //     ),
-                        //     child: appTitle(
-                        //       title: AppText.loginButton,
-                        //       color: Colors.white,
-                        //     ),
-                        //   ),
-                        // ),
-                        appButton2(
-                          AppText.loginButton,
-                          () {
-                            handleLogin();
-                          },
-                          width: 125.w,
-                          letterSpacing: 1,
-                        ),
+                          // Username TextForm field
+                          appInput(
+                            placeholder: "Username",
+                            textEditingController: usernameController,
+                            errorMsg: AppText.noUsernameError,
+                            errorLengthMsg: AppText.usernameLengthError,
+                          ),
+                          Gap(20.h),
 
-                        // Account Section
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            appParagraph(
-                              title: AppText.noAccount,
-                              color: Colors.grey,
+                          // Company TIN TextForm field
+                          appInput(
+                            placeholder: "Company TIN",
+                            textEditingController: companyTINController,
+                            errorMsg: AppText.companyTINError,
+                            errorLengthMsg: AppText.validCompanyTINError,
+                          ),
+                          Gap(20.h),
+
+                          // Password TextForm field
+                          TextFormField(
+                            obscureText: true,
+                            controller: passwordController,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              contentPadding: const EdgeInsets.only(left: 20),
+                              labelText: "Password",
+                              labelStyle: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 18,
+                              ),
                             ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return AppText.noPasswordError;
+                              }
+                              if (value.length < 6) {
+                                return AppText.passwordLengthError;
+                              }
+                              return null;
+                            },
+                          ),
+                          Gap(40.h),
 
-                            appButton(
-                              buttonText: AppText.createAccount,
-                              colors: Colors.grey,
-                              onTap: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => RegisterPage(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
+                          appButton2(
+                            AppText.loginButton,
+                            () {
+                              handleLogin();
+                            },
+                            width: 125.w,
+                            letterSpacing: 1,
+                          ),
 
-                        // const SizedBox(height: 20,),
-                      ],
+                          // Account Section
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              appParagraph(
+                                title: AppText.noAccount,
+                                color: Colors.grey,
+                              ),
+
+                              appButton(
+                                buttonText: AppText.createAccount,
+                                colors: Colors.grey,
+                                onTap: () {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => RegisterPage(),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          Gap(20.h),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -207,12 +184,14 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     try {
+      print("Sending login request for: ${usernameController.text}");
       final response = await APIService.loginUser(
         username: usernameController.text,
         companyTIN: companyTINController.text,
         password: passwordController.text,
       );
 
+      print("Login response received. Status: ${response.statusCode}");
       if (!mounted) return;
       Navigator.of(context, rootNavigator: true).pop();
 
@@ -221,27 +200,39 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         final prefs = await SharedPreferences.getInstance();
 
-        // Store all user data
-        await prefs.setString("userData", jsonEncode(responseData['user']));
+        // Check if user data exists in response
+        if (responseData['user'] != null) {
+          print("User data found in response: ${responseData['user']}");
+          await prefs.setString("userData", jsonEncode(responseData['user']));
+        } else {
+          print(
+            "WARNING: Login successful but 'user' object is missing from response!",
+          );
+        }
 
         // Explicitly store the token
-        await prefs.setString("jwt_token", responseData['token']);
+        if (responseData['token'] != null) {
+          await prefs.setString("jwt_token", responseData['token']);
+        }
 
         // Explicitly store company TIN for easy access
         await prefs.setString("company_tin", companyTINController.text);
-        print("Navigation executing");
+
+        print("Pre-navigation check: Token stored, userData stored.");
+        print("Initiating navigation to MainWrapper...");
 
         // Navigate to home
         if (!mounted) return;
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (_) {
-              print("Building MainWrapper -> to PAGE");
+              print("Building MainWrapper...");
               return const MainWrapper();
             },
           ),
         );
       } else {
+        print("Login failed: ${responseData['error']}");
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -251,13 +242,16 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
-      Navigator.of(context, rootNavigator: true).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error: ${e.toString()}"),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      print("Login exception: $e");
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error: ${e.toString()}"),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
     }
   }
 }

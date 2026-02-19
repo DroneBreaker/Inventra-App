@@ -47,12 +47,12 @@ func (s *AuthService) Register(data models.RegisterDTO) error {
 	return s.DB.Create(&user).Error
 }
 
-func (s *AuthService) Login(data models.LoginDTO) (string, error) {
+func (s *AuthService) Login(data models.LoginDTO) (*models.User, string, error) {
 	var user models.User
 
 	if err := s.DB.Where("username = ? AND company_tin = ?", data.Username, data.CompanyTIN).
 		First(&user).Error; err != nil {
-		return "", errors.New("invalid username or company TIN")
+		return nil, "", errors.New("invalid username or company TIN")
 	}
 
 	// if err != nil {
@@ -60,7 +60,7 @@ func (s *AuthService) Login(data models.LoginDTO) (string, error) {
 	// }
 
 	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data.Password)) != nil {
-		return "", errors.New("incorrect password")
+		return nil, "", errors.New("incorrect password")
 	}
 
 	claims := jwt.MapClaims{
@@ -72,5 +72,6 @@ func (s *AuthService) Login(data models.LoginDTO) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtSecret)
+	signedToken, err := token.SignedString(jwtSecret)
+	return &user, signedToken, err
 }

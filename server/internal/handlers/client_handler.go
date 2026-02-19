@@ -1,9 +1,6 @@
 package handlers
 
 import (
-	"bytes"
-	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/DroneBreaker/Inventra-App/internal/middleware"
@@ -22,14 +19,14 @@ func NewClientHandler(s *services.ClientService) *ClientHandler {
 
 func (h *ClientHandler) CreateClient(c *gin.Context) {
 	// DEBUG: Capture request body
-	bodyBytes, _ := io.ReadAll(c.Request.Body)
-	fmt.Println("DEBUG BODY:", string(bodyBytes))
-	// Restore the body so ShouldBindJSON can read it
-	c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+	// bodyBytes, _ := io.ReadAll(c.Request.Body)
+	// fmt.Println("DEBUG BODY:", string(bodyBytes))
+	// // Restore the body so ShouldBindJSON can read it
+	// c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
 	var client models.Client
 
-	if err := c.ShouldBindJSON(&client); err != nil {
+	if err := c.BindJSON(&client); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   "Could not add client",
 			"details": err.Error(),
@@ -52,5 +49,8 @@ func (h *ClientHandler) CreateClient(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, client)
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Client added successfully",
+		"client":  client,
+	})
 }

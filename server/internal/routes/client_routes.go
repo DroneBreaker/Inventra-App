@@ -21,7 +21,7 @@ func ClientRoutes(r *gin.Engine) {
 	clients.Use(middleware.AuthMiddleware())
 	clients.Use(middleware.CompanyScopeMiddleware())
 	{
-		clients.POST("/", clientHandler.CreateClient)
+		clients.POST("", clientHandler.CreateClient)
 		// users.GET("/", userHandler.GetUsers)
 		// users.GET("/:id", userHandler.GetUser)
 		// users.PATCH("/:id", userHandler.UpdateUser)
