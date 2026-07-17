@@ -1,22 +1,26 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type User struct {
 	ID          string `gorm:"primaryKey;type:char(36)"`
 	FirstName   string
 	LastName    string
 	Email       string
-	Username    string `gorm:"unique;not null"`
+	Username    string `gorm:"unique;not null;size:100"`
 	CompanyID   string
-	CompanyTIN  string
+	CompanyTIN  string `gorm:"size:20"`
 	CompanyName string
 	Company     Company `gorm:"foreignKey:CompanyTIN;references:TIN" json:"-"`
-	Password    string
+	Password    string  `json:"-"`
 	Role        Role
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-	DeletedAt   time.Time
+	DeletedAt   gorm.DeletedAt `gorm:"index"`
 }
 
 type Role string

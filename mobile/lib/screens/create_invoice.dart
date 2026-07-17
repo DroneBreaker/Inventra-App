@@ -41,6 +41,8 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   final TextEditingController exchangeRateController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController contactController = TextEditingController();
+  final TextEditingController totalExciseController = TextEditingController();
+  final TextEditingController totalLevyController = TextEditingController();
 
   // Item List
   List<Map<String, dynamic>> addedItems = [];
@@ -121,8 +123,8 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   String selectedTourismOrCST = "None";
 
   // ITEM CATEGORY OPTIONS
-  final List<String> itemCategoryOptions = ['Regular VAT', 'Rent', 'Exempt'];
-  String selectedItemCategory = "Regular VAT";
+  final List<String> itemCategoryOptions = ['Standard', 'Rent', 'Exempt'];
+  String selectedItemCategory = "Standard";
 
   // CURRENCY OPTIONS
   final List<String> currencyOptions = ["GHS", "USD", "EUR", "GBP"];
@@ -174,6 +176,9 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     "Overdue",
     "Canceled",
   ];
+
+  String? selectedSaleType = "Sale Type";
+  final List<String> saleType = ["NORMAL", "EXPORT"];
 
   // Add this to your _CreateInvoiceState class
 
@@ -857,6 +862,31 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                               ),
                               Gap(20.h),
 
+                              // Sales type TextForm field
+                              DropdownButtonFormField(
+                                value: selectedSaleType,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  labelText: 'Sale Type',
+                                ),
+                                items:
+                                    saleType.map((String option) {
+                                      return DropdownMenuItem(
+                                        value: option,
+                                        child: Text(option),
+                                      );
+                                    }).toList(),
+                                onChanged: (String? newValue) {
+                                  if (newValue != null) {
+                                    setState(() {
+                                      selectedSaleType = newValue;
+                                    });
+                                  }
+                                },
+                              ),
+
                               _buildClientSelection(),
                               Gap(20.h),
 
@@ -969,10 +999,24 @@ class _CreateInvoiceState extends State<CreateInvoice> {
 
                               _buildAddedItemsList(),
 
+                              // Total Levy TextForm field
+                              appInput(
+                                placeholder: "Total Levy",
+                                textEditingController: totalLevyController,
+                              ),
+                              Gap(20.h),
+
                               // Total VAT TextForm field
                               appInput(
                                 placeholder: "Total VAT",
                                 textEditingController: totalVATController,
+                              ),
+                              Gap(20.h),
+
+                              // Total Excise TextForm field
+                              appInput(
+                                placeholder: "Total Excise",
+                                textEditingController: totalExciseController,
                               ),
                               Gap(20.h),
 
@@ -1171,22 +1215,28 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     // Prepare invoice data matching your Rust model
     final invoiceData = {
       // "id": uuid.v4(),
+      "currency": selectedCurrency,
+      "exchangeRate": exchangeRateController,
       "flag": flagValue,
-      "invoice_number": invoiceNumberController.text.trim(),
-      "username": usernameController.text.trim(),
+      "invoiceNumber": invoiceNumberController.text.trim(),
+      "userName": usernameController.text.trim(),
+      // "totalLevy": "",
+      "calculationType": isTaxInclusive,
+      "saleType": selectedSaleType,
+      "totalExciseAmount": totalExciseController,
       "company_tin":
           prefs.getString('company_tin') ??
           "C000713911X", // Get from SharedPreferences or config
-      "client_name": clientNameController.text.trim(),
-      "client_tin":
+      "businessPartnerName": clientNameController.text.trim(),
+      "businessPartnerTin":
           clientTINController.text.trim().isEmpty
               ? "0000000000"
               : clientTINController.text.trim(),
-      "invoice_date": selectedInvoiceDate!.toUtc().toIso8601String(),
+      "TransactionDate": selectedInvoiceDate!.toUtc().toIso8601String(),
       "invoice_time": invoiceDateTime.toUtc().toIso8601String(),
-      "due_date": selectedDueDate!.toUtc().toIso8601String(),
-      "total_vat": _parseDecimal(totalVATController.text),
-      "total_amount": _parseDecimal(totalAmountController.text),
+      // "due_date": selectedDueDate!.toUtc().toIso8601String(),
+      "totalVat": _parseDecimal(totalVATController.text),
+      "totalAmount": _parseDecimal(totalAmountController.text),
       "items": [], // You'll need to add items collection logic
       "created_at": DateTime.now().toUtc().toIso8601String(),
       "updated_at": DateTime.now().toUtc().toIso8601String(),
@@ -1198,15 +1248,15 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   String _convertFlagToEnum(String flag) {
     switch (flag) {
       case 'Invoice':
-        return 'Invoice';
+        return 'INVOICE';
       case 'Purchase':
-        return 'Purchase';
+        return 'PURCHASE';
       case 'Refund':
-        return 'PartialRefund'; // You might want to add logic to determine Partial vs Full
+        return 'PARTIAL_REFUND'; // You might want to add logic to determine Partial vs Full
       case 'Credit Note':
         return 'CreditNote';
       default:
-        return 'Invoice';
+        return 'INVOICE';
     }
   }
 

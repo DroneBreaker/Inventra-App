@@ -3,6 +3,8 @@ package database
 import (
 	"log"
 
+	"github.com/DroneBreaker/Inventra-App/internal/models"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -29,6 +31,16 @@ func Connect() {
 
 	DB = db
 	log.Println("Connected to MySQL successfully")
+
+	// Auto-create/update tables to match your Go structs
+	err = DB.AutoMigrate(
+		&models.User{},
+		&models.Company{},
+	)
+	if err != nil {
+		log.Fatal("Failed to run AutoMigrate: ", err)
+	}
+	log.Println("Database migrated successfully")
 }
 
 func GetDB() *gorm.DB {

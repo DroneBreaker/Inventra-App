@@ -34,6 +34,8 @@ func (h *AuthHandler) Register(c *gin.Context) {
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
+	println("Login request received")
+
 	var payload models.LoginDTO
 	if err := c.Bind(&payload); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

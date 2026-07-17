@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:inventra/services/api_service.dart';
 import 'package:inventra/widgets/titles.dart';
 
@@ -13,33 +12,10 @@ class UserManagementPage extends StatefulWidget {
 }
 
 class _UserManagementPageState extends State<UserManagementPage> {
-  // Temporary list for UI demonstration (to be fetched from Rust backend)
-  List<Map<String, dynamic>> users = [
-    {
-      'id': '1',
-      'first_name': 'John',
-      'last_name': 'Doe',
-      'email': 'john@example.com',
-      'username': 'johndoe',
-      'company_name': 'Example Corp',
-      'company_id': 'C001',
-      'company_tin': '123-45-6789',
-      'role': 'Admin',
-      'lastLogin': '2023-05-15'
-    },
-    {
-      'id': '2',
-      'first_name': 'Jane',
-      'last_name': 'Smith',
-      'email': 'jane@example.com',
-      'username': 'janesmith',
-      'company_name': 'Sample Inc',
-      'company_id': 'C002',
-      'company_tin': '987-65-4321',
-      'role': 'Staff',
-      'lastLogin': '2023-05-10'
-    },
-  ];
+  // Real user data, fetched from the Gin backend
+  List<Map<String, dynamic>> users = [];
+  bool isLoading = true;
+  String? errorMessage;
 
   // Form controllers
   final TextEditingController firstNameController = TextEditingController();
@@ -50,22 +26,17 @@ class _UserManagementPageState extends State<UserManagementPage> {
   final TextEditingController companyIDController = TextEditingController();
   final TextEditingController companyTINController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   // Role options
-  String selectedRole = "Staff"; // Allow null initially
-  final roleOptions = [
-    "Staff", 
-    "Admin"
-  ];
+  String selectedRole = "Staff";
+  final roleOptions = ["Staff", "Admin"];
 
   @override
   void initState() {
     super.initState();
-    // Initialize _selectedRole to avoid null issues
-    // if (roleOptions.isNotEmpty) {
-    //   selectedRole = roleOptions.first;
-    // }
+    _fetchUsers();
   }
 
   @override
@@ -96,7 +67,7 @@ class _UserManagementPageState extends State<UserManagementPage> {
                 const SizedBox(height: 20),
                 // Users List
                 _buildUsersList(),
-                const SizedBox(height: 10,),
+                const SizedBox(height: 10),
               ],
             ),
           ),
@@ -106,6 +77,17 @@ class _UserManagementPageState extends State<UserManagementPage> {
   }
 
   Widget _buildDashboardCards() {
+    final today = DateTime.now();
+
+    bool isToday(dynamic lastLogin) {
+      if (lastLogin == null) return false;
+      final parsed = DateTime.tryParse(lastLogin.toString());
+      if (parsed == null) return false;
+      return parsed.year == today.year &&
+          parsed.month == today.month &&
+          parsed.day == today.day;
+    }
+
     return Row(
       children: [
         Expanded(
@@ -122,9 +104,9 @@ class _UserManagementPageState extends State<UserManagementPage> {
                   Text(
                     users.length.toString(),
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
-                        ),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
                   ),
                 ],
               ),
@@ -145,13 +127,13 @@ class _UserManagementPageState extends State<UserManagementPage> {
                   ),
                   Text(
                     users
-                        .where((u) => u['lastLogin'] == '2023-05-15')
+                        .where((u) => isToday(u['lastLogin']))
                         .length
                         .toString(),
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green,
-                        ),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green,
+                    ),
                   ),
                 ],
               ),
@@ -186,7 +168,6 @@ class _UserManagementPageState extends State<UserManagementPage> {
             ),
             const SizedBox(height: 16),
 
-
             // Last Name TextForm field
             TextField(
               controller: lastNameController,
@@ -199,7 +180,6 @@ class _UserManagementPageState extends State<UserManagementPage> {
             ),
             const SizedBox(height: 16),
 
-
             // Username TextForm field
             TextField(
               controller: usernameController,
@@ -211,7 +191,6 @@ class _UserManagementPageState extends State<UserManagementPage> {
               ),
             ),
             const SizedBox(height: 16),
-
 
             // Email TextForm field
             TextField(
@@ -226,7 +205,6 @@ class _UserManagementPageState extends State<UserManagementPage> {
             ),
             const SizedBox(height: 16),
 
-
             // Company Name TextForm field
             TextField(
               controller: companyNameController,
@@ -238,7 +216,6 @@ class _UserManagementPageState extends State<UserManagementPage> {
               ),
             ),
             const SizedBox(height: 16),
-
 
             // Company ID
             TextField(
@@ -252,7 +229,6 @@ class _UserManagementPageState extends State<UserManagementPage> {
             ),
             const SizedBox(height: 16),
 
-
             // Company TIN TextForm field
             TextField(
               controller: companyTINController,
@@ -265,16 +241,16 @@ class _UserManagementPageState extends State<UserManagementPage> {
             ),
             const SizedBox(height: 16),
 
-
             // Roles
             DropdownButtonFormField<String>(
               value: selectedRole,
-              items: roleOptions
-                  .map((role) => DropdownMenuItem(
-                        value: role,
-                        child: Text(role),
-                      ))
-                  .toList(),
+              items:
+                  roleOptions
+                      .map(
+                        (role) =>
+                            DropdownMenuItem(value: role, child: Text(role)),
+                      )
+                      .toList(),
               onChanged: (value) {
                 setState(() {
                   selectedRole = value!;
@@ -289,7 +265,6 @@ class _UserManagementPageState extends State<UserManagementPage> {
             ),
             const SizedBox(height: 16),
 
-
             // Password TextForm field
             TextField(
               controller: passwordController,
@@ -302,7 +277,6 @@ class _UserManagementPageState extends State<UserManagementPage> {
               obscureText: true,
             ),
             const SizedBox(height: 16),
-
 
             // Confirm Password TextForm field
             TextField(
@@ -330,7 +304,6 @@ class _UserManagementPageState extends State<UserManagementPage> {
     );
   }
 
-
   // Users
   Widget _buildUsersList() {
     return Card(
@@ -345,97 +318,145 @@ class _UserManagementPageState extends State<UserManagementPage> {
             ),
           ),
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.4, // Constrain height
-            child: ListView.builder(
-              itemCount: users.length,
-              itemBuilder: (context, index) {
-                final user = users[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    child: Text(user['first_name'][0]),
-                  ),
-                  title: Text('${user['first_name']} ${user['last_name']}'),
-                  subtitle: Text(user['email']),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Chip(
-                        label: Text(user['role']),
-                        backgroundColor: user['role'] == 'Admin'
-                            ? Colors.blue[100]
-                            : Colors.grey[200],
-                      ),
-                      // --------------------------------------------> DO LATER
-                      // IconButton(
-                      //   onPressed: () => _updateUser(user['id']), 
-                      //   icon: Icon(Icons.update),
-                      //   tooltip: 'Update User',
-                      // ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => {
-                          showDialog(context: context, builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: appTitle(title: "Confirm Deletion"),
-                              content: appParagraph(title: "Are you sure you want to delete ${user['first_name']} ${user['last_name']}?"),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text('Cancel'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context); // Close dialog
-                                    _deleteUser(user['id']); // Proceed with deletion
-                                  },
-                                  child: const Text(
-                                    'Delete',
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                ),
-                              ],
-                            );
-                          })
-                        },
-                        tooltip: 'Delete User',
-                      ),
-                    ],
-                  ),
-                  onTap: () {
-                    _showUserDetails(user);
-                  },
-                );
-              },
-            ),
+            height:
+                MediaQuery.of(context).size.height * 0.4, // Constrain height
+            child: _buildUsersListBody(),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _fetchUsers() async {
-    try {
-      final response =
-          await http.get(Uri.parse('http://10.0.2.2:8080/api/user_account/users'));
-      if (response.statusCode == 200) {
-        setState(() {
-          users = List<Map<String, dynamic>>.from(jsonDecode(response.body));
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Users refreshed successfully')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to fetch users: ${response.statusCode}')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching users: $e')),
+  Widget _buildUsersListBody() {
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (errorMessage != null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(errorMessage!, textAlign: TextAlign.center),
+            const SizedBox(height: 8),
+            TextButton(onPressed: _fetchUsers, child: const Text('Retry')),
+          ],
+        ),
       );
     }
+
+    if (users.isEmpty) {
+      return const Center(child: Text('No users found'));
+    }
+
+    return ListView.builder(
+      itemCount: users.length,
+      itemBuilder: (context, index) {
+        final user = users[index];
+        return ListTile(
+          leading: CircleAvatar(
+            child: Text(
+              (user['first_name'] ?? '?').toString().isNotEmpty
+                  ? user['first_name'].toString()[0]
+                  : '?',
+            ),
+          ),
+          title: Text('${user['first_name']} ${user['last_name']}'),
+          subtitle: Text(user['email']?.toString() ?? ''),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Chip(
+                label: Text(user['role']?.toString() ?? ''),
+                backgroundColor:
+                    user['role'] == 'Admin'
+                        ? Colors.blue[100]
+                        : Colors.grey[200],
+              ),
+              // --------------------------------------------> DO LATER
+              // IconButton(
+              //   onPressed: () => _updateUser(user['id']),
+              //   icon: Icon(Icons.update),
+              //   tooltip: 'Update User',
+              // ),
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed:
+                    () => showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: appTitle(title: "Confirm Deletion"),
+                          content: appParagraph(
+                            title:
+                                "Are you sure you want to delete ${user['first_name']} ${user['last_name']}?",
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context); // Close dialog
+                                _deleteUser(
+                                  user['id'].toString(),
+                                ); // Proceed with deletion
+                              },
+                              child: const Text(
+                                'Delete',
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                tooltip: 'Delete User',
+              ),
+            ],
+          ),
+          onTap: () {
+            _showUserDetails(user);
+          },
+        );
+      },
+    );
   }
 
+  Future<void> _fetchUsers() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
+    try {
+      final response = await APIService.fetchUsers();
+
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        // Adjust the 'data' key below if your Gin handler wraps the list
+        // differently, e.g. c.JSON(200, gin.H{"data": users}) vs a bare array.
+        final List<dynamic> userList =
+            decoded is List ? decoded : (decoded['data'] ?? []);
+
+        setState(() {
+          users = List<Map<String, dynamic>>.from(userList);
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          errorMessage = 'Failed to fetch users: ${response.statusCode}';
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Error fetching users: $e';
+        isLoading = false;
+      });
+    }
+  }
 
   // Add user
   Future<void> _addUser() async {
@@ -448,48 +469,31 @@ class _UserManagementPageState extends State<UserManagementPage> {
         companyTINController.text.isEmpty ||
         passwordController.text.isEmpty ||
         confirmPasswordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
       return;
     }
 
     if (passwordController.text != confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
       return;
     }
 
     try {
       final response = await APIService.registerUser(
-        firstName: firstNameController.text, 
+        firstName: firstNameController.text,
         lastName: lastNameController.text,
-        email: emailController.text, 
-        username: usernameController.text, 
+        email: emailController.text,
+        username: usernameController.text,
         companyName: companyNameController.text,
-        companyID: companyIDController.text, 
+        companyID: companyIDController.text,
         companyTIN: companyTINController.text,
         role: selectedRole,
         password: passwordController.text,
       );
-
-
-      // final response = await http.post(
-      //   Uri.parse('http://10.0.2.2:8080/api/user_account'),
-      //   headers: {'Content-Type': 'application/json'},
-      //   body: jsonEncode({
-      //     'first_name': firstNameController.text,
-      //     'last_name': lastNameController.text,
-      //     'username': usernameController.text,
-      //     'email': emailController.text,
-      //     'company_name': companyNameController.text,
-      //     'company_id': companyIDController.text,
-      //     'company_tin': companyTINController.text,
-      //     'role': selectedRole,
-      //     'password': passwordController.text,
-      //   }),
-      // );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         // Refresh users after adding
@@ -504,98 +508,123 @@ class _UserManagementPageState extends State<UserManagementPage> {
         companyTINController.clear();
         passwordController.clear();
         confirmPasswordController.clear();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User created successfully')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('User created successfully')),
+          );
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to create user: ${response.statusCode}')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to create user: ${response.statusCode}'),
+            ),
+          );
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error creating user: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error creating user: $e')));
+      }
     }
   }
-
 
   // Delete User
   Future<void> _deleteUser(String id) async {
     try {
-      final response = await http.delete(
-        Uri.parse('http://10.0.2.2:8080/api/user_account/users/$id'),
-      );
+      final response = await APIService.deleteUser(id);
       if (response.statusCode == 200) {
         await _fetchUsers(); // Refresh users after deletion
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User deleted successfully')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('User deleted successfully')),
+          );
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to delete user: ${response.statusCode}')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to delete user: ${response.statusCode}'),
+            ),
+          );
+        }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error deleting user: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error deleting user: $e')));
+      }
     }
   }
-
 
   // Update User
-  Future<void> _updateUser(String id) async {
+  Future<void> _updateUser(
+    String id,
+    Map<String, dynamic> updatedFields,
+  ) async {
     try {
-      final response = await http.put(
-        Uri.parse("http://10.0.2.2:8080/api/user_account/users/update/$id"),
-      );
+      final response = await APIService.updateUser(id, data: updatedFields);
 
       if (response.statusCode == 200) {
-        await _fetchUsers(); // Refresh users after deletion
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User updated successfully')),
-        );
+        await _fetchUsers(); // Refresh users after update
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('User updated successfully')),
+          );
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to delete user: ${response.statusCode}')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to update user: ${response.statusCode}'),
+            ),
+          );
+        }
       }
-    } catch(e) {
-
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error updating user: $e')));
+      }
     }
   }
+
   void _showUserDetails(Map<String, dynamic> user) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('${user['first_name']} ${user['last_name']}'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Email: ${user['email']}'),
-            const SizedBox(height: 8),
-            Text('Username: ${user['username']}'),
-            const SizedBox(height: 8),
-            Text('Company: ${user['company_name']}'),
-            const SizedBox(height: 8),
-            Text('Company ID: ${user['company_id']}'),
-            const SizedBox(height: 8),
-            Text('Company TIN: ${user['company_tin']}'),
-            const SizedBox(height: 8),
-            Text('Role: ${user['role']}'),
-            const SizedBox(height: 8),
-            Text('Last Login: ${user['lastLogin']}'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+      builder:
+          (context) => AlertDialog(
+            title: Text('${user['first_name']} ${user['last_name']}'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Email: ${user['email']}'),
+                const SizedBox(height: 8),
+                Text('Username: ${user['username']}'),
+                const SizedBox(height: 8),
+                Text('Company: ${user['company_name']}'),
+                const SizedBox(height: 8),
+                Text('Company ID: ${user['company_id']}'),
+                const SizedBox(height: 8),
+                Text('Company TIN: ${user['company_tin']}'),
+                const SizedBox(height: 8),
+                Text('Role: ${user['role']}'),
+                const SizedBox(height: 8),
+                Text('Last Login: ${user['lastLogin']}'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 

@@ -40,11 +40,27 @@ func (s *UserService) CreateUser(user *models.User) error {
 	// UUID
 	user.ID = uuid.New().String()
 
-	// Check company exists
+	// Check company exists; if not, create it (self-service signup)
 	var company models.Company
-	if err := s.DB.Where("tin = ?", user.CompanyTIN).First(&company).Error; err != nil {
-		return errors.New("company not found")
+	err = s.DB.Where("tin = ?", user.CompanyTIN).First(&company).Error
+
+	if err == gorm.ErrRecordNotFound {
+		// No company with this TIN yet — create one from the registration payload
+		company = models.Company{
+			ID:          uuid.New().String(),
+			CompanyID:   user.CompanyID,
+			CompanyName: user.CompanyName,
+			TIN:         user.CompanyTIN,
+		}
+
+		if err := s.DB.Create(&company).Error; err != nil {
+			return errors.New("failed to create company: " + err.Error())
+		}
+	} else if err != nil {
+		// Some other DB error occurred during the lookup
+		return err
 	}
+
 	user.CompanyName = company.CompanyName
 
 	return s.DB.Create(user).Error

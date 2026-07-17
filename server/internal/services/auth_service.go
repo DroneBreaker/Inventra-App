@@ -22,12 +22,29 @@ func NewAuthService(db *gorm.DB) *AuthService {
 }
 
 func (s *AuthService) Register(data models.RegisterDTO) error {
-	// var company models.Company
-	// if err := s.DB.Where("tin = ?", data.CompanyTIN).First(&company).Error; err != nil {
-	// 	return errors.New("company not found")
-	// }
+	var company models.Company
 
-	hashed, _ := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
+	err := s.DB.Where("tin = ?", data.CompanyTIN).First(&company).Error
+
+	if err == gorm.ErrRecordNotFound {
+		company = models.Company{
+			ID:          uuid.New().String(),
+			CompanyID:   data.CompanyID,
+			CompanyName: data.CompanyName,
+			TIN:         data.CompanyTIN,
+		}
+
+		if err := s.DB.Create(&company).Error; err != nil {
+			return errors.New("failed to create company: " + err.Error())
+		}
+	} else if err != nil {
+		return err
+	}
+
+	hashed, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
 
 	user := models.User{
 		ID:          uuid.New().String(),
@@ -37,11 +54,9 @@ func (s *AuthService) Register(data models.RegisterDTO) error {
 		Username:    data.Username,
 		Password:    string(hashed),
 		Role:        models.Role(data.Role),
-		CompanyName: data.CompanyName,
+		CompanyName: company.CompanyName,
 		CompanyID:   data.CompanyID,
-		CompanyTIN:  data.CompanyTIN,
-		// Company:     company,
-		// DeletedAt: time.Now(),
+		CompanyTIN:  company.TIN,
 	}
 
 	return s.DB.Create(&user).Error

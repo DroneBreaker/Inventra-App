@@ -25,6 +25,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController companyTINController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +52,8 @@ class _LoginPageState extends State<LoginPage> {
               child: Container(
                 constraints: BoxConstraints(minHeight: 540.h, maxHeight: 650.h),
                 decoration: BoxDecoration(
-                  color: Colors.indigo,
+                  color: AppColors.secondary,
+                  // color: Colors.indigo,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(30.r),
                     topRight: Radius.circular(30.r),
@@ -107,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                               contentPadding: const EdgeInsets.only(left: 20),
                               labelText: "Password",
                               labelStyle: TextStyle(
-                                color: Colors.grey,
+                                color: Colors.black54,
                                 fontSize: 18,
                               ),
                             ),
@@ -123,14 +125,16 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           Gap(40.h),
 
-                          appButton2(
-                            AppText.loginButton,
-                            () {
-                              handleLogin();
-                            },
-                            width: 125.w,
-                            letterSpacing: 1,
-                          ),
+                          isLoading
+                              ? const CircularProgressIndicator()
+                              : appButton2(
+                                AppText.loginButton,
+                                () {
+                                  handleLogin();
+                                },
+                                width: 125.w,
+                                letterSpacing: 1,
+                              ),
 
                           // Account Section
                           Row(
@@ -138,12 +142,12 @@ class _LoginPageState extends State<LoginPage> {
                             children: [
                               appParagraph(
                                 title: AppText.noAccount,
-                                color: Colors.grey,
+                                color: AppColors.white,
                               ),
 
                               appButton(
                                 buttonText: AppText.createAccount,
-                                colors: Colors.grey,
+                                colors: AppColors.white,
                                 onTap: () {
                                   Navigator.pushReplacement(
                                     context,
@@ -174,14 +178,9 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    // Show loading indicator
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return const Center(child: CircularProgressIndicator());
-      },
-    );
+    setState(() {
+      isLoading = true;
+    });
 
     try {
       print("Sending login request for: ${usernameController.text}");
@@ -192,10 +191,18 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       print("Login response received. Status: ${response.statusCode}");
+      print("Raw Response body: ${response.body}");
       if (!mounted) return;
-      Navigator.of(context, rootNavigator: true).pop();
 
-      final responseData = jsonDecode(response.body);
+      dynamic responseData;
+      try {
+        responseData = jsonDecode(response.body);
+      } catch (e) {
+        print("Failed to decode response as JSON: $e");
+        throw Exception(
+          "Server did not return a valid JSON response. Status code: ${response.statusCode}",
+        );
+      }
 
       if (response.statusCode == 200) {
         final prefs = await SharedPreferences.getInstance();
@@ -244,13 +251,18 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       print("Login exception: $e");
       if (mounted) {
-        Navigator.of(context, rootNavigator: true).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Error: ${e.toString()}"),
             backgroundColor: AppColors.error,
           ),
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
       }
     }
   }

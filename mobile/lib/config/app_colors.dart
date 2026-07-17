@@ -2,14 +2,36 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Primary Colors
-  static const Color primary = Color(0xFFD16BA5); // Blue
+  static const Color primary = Color(0xFFF8F5EF); // Blue
+  // static const Color primary = Color(0xFFD16BA5); // Blue
   static const Color primaryLight = Color(0xFFC982AA);
   static const Color primaryDark = Color(0xFFC73085);
 
+  // backgroundImage: {
+  //       'forest-gradient': 'linear-gradient(135deg, #0F2419 0%, #1A3D2B 45%, #245235 100%)',
+  //       'gold-shimmer':    'linear-gradient(90deg, #C9A84C 0%, #E2C572 50%, #C9A84C 100%)',
+  //     },
+
+  //     colors: {
+  //       ivory:          '#F8F5EF',
+  //       'ivory-dark':   '#EEE9DF',
+  //       forest:         '#1A3D2B',
+  //       'forest-light': '#2E6B47',
+  //       'forest-mid':   '#245235',
+  //       gold:           '#C9A84C',
+  //       'gold-light':   '#E2C572',
+  //       'gold-dark':    '#A8882A',
+  //       charcoal:       '#2C2C2C',
+  //       'charcoal-light':'#4A4A4A',
+  //       'charcoal-muted':'#7A7A7A',
+  //     },
+
   // Secondary Colors
-  static const Color secondary = Color(0xFF86A8E7); // Green
+  static const Color secondary = Color(0xFFE2C572); // Green
+  // static const Color secondary = Color(0xFF86A8E7); // Green
   static const Color secondaryLight = Color(0xFF9CB6E5);
-  static const Color secondaryDark = Color(0xFF3C75DC);
+  static const Color secondaryDark = Color(0xFF1A3D2B);
+  // static const Color secondaryDark = Color(0xFF3C75DC);
 
   // Accent Colors
   static const Color accent = Color(0xFF5FFBF1); // Orange
