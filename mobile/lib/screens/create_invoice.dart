@@ -14,6 +14,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+// ---------------------------------------------------------------------------
+// GRA E-VAT tax rate constants
+// ---------------------------------------------------------------------------
+const double VAT_RATE = 0.15;
+const double NHIL_RATE = 0.025;
+const double GETFUND_RATE = 0.025;
+const double CST_RATE = 0.05;
+const double TOURISM_RATE = 0.01;
+const double EXCISE_RATE = 0.05;
+
 class CreateInvoice extends StatefulWidget {
   const CreateInvoice({super.key});
 
@@ -41,7 +51,6 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   final TextEditingController exchangeRateController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController contactController = TextEditingController();
-  final TextEditingController totalExciseController = TextEditingController();
   final TextEditingController totalLevyController = TextEditingController();
 
   // Item List
@@ -68,7 +77,6 @@ class _CreateInvoiceState extends State<CreateInvoice> {
 
     if (date != null) {
       setState(() {
-        // Format the picked date and display it in the text field
         invoiceDateController.text = DateFormat('yyyy-MM-dd').format(date);
         selectedInvoiceDate = date;
       });
@@ -86,7 +94,6 @@ class _CreateInvoiceState extends State<CreateInvoice> {
 
     if (date != null) {
       setState(() {
-        // Format the picked date and display it in the text field
         dueDateController.text = DateFormat('yyyy-MM-dd').format(date);
         selectedDueDate = date;
       });
@@ -101,7 +108,6 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     );
 
     if (time != null) {
-      // Format the TimeOfDay manually to 'HH:mm'
       final String formattedTime = time.format(context);
 
       setState(() {
@@ -113,27 +119,12 @@ class _CreateInvoiceState extends State<CreateInvoice> {
 
   // OPTIONS
   bool isTaxInclusive = true;
-  bool isTaxable = true;
-  bool isDiscount = false;
   bool isActive = false;
   String activeButton = '';
 
-  // CST OR TOURISM OPTIONS
-  final List<String> tourismOrCSTOptions = ['None', 'Tourism', 'CST'];
-  String selectedTourismOrCST = "None";
-
-  // ITEM CATEGORY OPTIONS
-  final List<String> itemCategoryOptions = ['Standard', 'Rent', 'Exempt'];
-  String selectedItemCategory = "Standard";
-
   // CURRENCY OPTIONS
   final List<String> currencyOptions = ["GHS", "USD", "EUR", "GBP"];
-  // String selectedCurrency = "GHS";
   String? selectedCurrency;
-
-  // CLIENT OPTIONS
-  String selectedClient = "Customer";
-  final List<String> clientOptions = ['Customer', 'Supplier', "Exempt"];
 
   // Enhanced client management
   List<Map<String, dynamic>> clients = [
@@ -141,14 +132,14 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     {'name': 'Jane Smith', 'tin': 'TIN002'},
     {'name': 'Acme Corporation', 'tin': 'TIN003'},
     {'name': 'Tech Solutions Ltd', 'tin': 'TIN004'},
-
-    // CustomerService.baseUrl
   ];
   List<Map<String, dynamic>> filteredClients = [];
   bool showClientDropdown = false;
   Map<String, dynamic>? selectedClientData;
 
   // FLAG OPTIONS
+  // "Credit Note" / "Debit Note" route to a separate endpoint — see
+  // _sendInvoiceToAPI / _sendNoteToAPI split below.
   String? selectedFlag;
   final List<String> flags = [
     "Invoice",
@@ -157,36 +148,24 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     "Credit Note",
     "Debit Note",
   ];
-  // final List<Map<String, dynamic>> flags = [
-  //   {'text': 'Invoice', 'icon': Icons.receipt_long},
 
-  //   {'text': 'Purchase', 'icon': Icons.shopping_cart},
-
-  //   {'text': 'Refund', 'icon': Icons.assignment_return},
-
-  //   {'text': 'Credit Note', 'icon': Icons.note},
-  // ];
-
-  // INVOICE STATUS OPTIONS
-  String selectedInvoiceStatus = "Draft";
-  final List<String> invoiceStatus = [
-    "Draft",
-    "Sent",
-    "Paid",
-    "Overdue",
-    "Canceled",
-  ];
-
-  String? selectedSaleType = "Sale Type";
+  String? selectedSaleType;
   final List<String> saleType = ["NORMAL", "EXPORT"];
-
-  // Add this to your _CreateInvoiceState class
 
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      usernameController.text = prefs.getString('username') ?? '';
-    });
+
+    final userDataString = prefs.getString("userData");
+
+    if (userDataString != null) {
+      final userData = jsonDecode(userDataString);
+
+      usernameController.text = userData['Username'].toString();
+
+      if (mounted) {
+        setState(() {});
+      }
+    }
   }
 
   @override
@@ -195,26 +174,23 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     filteredClients = List.from(clients);
     _loadUserData();
 
-    // Add listener to client name controller
     clientNameController.addListener(_onClientNameChanged);
-
-    // Add listener to item name controller
     itemNameController.addListener(_onItemNameChanged);
   }
 
   @override
   void dispose() {
     clientNameController.removeListener(_onClientNameChanged);
+    itemNameController.removeListener(_onItemNameChanged);
     super.dispose();
   }
 
   void _onClientNameChanged() {
-    final query = clientNameController.text.toLowerCase();
+    final query = clientNameController.text.trim();
 
     if (query.isEmpty) {
       setState(() {
-        filteredClients = List.from(clients); // Keep local defaults or clear?
-        // Maybe clear or show defaults if desired, but for API search usually we wait for input
+        filteredClients = [];
         showClientDropdown = false;
         selectedClientData = null;
         clientTINController.clear();
@@ -222,15 +198,11 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       return;
     }
 
-    // Call API
     CustomerService.searchCustomers(query).then((results) {
       if (mounted) {
         setState(() {
           filteredClients = results;
           showClientDropdown = results.isNotEmpty;
-
-          // Optional: Auto-select if exact match?
-          // For now, let user select from dropdown
         });
       }
     });
@@ -256,8 +228,6 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       return;
     }
 
-    // Call API to search items
-    // Debouncing would be good here, but for now direct call
     ItemService.searchItems(query).then((items) {
       if (mounted) {
         setState(() {
@@ -268,11 +238,15 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     });
   }
 
+  // Item fields come straight from the Go Item model's JSON keys:
+  // item_code, name, item_category, amount (unit selling price).
+  // "cost" (internal cost-of-goods) is never touched here — it's not
+  // part of the invoice payload.
   void _selectItem(Map<String, dynamic> item) {
     setState(() {
       selectedItemData = item;
-      itemNameController.text = item['item_name'];
-      priceController.text = item['price'].toString();
+      itemNameController.text = item['name'];
+      priceController.text = item['amount'].toString();
       showItemDropdown = false;
     });
   }
@@ -290,11 +264,9 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       addedItems.add({
         ...selectedItemData!,
         'quantity': quantity,
-        'final_price':
-            price, // Allow manual price override if needed, or stick to item price
+        'final_price': price,
       });
 
-      // Clear item fields
       itemNameController.clear();
       quantityController.clear();
       priceController.clear();
@@ -311,86 +283,117 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     });
   }
 
+  // Live on-screen totals preview. This mirrors the EXCLUSIVE-style
+  // calculation for display purposes only — the authoritative,
+  // calculationType-aware totals are computed in _prepareInvoiceData()
+  // right before submission.
   void _calculateTotals() {
     double totalVAT = 0.0;
     double totalAmount = 0.0;
 
-    // CONSTANTS
-    const double VAT_RATE = 0.15;
-    const double NHIL_RATE = 0.025;
-    const double GETFUND_RATE = 0.025;
-    const double CST_RATE = 0.05;
-    const double EXCISE_RATE =
-        0.05; // As per user: "Excise duty amount which is 5% of base price"
-    const double TOURISM_RATE = 0.01;
-
     for (var item in addedItems) {
-      double basePrice = (item['final_price'] as num).toDouble();
-      int quantity = (item['quantity'] as num).toInt();
-      double rowBaseTotal = basePrice * quantity;
-
-      String? category =
-          item['item_category']
-              as String?; // e.g. "Standard", "CST", "Excise", "Tourism", "Exempt"
-      // User terms: "Regular VAT" (Standard), "Standard with CST", "Standard with EXC_PLASTIC", etc.
-      // We need to map `item_category` or `tourism_cst_option` to logic.
-      // Based on previous code, there was `tourismOrCSTOptions` and `itemCategoryOptions`.
-      // Let's assume the item object has these fields populated correctly from DB.
-
-      // Map item category/options to logic
-      // Assuming 'item_category' holds the main tax type or we check flags
-
-      // Levies (NHIL & GETFUND) - Applied on all except NON VAT (Exempt)
-      double nhil = 0.0;
-      double getfund = 0.0;
-
-      bool isExempt = category?.toLowerCase().contains('exempt') == true;
-
-      if (!isExempt) {
-        nhil = rowBaseTotal * NHIL_RATE;
-        getfund = rowBaseTotal * GETFUND_RATE;
-      }
-
-      double specificTax = 0.0;
-      double vatableAmount =
-          rowBaseTotal; // Default base for VAT is just the price?
-      // User said: "standard item is 15% of the base price" => This implies VAT base is ONLY base price.
-      // "standard with CST is 15% of the (base price + plus CST amount)"
-
-      // Check for specific taxes based on item properties
-      // We might need to look at 'tourism_cst_option' from ItemService response
-      String tourismCst = item['tourism_cst_option'] ?? 'None';
-
-      if (tourismCst == 'CST') {
-        specificTax = rowBaseTotal * CST_RATE;
-        vatableAmount = rowBaseTotal + specificTax;
-      } else if (tourismCst == 'Tourism') {
-        specificTax = rowBaseTotal * TOURISM_RATE;
-        vatableAmount = rowBaseTotal + specificTax;
-      } else if (category?.toUpperCase() == 'EXC_PLASTIC' ||
-          category?.toLowerCase().contains('excise') == true) {
-        specificTax = rowBaseTotal * EXCISE_RATE;
-        vatableAmount = rowBaseTotal + specificTax;
-      } else {
-        // Standard
-        vatableAmount = rowBaseTotal;
-      }
-
-      double vat = 0.0;
-      if (!isExempt) {
-        vat = vatableAmount * VAT_RATE;
-      }
-
-      // Total for this row's contribution to invoice total
-      // Total Amount = Base + SpecificTax + Levies + VAT
-      double rowTotal = rowBaseTotal + specificTax + nhil + getfund + vat;
-
-      totalVAT += vat;
-      totalAmount += rowTotal;
+      final calc = _calculateItemTaxes(
+        item,
+        isTaxInclusive ? 'INCLUSIVE' : 'EXCLUSIVE',
+      );
+      totalVAT += calc['_vat'] as double;
+      totalAmount +=
+          (calc['unitPrice'] as double) * (calc['quantity'] as double);
     }
 
     totalVATController.text = totalVAT.toStringAsFixed(2);
     totalAmountController.text = totalAmount.toStringAsFixed(2);
+  }
+
+  // ---------------------------------------------------------------------
+  // Per-item tax calculation.
+  //
+  // totalAmount contribution is ALWAYS unitPrice * quantity regardless of
+  // calculationType (per the E-VAT spec). What changes between INCLUSIVE
+  // and EXCLUSIVE is how VAT/levies/excise are derived from that base.
+  //
+  // categoryCode comes directly from item['item_category'], which is
+  // stored in the DB using the exact API codes: "", "CST", "TRSM", "EXM",
+  // "RNT", "EXC_PLASTIC".
+  //
+  // NOTE: the INCLUSIVE back-calculation for combined CST/Tourism/Excise
+  // rates is implemented here per standard practice, but should be
+  // verified against GRA's official tax calculation Excel template
+  // before relying on it for real submissions.
+  // ---------------------------------------------------------------------
+  Map<String, dynamic> _calculateItemTaxes(
+    Map<String, dynamic> item,
+    String calculationType,
+  ) {
+    final String categoryCode = item['item_category'] ?? '';
+    final double unitPrice = (item['final_price'] as num).toDouble();
+    final double quantity = (item['quantity'] as num).toDouble();
+    final bool isExempt = categoryCode == 'EXM';
+
+    final double grossOrNetBase = unitPrice * quantity;
+
+    double nhil = 0, getfund = 0, cst = 0, tourism = 0, excise = 0, vat = 0;
+
+    if (calculationType == 'EXCLUSIVE') {
+      double base = grossOrNetBase;
+
+      if (!isExempt) {
+        nhil = base * NHIL_RATE;
+        getfund = base * GETFUND_RATE;
+      }
+
+      double vatableAmount = base;
+      if (categoryCode == 'CST') {
+        cst = base * CST_RATE;
+        vatableAmount += cst;
+      } else if (categoryCode == 'TRSM') {
+        tourism = base * TOURISM_RATE;
+        vatableAmount += tourism;
+      } else if (categoryCode == 'EXC_PLASTIC') {
+        excise = base * EXCISE_RATE;
+        vatableAmount += excise;
+      }
+
+      if (!isExempt) {
+        vat = vatableAmount * VAT_RATE;
+      }
+    } else {
+      // INCLUSIVE — back-calculate the base out of the tax-inclusive price.
+      double combinedRate = 1.0;
+      if (!isExempt) combinedRate += VAT_RATE + NHIL_RATE + GETFUND_RATE;
+      if (categoryCode == 'CST') combinedRate += CST_RATE;
+      if (categoryCode == 'TRSM') combinedRate += TOURISM_RATE;
+      if (categoryCode == 'EXC_PLASTIC') combinedRate += EXCISE_RATE;
+
+      double base = grossOrNetBase / combinedRate;
+
+      if (!isExempt) {
+        nhil = base * NHIL_RATE;
+        getfund = base * GETFUND_RATE;
+      }
+      if (categoryCode == 'CST') cst = base * CST_RATE;
+      if (categoryCode == 'TRSM') tourism = base * TOURISM_RATE;
+      if (categoryCode == 'EXC_PLASTIC') excise = base * EXCISE_RATE;
+
+      double vatableAmount = base + cst + tourism + excise;
+      if (!isExempt) vat = vatableAmount * VAT_RATE;
+    }
+
+    return {
+      'itemCode': item['item_code'] ?? '',
+      'itemCategory': categoryCode,
+      'description': item['name'] ?? '',
+      'quantity': quantity,
+      'unitPrice': unitPrice,
+      'levyAmountA': double.parse(nhil.toStringAsFixed(2)),
+      'levyAmountB': double.parse(getfund.toStringAsFixed(2)),
+      'levyAmountC': 0.0, // COVID levy — not applicable from Jan 2026 onward
+      'levyAmountD': double.parse(cst.toStringAsFixed(2)),
+      'levyAmountE': double.parse(tourism.toStringAsFixed(2)),
+      'exciseAmount': double.parse(excise.toStringAsFixed(2)),
+      'discountAmount': 0.0,
+      '_vat': vat, // internal only — stripped before sending to the API
+    };
   }
 
   Widget _buildItemSelection() {
@@ -400,7 +403,6 @@ class _CreateInvoiceState extends State<CreateInvoice> {
         appTitle(title: "Add Items"),
         SizedBox(height: 10),
 
-        // Item Name Search/Autocomplete
         Stack(
           children: [
             TextFormField(
@@ -434,7 +436,6 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                 }
               },
             ),
-
             if (showItemDropdown && filteredItems.isNotEmpty)
               Positioned(
                 top: 60,
@@ -456,8 +457,8 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                       itemBuilder: (context, index) {
                         final item = filteredItems[index];
                         return ListTile(
-                          title: Text(item['item_name']),
-                          subtitle: Text('Price: ${item['price']}'),
+                          title: Text(item['name']),
+                          subtitle: Text('Price: ${item['amount']}'),
                           onTap: () => _selectItem(item),
                           dense: true,
                         );
@@ -474,7 +475,8 @@ class _CreateInvoiceState extends State<CreateInvoice> {
           Padding(
             padding: const EdgeInsets.only(bottom: 10.0),
             child: Text(
-              "Selected: ${selectedItemData!['item_name']} - ${selectedItemData!['item_category']}",
+              "Selected: ${selectedItemData!['name']}"
+              "${(selectedItemData!['item_category'] ?? '').toString().isEmpty ? '' : ' - ${selectedItemData!['item_category']}'}",
               style: TextStyle(
                 color: Colors.green,
                 fontWeight: FontWeight.bold,
@@ -506,18 +508,6 @@ class _CreateInvoiceState extends State<CreateInvoice> {
             ),
           ],
         ),
-        // SizedBox(height: 10),
-        // SizedBox(
-        //   width: double.infinity,
-        //   child: ElevatedButton(
-        //     onPressed: _addItemToList,
-        //     style: ElevatedButton.styleFrom(
-        //       backgroundColor: AppColors.primary,
-        //       foregroundColor: Colors.white,
-        //     ),
-        //     child: Text("Add Item"),
-        //   ),
-        // ),
       ],
     );
   }
@@ -538,6 +528,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
           separatorBuilder: (context, index) => SizedBox(height: 10),
           itemBuilder: (context, index) {
             final item = addedItems[index];
+            final String category = (item['item_category'] ?? '').toString();
             return Container(
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -553,7 +544,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item['item_name'],
+                          item['name'],
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Text(
@@ -561,7 +552,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                           style: TextStyle(color: Colors.grey),
                         ),
                         Text(
-                          "Tax: ${item['item_category'] ?? 'Standard'} / Opt: ${item['tourism_cst_option'] ?? 'None'}",
+                          "Category: ${category.isEmpty ? 'Standard' : category}",
                           style: TextStyle(
                             fontSize: 10,
                             color: Colors.blueGrey,
@@ -583,11 +574,9 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     );
   }
 
-  // Replace your existing Client Name and Client TIN TextFormFields with this:
   Widget _buildClientSelection() {
     return Column(
       children: [
-        // Client Name with dropdown
         Stack(
           children: [
             TextFormField(
@@ -621,8 +610,6 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                 }
               },
             ),
-
-            // Client Dropdown suggestions
             if (showClientDropdown && filteredClients.isNotEmpty)
               Positioned(
                 top: 60,
@@ -656,10 +643,8 @@ class _CreateInvoiceState extends State<CreateInvoice> {
               ),
           ],
         ),
-
         SizedBox(height: 20),
 
-        // Client TIN (auto-populated)
         TextFormField(
           controller: clientTINController,
           enabled: false,
@@ -677,9 +662,6 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       ],
     );
   }
-
-  // In your build method, replace the existing Client Name and Client TIN sections with:
-  // _buildClientSelection(),
 
   @override
   Widget build(BuildContext context) {
@@ -715,63 +697,11 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                         builder: (FormFieldState<String> state) {
                           return Column(
                             children: [
-                              appTitle(title: "INVOICE FUCKERS"),
+                              appTitle(title: "Create Invoice"),
                               SizedBox(height: 10),
 
-                              // Document Type
                               appTitle(title: "Select Document Type"),
                               SizedBox(height: 10),
-
-                              // INVOICE FLAGS
-                              // Wrap(
-                              //   spacing: 25.0,
-                              //   runSpacing: 12.0,
-                              //   children:
-                              //       flags.map((flag) {
-                              //         final bool isActive =
-                              //             activeButton == flag['text'];
-                              //         return appButton(
-                              //           buttonText: flag['text'],
-                              //           onTap: () {
-                              //             setState(() {
-                              //               activeButton = flag['text'];
-                              //               selectedFlag = flag['text'];
-                              //             });
-
-                              //             state.didChange(flag['text']);
-                              //           },
-                              //           colors: AppColors.buttonPrimary,
-                              //           // fontSize: 16,
-                              //           icon:
-                              //               isActive
-                              //                   ? Icon(
-                              //                     flag['icon'],
-                              //                     color: Colors.amber,
-                              //                     size: 25,
-                              //                   )
-                              //                   : null,
-                              //         );
-                              //       }).toList(),
-
-                              //   // Button(
-                              //   //   buttonText: "Purchase",
-                              //   //   onTap: () {},
-                              //   //   colors: Colors.white,
-                              //   //   fontSize: 16,
-                              //   // ),
-                              //   // Button(
-                              //   //   buttonText: "Refund",
-                              //   //   onTap: () {},
-                              //   //   colors: Colors.white,
-                              //   //   fontSize: 16,
-                              //   // ),
-                              //   // Button(
-                              //   //   buttonText: "Credit Note",
-                              //   //   onTap: () {},
-                              //   //   colors: Colors.white,
-                              //   //   fontSize: 16,
-                              //   // ),
-                              // ),
                               Gap(20.h),
 
                               // Invoice Number TextForm field
@@ -805,6 +735,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                                     setState(() {
                                       selectedFlag = newValue;
                                     });
+                                    state.didChange(newValue);
                                   }
                                 },
                               ),
@@ -854,15 +785,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                                 ),
                               Gap(20.h),
 
-                              // Username TextForm field
-                              appInput(
-                                placeholder: "Username",
-                                textEditingController: usernameController,
-                                isEnabled: false,
-                              ),
-                              Gap(20.h),
-
-                              // Sales type TextForm field
+                              // Sale Type Textform field
                               DropdownButtonFormField(
                                 value: selectedSaleType,
                                 decoration: InputDecoration(
@@ -886,6 +809,15 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                                   }
                                 },
                               ),
+                              Gap(20.h),
+
+                              // Username TextForm field
+                              appInput(
+                                placeholder: "Username",
+                                textEditingController: usernameController,
+                                isEnabled: false,
+                              ),
+                              Gap(20.h),
 
                               _buildClientSelection(),
                               Gap(20.h),
@@ -901,7 +833,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                                       textInputType: TextInputType.datetime,
                                       onTap:
                                           (value) =>
-                                              print('Invoice Time: $value'),
+                                              print('Invoice Date: $value'),
                                     ),
                                   ),
                                   IconButton(
@@ -917,15 +849,13 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                               Row(
                                 children: [
                                   Expanded(
-                                    child: Form(
-                                      child: appInput(
-                                        placeholder: "Invoice Time",
-                                        textEditingController:
-                                            invoiceTimeController,
-                                        onTap:
-                                            (value) =>
-                                                print('Invoice Time: $value'),
-                                      ),
+                                    child: appInput(
+                                      placeholder: "Invoice Time",
+                                      textEditingController:
+                                          invoiceTimeController,
+                                      onTap:
+                                          (value) =>
+                                              print('Invoice Time: $value'),
                                     ),
                                   ),
                                   IconButton(
@@ -937,86 +867,44 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                               ),
                               Gap(20.h),
 
-                              //           Row(
-                              //   children: [
-                              //     Expanded(
-                              //       child: Form(
-                              //         child: TextFormField(
-                              //           controller: dateReceivedController,
-                              //           keyboardType: TextInputType.datetime,
-                              //           decoration: InputDecoration(
-                              //             border: OutlineInputBorder(
-                              //               borderRadius: BorderRadius.circular(10)
-                              //             ),
-                              //             contentPadding: EdgeInsets.only(top: 40, left: 20),
-                              //             hintText: "Date Received"
-                              //           ),
-                              //           onChanged: (value) {
-                              //             print('Date Received: $value');
-                              //           },
-                              //         ),
-                              //       ),
-                              //     ),
-                              //     Gap(15.w),
-                              //     IconButton(onPressed: () => _selectDateReceived(context), icon: Icon(Icons.calendar_month, size: 30,))
-                              //   ],
-                              // ),
+                              // Due Date (kept for internal/local tracking —
+                              // not part of the E-VAT payload)
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: appInput(
+                                      placeholder: "Due Date",
+                                      textEditingController: dueDateController,
+                                      textInputType: TextInputType.datetime,
+                                      onTap:
+                                          (value) => print('Due Date: $value'),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () => _selectDueDate(context),
+                                    icon: Icon(Icons.calendar_month, size: 30),
+                                  ),
+                                ],
+                              ),
+                              Gap(20.h),
 
-                              // Due Date TextForm field
-                              // Row(
-                              //   children: [
-                              //     Expanded(
-                              //       child: Form(
-                              //         child: TextFormField(
-                              //           controller: dueDateController,
-                              //           keyboardType: TextInputType.datetime,
-                              //           decoration: InputDecoration(
-                              //             border: OutlineInputBorder(
-                              //               borderRadius: BorderRadius.circular(
-                              //                 10,
-                              //               ),
-                              //             ),
-                              //             contentPadding: EdgeInsets.only(
-                              //               left: 20,
-                              //             ),
-                              //             hintText: "Due Date",
-                              //           ),
-                              //           onChanged: (value) {
-                              //             print('Due Date: $value');
-                              //           },
-                              //         ),
-                              //       ),
-                              //     ),
-                              //     IconButton(
-                              //       onPressed: () => _selectDueDate(context),
-                              //       icon: Icon(Icons.calendar_month, size: 30),
-                              //     ),
-                              //   ],
-                              // ),
-                              // Gap(20.h),
                               _buildItemSelection(),
                               Gap(20.h),
 
                               _buildAddedItemsList(),
 
-                              // Total Levy TextForm field
-                              appInput(
-                                placeholder: "Total Levy",
-                                textEditingController: totalLevyController,
-                              ),
-                              Gap(20.h),
-
                               // Total VAT TextForm field
                               appInput(
                                 placeholder: "Total VAT",
                                 textEditingController: totalVATController,
+                                isEnabled: false,
                               ),
                               Gap(20.h),
 
-                              // Total Excise TextForm field
                               appInput(
-                                placeholder: "Total Excise",
-                                textEditingController: totalExciseController,
+                                placeholder: "Total Levy",
+                                textEditingController: totalLevyController,
+                                isEnabled: false,
                               ),
                               Gap(20.h),
 
@@ -1028,30 +916,29 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                               ),
                               Gap(20.h),
 
-                              // Invoice Status Dropdown
-                              // DropdownButtonFormField(
-                              //   value: selectedInvoiceStatus,
-                              //   decoration: InputDecoration(
-                              //     border: OutlineInputBorder(
-                              //       borderRadius: BorderRadius.circular(10),
-                              //     ),
-                              //     labelText: 'Invoice Status',
-                              //   ),
-                              //   items: invoiceStatus.map((String option) {
-                              //     return DropdownMenuItem(
-                              //       value: option,
-                              //       child: Text(option),
-                              //     );
-                              //   }).toList(),
-                              //   onChanged: (String? newValue) {
-                              //     if(newValue != null) {
-                              //       setState(() {
-                              //         selectedItemCategory = newValue;
-                              //       });
-                              //     }
-                              //   },
-                              // ),
-                              // Gap(20.h),
+                              // Tax inclusive/exclusive toggle
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  appParagraph(
+                                    title: "Prices include tax",
+                                    fontSize: 16,
+                                  ),
+                                  Switch(
+                                    value: isTaxInclusive,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        print("Switch changed to: $value");
+
+                                        isTaxInclusive = value;
+                                        _calculateTotals();
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                              Gap(20.h),
 
                               // Button
                               SizedBox(
@@ -1083,13 +970,11 @@ class _CreateInvoiceState extends State<CreateInvoice> {
             ],
           ),
         ),
-        // ),
       ),
     );
   }
 
   void handleInvoice() async {
-    // Validate form
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -1100,13 +985,11 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       return;
     }
 
-    // Additional validation for required fields
     if (!_validateRequiredFields()) {
       return;
     }
 
     try {
-      // Show loading indicator
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -1115,14 +998,16 @@ class _CreateInvoiceState extends State<CreateInvoice> {
         },
       );
 
-      // Prepare invoice data
       final invoiceData = await _prepareInvoiceData();
 
-      // Send to API
-      final response = await _sendInvoiceToAPI(invoiceData);
+      final bool isNote =
+          selectedFlag == 'Credit Note' || selectedFlag == 'Debit Note';
+      final response =
+          isNote
+              ? await _sendNoteToAPI(invoiceData)
+              : await _sendInvoiceToAPI(invoiceData);
 
-      // Hide loading indicator
-      Navigator.of(context).pop();
+      if (mounted) Navigator.of(context).pop(); // hide loading indicator
 
       if (response['success'] == true) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1132,18 +1017,13 @@ class _CreateInvoiceState extends State<CreateInvoice> {
           ),
         );
 
-        // Clear form or navigate back
         _clearForm();
-        Navigator.of(context).pop();
+        if (mounted) Navigator.of(context).pop();
       } else {
-        // Handle API error
         _showErrorDialog(response['message'] ?? 'Failed to create invoice');
       }
     } catch (e) {
-      // Hide loading indicator if still showing
-      Navigator.of(context).pop();
-
-      // Handle network or other errors
+      if (mounted) Navigator.of(context).pop();
       _showErrorDialog('Network error: ${e.toString()}');
     }
   }
@@ -1166,8 +1046,11 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     if (invoiceTimeController.text.trim().isEmpty) {
       missingFields.add('Invoice Time');
     }
-    if (dueDateController.text.trim().isEmpty) {
-      missingFields.add('Due Date');
+    if (selectedCurrency == null) {
+      missingFields.add('Currency');
+    }
+    if (addedItems.isEmpty) {
+      missingFields.add('At least one item');
     }
 
     if (missingFields.isNotEmpty) {
@@ -1177,72 +1060,86 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       return false;
     }
 
-    // Validate dates
     if (selectedInvoiceDate == null) {
       _showErrorDialog('Please select a valid invoice date');
       return false;
     }
 
-    if (selectedDueDate == null) {
-      _showErrorDialog('Please select a valid due date');
-      return false;
-    }
-
-    if (selectedDueDate!.isBefore(selectedInvoiceDate!)) {
-      _showErrorDialog('Due date cannot be before invoice date');
+    if (selectedCurrency != 'GHS' &&
+        (double.tryParse(exchangeRateController.text) == null)) {
+      _showErrorDialog('Please enter a valid exchange rate');
       return false;
     }
 
     return true;
   }
 
-  Future<Map<String, dynamic>> _prepareInvoiceData() async {
-    // final uuid = const Uuid();
+  // ---------------------------------------------------------------------
+  // reference = companyTIN-branchCode, used in the URL path.
+  // branch_code defaults to "001" (head office) if not set at login.
+  // ---------------------------------------------------------------------
+  Future<String> _buildReference() async {
     final prefs = await SharedPreferences.getInstance();
+    final companyTin = prefs.getString('company_tin') ?? 'CXX000000YY';
+    final branchCode = prefs.getString('branch_code') ?? '008';
+    return '$companyTin-$branchCode';
+  }
 
-    // Convert flag text to enum value
-    String flagValue = _convertFlagToEnum(selectedFlag!);
+  Future<Map<String, dynamic>> _prepareInvoiceData() async {
+    final String calculationType = isTaxInclusive ? 'INCLUSIVE' : 'EXCLUSIVE';
 
-    // Combine date and time for invoice_time
-    DateTime invoiceDateTime = DateTime(
-      selectedInvoiceDate!.year,
-      selectedInvoiceDate!.month,
-      selectedInvoiceDate!.day,
-      selectedInvoiceTime?.hour ?? 0,
-      selectedInvoiceTime?.minute ?? 0,
-    );
+    final List<Map<String, dynamic>> itemPayloads =
+        addedItems
+            .map((item) => _calculateItemTaxes(item, calculationType))
+            .toList();
 
-    // Prepare invoice data matching your Rust model
-    final invoiceData = {
-      // "id": uuid.v4(),
-      "currency": selectedCurrency,
-      "exchangeRate": exchangeRateController,
-      "flag": flagValue,
+    double totalAmount = 0, totalVat = 0, totalLevy = 0, totalExcise = 0;
+
+    for (var itemPayload in itemPayloads) {
+      totalAmount +=
+          (itemPayload['unitPrice'] as double) *
+          (itemPayload['quantity'] as double);
+      totalVat += itemPayload['_vat'] as double;
+      totalLevy +=
+          (itemPayload['levyAmountA'] as double) +
+          (itemPayload['levyAmountB'] as double) +
+          (itemPayload['levyAmountC'] as double) +
+          (itemPayload['levyAmountD'] as double) +
+          (itemPayload['levyAmountE'] as double);
+      totalExcise += itemPayload['exciseAmount'] as double;
+    }
+
+    // Strip internal-only field before sending to the API
+    final cleanItems =
+        itemPayloads.map((i) {
+          final copy = Map<String, dynamic>.from(i);
+          copy.remove('_vat');
+          return copy;
+        }).toList();
+
+    return {
+      "flag": _convertFlagToEnum(selectedFlag!),
       "invoiceNumber": invoiceNumberController.text.trim(),
       "userName": usernameController.text.trim(),
-      // "totalLevy": "",
-      "calculationType": isTaxInclusive,
-      "saleType": selectedSaleType,
-      "totalExciseAmount": totalExciseController,
-      "company_tin":
-          prefs.getString('company_tin') ??
-          "C000713911X", // Get from SharedPreferences or config
+      "currency": selectedCurrency ?? 'GHS',
+      "exchangeRate":
+          selectedCurrency == 'GHS'
+              ? 1.0
+              : (double.tryParse(exchangeRateController.text) ?? 1.0),
+      "calculationType": calculationType,
+      "saleType": selectedSaleType ?? "NORMAL",
+      "transactionDate": DateFormat('yyyy-MM-dd').format(selectedInvoiceDate!),
       "businessPartnerName": clientNameController.text.trim(),
       "businessPartnerTin":
           clientTINController.text.trim().isEmpty
               ? "0000000000"
               : clientTINController.text.trim(),
-      "TransactionDate": selectedInvoiceDate!.toUtc().toIso8601String(),
-      "invoice_time": invoiceDateTime.toUtc().toIso8601String(),
-      // "due_date": selectedDueDate!.toUtc().toIso8601String(),
-      "totalVat": _parseDecimal(totalVATController.text),
-      "totalAmount": _parseDecimal(totalAmountController.text),
-      "items": [], // You'll need to add items collection logic
-      "created_at": DateTime.now().toUtc().toIso8601String(),
-      "updated_at": DateTime.now().toUtc().toIso8601String(),
+      "totalAmount": double.parse(totalAmount.toStringAsFixed(2)),
+      "totalVat": double.parse(totalVat.toStringAsFixed(2)),
+      "totalLevy": double.parse(totalLevy.toStringAsFixed(2)),
+      "totalExciseAmount": double.parse(totalExcise.toStringAsFixed(2)),
+      "items": cleanItems,
     };
-
-    return invoiceData;
   }
 
   String _convertFlagToEnum(String flag) {
@@ -1252,41 +1149,80 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       case 'Purchase':
         return 'PURCHASE';
       case 'Refund':
-        return 'PARTIAL_REFUND'; // You might want to add logic to determine Partial vs Full
+        return 'REFUND';
       case 'Credit Note':
-        return 'CreditNote';
+        return 'CREDIT_NOTE'; // confirm exact value once note endpoint docs are available
+      case 'Debit Note':
+        return 'DEBIT_NOTE'; // confirm exact value once note endpoint docs are available
       default:
         return 'INVOICE';
     }
   }
 
-  double _parseDecimal(String value) {
-    if (value.trim().isEmpty) return 0.0;
-    try {
-      return double.parse(value.trim());
-    } catch (e) {
-      return 0.0;
-    }
-  }
-
+  // ---------------------------------------------------------------------
+  // Invoice / Purchase / Refund submission.
+  // ---------------------------------------------------------------------
   Future<Map<String, dynamic>> _sendInvoiceToAPI(
     Map<String, dynamic> invoiceData,
   ) async {
     const String baseUrl =
         'https://vsdcstaging.vat-gh.com/vsdc/api/v1/taxpayer';
-    const String reference = 'C000713911X-002';
     const String securityKey =
-        'IWhnuThonHN9VY1xuQO5VV/s5/PR2v3bcdDr0SmAwiI3JjMSK39WpXsmSU9wEwqv';
+        'Yqu34/kLbewAY1NCH3lKjUEaZFFNtoxpiLzKGI8JrcdrUmxO9ud8dZO2Nx/mQPAE'; // from staging credentials
 
-    final String endpoint = '$baseUrl/$reference/invoice';
+    return _postToVsdc(
+      endpointSuffix: 'invoice',
+      baseUrl: baseUrl,
+      securityKey: securityKey,
+      invoiceData: invoiceData,
+    );
+  }
+
+  // ---------------------------------------------------------------------
+  // Credit Note / Debit Note submission — separate endpoint.
+
+  Future<Map<String, dynamic>> _sendNoteToAPI(
+    Map<String, dynamic> invoiceData,
+  ) async {
+    const String baseUrl =
+        'https://vsdcstaging.vat-gh.com/vsdc/api/v1/taxpayer';
+    const String securityKey =
+        'Yqu34/kLbewAY1NCH3lKjUEaZFFNtoxpiLzKGI8JrcdrUmxO9ud8dZO2Nx/mQPAE';
+
+    return _postToVsdc(
+      endpointSuffix: 'note', // TODO: confirm actual path segment
+      baseUrl: baseUrl,
+      securityKey: securityKey,
+      invoiceData: invoiceData,
+    );
+  }
+
+  Future<Map<String, dynamic>> _postToVsdc({
+    required String endpointSuffix,
+    required String baseUrl,
+    required String securityKey,
+    required Map<String, dynamic> invoiceData,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final appAuthToken = prefs.getString('jwt_token');
+
+    if (appAuthToken == null) {
+      return {
+        'success': false,
+        'message': 'You must be logged in to submit an invoice',
+      };
+    }
+
+    final reference = await _buildReference();
+    final endpoint = '$baseUrl/$reference/$endpointSuffix';
 
     try {
       final response = await http.post(
         Uri.parse(endpoint),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $securityKey',
-          'X-Security-Key': securityKey, // Alternative header format if needed
+          'security_key': securityKey,
+          'Authorization': 'Bearer $appAuthToken',
         },
         body: json.encode(invoiceData),
       );
@@ -1339,7 +1275,6 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   }
 
   void _clearForm() {
-    // Clear all controllers
     invoiceNumberController.clear();
     clientNameController.clear();
     clientTINController.clear();
@@ -1348,27 +1283,19 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     dueDateController.clear();
     totalVATController.clear();
     totalAmountController.clear();
+    exchangeRateController.clear();
 
-    // Reset state variables
     setState(() {
       selectedFlag = null;
+      selectedCurrency = null;
       activeButton = '';
       selectedInvoiceDate = null;
       selectedDueDate = null;
       selectedInvoiceTime = null;
       selectedClientData = null;
       showClientDropdown = false;
+      addedItems = [];
+      isTaxInclusive = true;
     });
-  }
-
-  bool _isValidInvoiceNumber(String invoiceNumber) {
-    return invoiceNumber.trim().isNotEmpty && invoiceNumber.trim().length >= 3;
-  }
-
-  // Helper method to validate TIN format
-  bool _isValidTIN(String tin) {
-    // Add your TIN validation logic here
-    if (tin.trim().isEmpty) return true; // Optional field
-    return tin.trim().length >= 9; // Example validation
   }
 }

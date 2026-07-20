@@ -54,3 +54,37 @@ func (h *ClientHandler) CreateClient(c *gin.Context) {
 		"client":  client,
 	})
 }
+
+func (h *ClientHandler) GetAllClients(c *gin.Context) {
+	clients, err := h.service.GetAllClients()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Could not get clients",
+			"details": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, clients)
+}
+
+// client_handler.go
+func (h *ClientHandler) SearchClients(c *gin.Context) {
+	query := c.Query("search")
+
+	companyTIN, err := middleware.GetCompanyTIN(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	clients, err := h.service.SearchClients(query, companyTIN)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Could not search clients",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, clients) // bare array — matches Flutter's List<dynamic> parse
+}

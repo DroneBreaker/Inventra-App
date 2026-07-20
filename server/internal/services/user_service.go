@@ -18,10 +18,10 @@ func NewUserService(db *gorm.DB) *UserService {
 }
 
 // Get All users
-func (s *UserService) GetAll(companyID string) ([]models.User, error) {
+func (s *UserService) GetAll(companyTIN string) ([]models.User, error) {
 	var user []models.User
 
-	if err := s.DB.Where("company_id = ?", companyID).Find(&user).Error; err != nil {
+	if err := s.DB.Where("company_tin = ?", companyTIN).Find(&user).Error; err != nil {
 		return nil, err
 	}
 

@@ -74,8 +74,6 @@ class CustomerService {
     try {
       final token = await _getToken();
 
-      // Assuming the API supports a search query parameter
-      // If not, we might need to fetch all and filter locally, but let's try this first
       final response = await http.get(
         Uri.parse('$baseUrl/clients?search=$query'),
         headers: {'Authorization': 'Bearer $token'},
@@ -83,15 +81,15 @@ class CustomerService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        // Ensure we return a List<Map<String, dynamic>>
-        return List<Map<String, dynamic>>.from(data);
-      } else {
-        // Fallback or empty list on error
-        print('Failed to search customers: ${response.statusCode}');
-        return [];
+
+        return data.map<Map<String, dynamic>>((client) {
+          return {'name': client['client_name'], 'tin': client['client_tin']};
+        }).toList();
       }
+
+      return [];
     } catch (e) {
-      print('Error searching customers: $e');
+      print(e);
       return [];
     }
   }
