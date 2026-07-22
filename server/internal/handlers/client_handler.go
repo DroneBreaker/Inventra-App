@@ -56,7 +56,8 @@ func (h *ClientHandler) CreateClient(c *gin.Context) {
 }
 
 func (h *ClientHandler) GetAllClients(c *gin.Context) {
-	clients, err := h.service.GetAllClients()
+	clientType := c.Query("type") // e.g. ?type=Customer
+	clients, err := h.service.GetAllClients(clientType)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Could not get clients",
@@ -87,4 +88,38 @@ func (h *ClientHandler) SearchClients(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, clients) // bare array — matches Flutter's List<dynamic> parse
+}
+
+func (h *ClientHandler) UpdateClient(c *gin.Context) {
+	id := c.Param("id")
+
+	companyTIN, err := middleware.GetCompanyTIN(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	var body map[string]interface{}
+	if err := c.BindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	// Only allow safe fields to be updated
+	allowed := map[string]interface{}{}
+	for _, field := range []string{"client_name", "client_email", "client_phone"} {
+		if val, ok := body[field]; ok {
+			allowed[field] = val
+		}
+	}
+
+	if err := h.service.UpdateClient(id, companyTIN, allowed); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Could not update client",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Client updated successfully"})
 }

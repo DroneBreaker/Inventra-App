@@ -93,4 +93,52 @@ class CustomerService {
       return [];
     }
   }
+
+  static Future<List<Map<String, dynamic>>> getClients({
+    String? clientType,
+  }) async {
+    try {
+      final token = await _getToken();
+      final uri = Uri.parse('$baseUrl/clients/').replace(
+        queryParameters: clientType != null ? {'type': clientType} : null,
+      );
+      final response = await http.get(
+        uri,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.cast<Map<String, dynamic>>();
+      }
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  static Future<bool> updateClient({
+    required String id,
+    required String clientName,
+    required String clientEmail,
+    required String clientPhone,
+  }) async {
+    try {
+      final token = await _getToken();
+      final response = await http.put(
+        Uri.parse('$baseUrl/clients/$id'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'client_name': clientName,
+          'client_email': clientEmail,
+          'client_phone': clientPhone,
+        }),
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
 }

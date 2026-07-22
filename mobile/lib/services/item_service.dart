@@ -121,4 +121,26 @@ class ItemService {
       return [];
     }
   }
+
+  static Future<List<Map<String, dynamic>>> getAllItems() async {
+    try {
+      final token = await _getToken();
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/items'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return List<Map<String, dynamic>>.from(data);
+      } else {
+        print('Failed to get items: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error getting items: $e');
+      return [];
+    }
+  }
 }

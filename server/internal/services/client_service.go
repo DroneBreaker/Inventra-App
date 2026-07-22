@@ -19,9 +19,13 @@ func (s *ClientService) CreateClient(client *models.Client) error {
 	return s.DB.Create(client).Error
 }
 
-func (s *ClientService) GetAllClients() ([]models.Client, error) {
+func (s *ClientService) GetAllClients(clientType string) ([]models.Client, error) {
 	var clients []models.Client
-	return clients, s.DB.Find(&clients).Error
+	db := s.DB
+	if clientType != "" {
+		db = db.Where("client_type = ?", clientType)
+	}
+	return clients, db.Find(&clients).Error
 }
 
 // client_service.go
@@ -36,4 +40,12 @@ func (s *ClientService) SearchClients(query string, companyTIN string) ([]models
 
 	err := db.Limit(20).Find(&clients).Error
 	return clients, err
+}
+
+func (s *ClientService) UpdateClient(id string, companyTIN string, updates map[string]interface{}) error {
+	return s.DB.
+		Model(&models.Client{}).
+		Where("id = ? AND company_tin = ?", id, companyTIN).
+		Updates(updates).
+		Error
 }

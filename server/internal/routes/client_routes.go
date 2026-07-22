@@ -24,7 +24,6 @@ func ClientRoutes(r *gin.Engine) {
 		clients.POST("", clientHandler.CreateClient)
 		clients.GET("/", clientHandler.GetAllClients)
 		clients.GET("", clientHandler.SearchClients)
-		// users.PATCH("/:id", userHandler.UpdateUser)
-		// users.DELETE("/:id", userHandler.DeleteUser)
+		clients.PUT("/:id", clientHandler.UpdateClient)
 	}
 }
