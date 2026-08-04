@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 
 class CustomerService {
   // static const String baseUrl = "http://192.168.80.147:8080/api";
-  static const String baseUrl = "http://10.0.2.2:8080/api";
+  static const String baseUrl = "http://10.0.2.2:8081/api";
 
   // Helper method to get JWT token from shared preferences
   static Future<String> _getToken() async {

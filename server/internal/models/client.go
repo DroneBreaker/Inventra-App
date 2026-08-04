@@ -8,7 +8,7 @@ type Client struct {
 	ClientTIN   string     `gorm:"unique;not null" json:"client_tin"`
 	ClientEmail string     `json:"client_email"`
 	CompanyTIN  string     `json:"company_tin"`
-	ClientType  ClientType `json:"client_type"`
+	ClientType  ClientType `gorm:"not null" json:"client_type"`
 	ClientPhone string     `json:"client_phone"`
 	Company     Company    `gorm:"foreignKey:CompanyTIN;references:TIN" json:"-"`
 	CreatedAt   time.Time  `json:"created_at"`

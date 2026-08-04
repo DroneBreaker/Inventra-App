@@ -19,6 +19,7 @@ func main() {
 	routes.RegisterRoutes(r)
 	routes.UserRoutes(r)
 	routes.ClientRoutes(r)
+	routes.ItemRoutes(r)
 
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -32,5 +33,5 @@ func main() {
 	// }
 
 	// log.Println("Server running on port", port)
-	r.Run()
+	r.Run(":8081")
 }

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/DroneBreaker/Inventra-App/internal/middleware"
@@ -33,6 +34,9 @@ func (h *ClientHandler) CreateClient(c *gin.Context) {
 		})
 		return
 	}
+
+	fmt.Printf("Received Client: %+v\n", client)
+	fmt.Println("Client Type:", client.ClientType)
 
 	companyTIN, err := middleware.GetCompanyTIN(c)
 	if err != nil {
