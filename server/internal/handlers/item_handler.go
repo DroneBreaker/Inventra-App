@@ -24,6 +24,18 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 		return
 	}
 
+	query := c.Query("search")
+
+	if query != "" {
+		items, err := h.Service.SearchItems(query, companyTIN)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, items)
+		return
+	}
+
 	items, err := h.Service.GetItems(companyTIN)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

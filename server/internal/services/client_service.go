@@ -19,9 +19,9 @@ func (s *ClientService) CreateClient(client *models.Client) error {
 	return s.DB.Create(client).Error
 }
 
-func (s *ClientService) GetAllClients(clientType string) ([]models.Client, error) {
+func (s *ClientService) GetAllClients(clientType string, companyTIN string) ([]models.Client, error) {
 	var clients []models.Client
-	db := s.DB
+	db := s.DB.Where("company_tin = ?", companyTIN)
 	if clientType != "" {
 		db = db.Where("client_type = ?", clientType)
 	}

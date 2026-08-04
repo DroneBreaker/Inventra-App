@@ -6,7 +6,6 @@ import 'package:inventra/config/app_colors.dart';
 import 'package:inventra/config/app_text.dart';
 import 'package:inventra/services/customer_service.dart';
 import 'package:inventra/services/item_service.dart';
-import 'package:inventra/widgets/button.dart';
 import 'package:inventra/widgets/forms.dart';
 import 'package:inventra/widgets/titles.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -58,6 +57,10 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   Map<String, dynamic>? selectedItemData;
   bool showItemDropdown = false;
   List<Map<String, dynamic>> filteredItems = [];
+  Map<String, dynamic>? _currentItemTaxPreview;
+
+  bool _isSelectingClient = false;
+  bool _isSelectingItem = false;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -70,15 +73,15 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   Future<void> _selectInvoiceDate(BuildContext context) async {
     final DateTime? date = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: selectedInvoiceDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
 
     if (date != null) {
       setState(() {
-        invoiceDateController.text = DateFormat('yyyy-MM-dd').format(date);
         selectedInvoiceDate = date;
+        invoiceDateController.text = DateFormat('yyyy-MM-dd').format(date);
       });
     }
   }
@@ -87,15 +90,16 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   Future<void> _selectDueDate(BuildContext context) async {
     final DateTime? date = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate:
+          selectedDueDate ?? DateTime.now().add(const Duration(days: 30)),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
 
     if (date != null) {
       setState(() {
-        dueDateController.text = DateFormat('yyyy-MM-dd').format(date);
         selectedDueDate = date;
+        dueDateController.text = DateFormat('yyyy-MM-dd').format(date);
       });
     }
   }
@@ -104,15 +108,17 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   Future<void> _selectInvoiceTime(BuildContext context) async {
     final TimeOfDay? time = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: selectedInvoiceTime ?? TimeOfDay.now(),
     );
 
     if (time != null) {
-      final String formattedTime = time.format(context);
+      final now = DateTime.now();
+      final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
+      final String formattedTime = DateFormat('HH:mm').format(dt);
 
       setState(() {
-        invoiceTimeController.text = formattedTime;
         selectedInvoiceTime = time;
+        invoiceTimeController.text = formattedTime;
       });
     }
   }
@@ -133,13 +139,13 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     {'name': 'Acme Corporation', 'tin': 'TIN003'},
     {'name': 'Tech Solutions Ltd', 'tin': 'TIN004'},
   ];
+  List<Map<String, dynamic>> _allClients = [];
+  List<Map<String, dynamic>> _allItems = [];
   List<Map<String, dynamic>> filteredClients = [];
   bool showClientDropdown = false;
   Map<String, dynamic>? selectedClientData;
 
   // FLAG OPTIONS
-  // "Credit Note" / "Debit Note" route to a separate endpoint — see
-  // _sendInvoiceToAPI / _sendNoteToAPI split below.
   String? selectedFlag;
   final List<String> flags = [
     "Invoice",
@@ -154,12 +160,10 @@ class _CreateInvoiceState extends State<CreateInvoice> {
 
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
-
     final userDataString = prefs.getString("userData");
 
     if (userDataString != null) {
       final userData = jsonDecode(userDataString);
-
       usernameController.text = userData['Username'].toString();
 
       if (mounted) {
@@ -168,25 +172,102 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     }
   }
 
+  Future<void> _preloadData() async {
+    try {
+      final loadedClients = await CustomerService.getClients();
+      if (mounted && loadedClients.isNotEmpty) {
+        setState(() {
+          _allClients = loadedClients;
+        });
+      }
+    } catch (_) {}
+
+    try {
+      final loadedItems = await ItemService.getAllItems();
+      if (mounted && loadedItems.isNotEmpty) {
+        setState(() {
+          _allItems = loadedItems;
+        });
+      }
+    } catch (_) {}
+  }
+
   @override
   void initState() {
     super.initState();
     filteredClients = List.from(clients);
+    _allClients = List.from(clients);
     _loadUserData();
+    _preloadData();
+
+    // Default Date and Time
+    final now = DateTime.now();
+    selectedInvoiceDate = now;
+    selectedInvoiceTime = TimeOfDay.fromDateTime(now);
+    selectedDueDate = now.add(const Duration(days: 30));
+
+    invoiceDateController.text = DateFormat('yyyy-MM-dd').format(now);
+    invoiceTimeController.text = DateFormat('HH:mm').format(now);
+    dueDateController.text = DateFormat('yyyy-MM-dd').format(selectedDueDate!);
 
     clientNameController.addListener(_onClientNameChanged);
     itemNameController.addListener(_onItemNameChanged);
+
+    quantityController.addListener(_onItemInputChange);
+    priceController.addListener(_onItemInputChange);
   }
 
   @override
   void dispose() {
     clientNameController.removeListener(_onClientNameChanged);
     itemNameController.removeListener(_onItemNameChanged);
+    quantityController.removeListener(_onItemInputChange);
+    priceController.removeListener(_onItemInputChange);
     super.dispose();
   }
 
+  void _onItemInputChange() {
+    if (selectedItemData != null) {
+      setState(() {
+        _updateCurrentItemPreview();
+      });
+    }
+  }
+
+  void _updateCurrentItemPreview() {
+    if (selectedItemData == null) {
+      _currentItemTaxPreview = null;
+      return;
+    }
+
+    final double price =
+        double.tryParse(priceController.text) ??
+        ((selectedItemData!['amount'] ?? selectedItemData!['price'] ?? 0.0)
+                as num)
+            .toDouble();
+    final double quantity = double.tryParse(quantityController.text) ?? 0.0;
+
+    if (price <= 0 || quantity <= 0) {
+      _currentItemTaxPreview = null;
+      return;
+    }
+
+    final itemTemp = {
+      ...selectedItemData!,
+      'final_price': price,
+      'quantity': quantity,
+    };
+
+    _currentItemTaxPreview = _calculateItemTaxes(
+      itemTemp,
+      isTaxInclusive ? 'INCLUSIVE' : 'EXCLUSIVE',
+    );
+  }
+
   void _onClientNameChanged() {
-    final query = clientNameController.text.trim();
+    if (_isSelectingClient) return;
+
+    final query = clientNameController.text.trim().toLowerCase();
 
     if (query.isEmpty) {
       setState(() {
@@ -198,57 +279,169 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       return;
     }
 
+    if (selectedClientData != null) {
+      final name =
+          (selectedClientData!['name'] ??
+                  selectedClientData!['client_name'] ??
+                  '')
+              .toString()
+              .trim()
+              .toLowerCase();
+      if (name == query) return;
+    }
+
+    final localPool = _allClients.isNotEmpty ? _allClients : clients;
+
+    final matches =
+        localPool.where((c) {
+          final name =
+              (c['name'] ?? c['client_name'] ?? '').toString().toLowerCase();
+          final tin =
+              (c['tin'] ?? c['client_tin'] ?? '').toString().toLowerCase();
+          return name.contains(query) || tin.contains(query);
+        }).toList();
+
+    setState(() {
+      filteredClients = matches;
+      showClientDropdown = matches.isNotEmpty;
+    });
+
     CustomerService.searchCustomers(query).then((results) {
+      print(
+        'searchCustomers("$query") returned ${results.length} items: $results',
+      );
+
       if (mounted) {
-        setState(() {
-          filteredClients = results;
-          showClientDropdown = results.isNotEmpty;
-        });
+        final currentQuery = clientNameController.text.trim().toLowerCase();
+        if (currentQuery.isNotEmpty && selectedClientData == null) {
+          final combined = [...matches];
+          for (var r in results) {
+            final rName = (r['name'] ?? r['client_name'] ?? '').toString();
+            if (!combined.any(
+              (e) => (e['name'] ?? e['client_name'] ?? '').toString() == rName,
+            )) {
+              combined.add(r);
+            }
+          }
+          setState(() {
+            filteredClients = combined;
+            showClientDropdown = combined.isNotEmpty;
+
+            print("showClientDropdown = $showClientDropdown");
+            print("filteredClients = $filteredClients");
+          });
+        }
       }
     });
   }
 
   void _selectClient(Map<String, dynamic> client) {
+    _isSelectingClient = true;
+    final String name = client['name'] ?? client['client_name'] ?? '';
+    final String tin = client['tin'] ?? client['client_tin'] ?? '';
+
     setState(() {
       selectedClientData = client;
-      clientNameController.text = client['name'];
-      clientTINController.text = client['tin'] ?? '';
+      clientNameController.text = name;
+      clientTINController.text = tin;
       showClientDropdown = false;
     });
+
+    Future.microtask(() => _isSelectingClient = false);
   }
 
   // Item Search Logic
   void _onItemNameChanged() {
-    final query = itemNameController.text.toLowerCase();
+    if (_isSelectingItem) return;
+
+    final query = itemNameController.text.trim().toLowerCase();
     if (query.isEmpty) {
       setState(() {
         filteredItems = [];
         showItemDropdown = false;
+        selectedItemData = null;
+        _currentItemTaxPreview = null;
       });
       return;
     }
 
+    if (selectedItemData != null) {
+      final name =
+          (selectedItemData!['name'] ?? selectedItemData!['item_name'] ?? '')
+              .toString()
+              .trim()
+              .toLowerCase();
+      if (name == query) return;
+    }
+
+    final matches =
+        _allItems.where((i) {
+          final name =
+              (i['name'] ?? i['item_name'] ?? '').toString().toLowerCase();
+          final code =
+              (i['code'] ?? i['item_code'] ?? '').toString().toLowerCase();
+          return name.contains(query) || code.contains(query);
+        }).toList();
+
+    setState(() {
+      filteredItems = matches;
+      showItemDropdown = matches.isNotEmpty;
+    });
+
     ItemService.searchItems(query).then((items) {
+      print('searchItems("$query") returned ${items.length} items: $items');
+
       if (mounted) {
-        setState(() {
-          filteredItems = items;
-          showItemDropdown = items.isNotEmpty;
-        });
+        final currentQuery = itemNameController.text.trim().toLowerCase();
+        if (currentQuery.isNotEmpty && selectedItemData == null) {
+          final filteredRemote =
+              items.where((i) {
+                final name =
+                    (i['name'] ?? i['item_name'] ?? '')
+                        .toString()
+                        .toLowerCase();
+                final code =
+                    (i['code'] ?? i['item_code'] ?? '')
+                        .toString()
+                        .toLowerCase();
+                return name.contains(currentQuery) ||
+                    code.contains(currentQuery);
+              }).toList();
+
+          final combined = [...matches];
+          for (var r in filteredRemote) {
+            final rName = (r['name'] ?? r['item_name'] ?? '').toString();
+            if (!combined.any(
+              (e) => (e['name'] ?? e['item_name'] ?? '').toString() == rName,
+            )) {
+              combined.add(r);
+            }
+          }
+
+          setState(() {
+            filteredItems = combined;
+            showItemDropdown = combined.isNotEmpty;
+          });
+        }
       }
     });
   }
 
-  // Item fields come straight from the Go Item model's JSON keys:
-  // item_code, name, item_category, amount (unit selling price).
-  // "cost" (internal cost-of-goods) is never touched here — it's not
-  // part of the invoice payload.
   void _selectItem(Map<String, dynamic> item) {
+    _isSelectingItem = true;
+    final String name = item['name'] ?? item['item_name'] ?? '';
+    final double price =
+        ((item['amount'] ?? item['price'] ?? 0.0) as num).toDouble();
+
     setState(() {
       selectedItemData = item;
-      itemNameController.text = item['name'];
-      priceController.text = item['amount'].toString();
+      itemNameController.text = name;
+      priceController.text = price > 0 ? price.toString() : '';
       showItemDropdown = false;
+      _updateCurrentItemPreview();
     });
+
+    Future.microtask(() => _isSelectingItem = false);
   }
 
   void _addItemToList() {
@@ -257,8 +450,13 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       return;
     }
 
-    final int quantity = int.tryParse(quantityController.text) ?? 1;
+    final double quantity = double.tryParse(quantityController.text) ?? 1.0;
     final double price = double.tryParse(priceController.text) ?? 0.0;
+
+    if (price <= 0 || quantity <= 0) {
+      _showErrorDialog('Please enter valid positive price and quantity');
+      return;
+    }
 
     setState(() {
       addedItems.add({
@@ -271,6 +469,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       quantityController.clear();
       priceController.clear();
       selectedItemData = null;
+      _currentItemTaxPreview = null;
 
       _calculateTotals();
     });
@@ -283,12 +482,9 @@ class _CreateInvoiceState extends State<CreateInvoice> {
     });
   }
 
-  // Live on-screen totals preview. This mirrors the EXCLUSIVE-style
-  // calculation for display purposes only — the authoritative,
-  // calculationType-aware totals are computed in _prepareInvoiceData()
-  // right before submission.
   void _calculateTotals() {
     double totalVAT = 0.0;
+    double totalLevy = 0.0;
     double totalAmount = 0.0;
 
     for (var item in addedItems) {
@@ -296,38 +492,25 @@ class _CreateInvoiceState extends State<CreateInvoice> {
         item,
         isTaxInclusive ? 'INCLUSIVE' : 'EXCLUSIVE',
       );
-      totalVAT += calc['_vat'] as double;
-      totalAmount +=
-          (calc['unitPrice'] as double) * (calc['quantity'] as double);
+      totalVAT += (calc['_vat'] as num).toDouble();
+      totalLevy += (calc['_totalLevy'] as num).toDouble();
+      totalAmount += (calc['_itemTotal'] as num).toDouble();
     }
 
     totalVATController.text = totalVAT.toStringAsFixed(2);
+    totalLevyController.text = totalLevy.toStringAsFixed(2);
     totalAmountController.text = totalAmount.toStringAsFixed(2);
   }
 
-  // ---------------------------------------------------------------------
-  // Per-item tax calculation.
-  //
-  // totalAmount contribution is ALWAYS unitPrice * quantity regardless of
-  // calculationType (per the E-VAT spec). What changes between INCLUSIVE
-  // and EXCLUSIVE is how VAT/levies/excise are derived from that base.
-  //
-  // categoryCode comes directly from item['item_category'], which is
-  // stored in the DB using the exact API codes: "", "CST", "TRSM", "EXM",
-  // "RNT", "EXC_PLASTIC".
-  //
-  // NOTE: the INCLUSIVE back-calculation for combined CST/Tourism/Excise
-  // rates is implemented here per standard practice, but should be
-  // verified against GRA's official tax calculation Excel template
-  // before relying on it for real submissions.
-  // ---------------------------------------------------------------------
   Map<String, dynamic> _calculateItemTaxes(
     Map<String, dynamic> item,
     String calculationType,
   ) {
-    final String categoryCode = item['item_category'] ?? '';
-    final double unitPrice = (item['final_price'] as num).toDouble();
-    final double quantity = (item['quantity'] as num).toDouble();
+    final String categoryCode = (item['item_category'] ?? '').toString();
+    final double unitPrice =
+        ((item['final_price'] ?? item['amount'] ?? item['price'] ?? 0.0) as num)
+            .toDouble();
+    final double quantity = ((item['quantity'] ?? 1) as num).toDouble();
     final bool isExempt = categoryCode == 'EXM';
 
     final double grossOrNetBase = unitPrice * quantity;
@@ -379,104 +562,143 @@ class _CreateInvoiceState extends State<CreateInvoice> {
       if (!isExempt) vat = vatableAmount * VAT_RATE;
     }
 
+    final double totalLevies = nhil + getfund + cst + tourism + excise;
+    final double itemTotal =
+        calculationType == 'EXCLUSIVE'
+            ? (grossOrNetBase + totalLevies + vat)
+            : grossOrNetBase;
+
     return {
-      'itemCode': item['item_code'] ?? '',
+      'itemCode': item['item_code'] ?? item['code'] ?? '',
       'itemCategory': categoryCode,
-      'description': item['name'] ?? '',
+      'description': item['name'] ?? item['item_name'] ?? '',
       'quantity': quantity,
       'unitPrice': unitPrice,
       'levyAmountA': double.parse(nhil.toStringAsFixed(2)),
       'levyAmountB': double.parse(getfund.toStringAsFixed(2)),
-      'levyAmountC': 0.0, // COVID levy — not applicable from Jan 2026 onward
       'levyAmountD': double.parse(cst.toStringAsFixed(2)),
       'levyAmountE': double.parse(tourism.toStringAsFixed(2)),
       'exciseAmount': double.parse(excise.toStringAsFixed(2)),
       'discountAmount': 0.0,
-      '_vat': vat, // internal only — stripped before sending to the API
+      '_vat': double.parse(vat.toStringAsFixed(2)),
+      '_totalLevy': double.parse(totalLevies.toStringAsFixed(2)),
+      '_itemTotal': double.parse(itemTotal.toStringAsFixed(2)),
     };
   }
 
   Widget _buildItemSelection() {
+    final String selectedItemName =
+        selectedItemData != null
+            ? (selectedItemData!['name'] ??
+                selectedItemData!['item_name'] ??
+                '')
+            : '';
+    final String selectedItemCategory =
+        selectedItemData != null
+            ? (selectedItemData!['item_category'] ?? '').toString()
+            : '';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         appTitle(title: "Add Items"),
         SizedBox(height: 10),
 
-        Stack(
-          children: [
-            TextFormField(
-              controller: itemNameController,
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(left: 20),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                hintText: "Search Item...",
-                suffixIcon:
-                    itemNameController.text.isNotEmpty
-                        ? IconButton(
-                          onPressed: () {
-                            itemNameController.clear();
-                            setState(() {
-                              showItemDropdown = false;
-                              selectedItemData = null;
-                              priceController.clear();
-                            });
-                          },
-                          icon: Icon(Icons.clear),
-                        )
-                        : Icon(Icons.search),
-              ),
-              onTap: () {
-                if (itemNameController.text.isNotEmpty) {
-                  setState(() {
-                    showItemDropdown = true;
-                  });
-                }
-              },
-            ),
-            if (showItemDropdown && filteredItems.isNotEmpty)
-              Positioned(
-                top: 60,
-                left: 0,
-                right: 0,
-                child: Material(
-                  elevation: 4,
-                  borderRadius: BorderRadius.circular(10),
-                  child: Container(
-                    constraints: BoxConstraints(maxHeight: 200),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.white,
-                    ),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: filteredItems.length,
-                      itemBuilder: (context, index) {
-                        final item = filteredItems[index];
-                        return ListTile(
-                          title: Text(item['name']),
-                          subtitle: Text('Price: ${item['amount']}'),
-                          onTap: () => _selectItem(item),
-                          dense: true,
-                        );
+        TextFormField(
+          controller: itemNameController,
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.only(left: 20),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            hintText: "Search Item...",
+            suffixIcon:
+                itemNameController.text.isNotEmpty
+                    ? IconButton(
+                      onPressed: () {
+                        itemNameController.clear();
+                        setState(() {
+                          showItemDropdown = false;
+                          selectedItemData = null;
+                          priceController.clear();
+                          quantityController.clear();
+                          _currentItemTaxPreview = null;
+                        });
                       },
+                      icon: Icon(Icons.clear),
+                    )
+                    : Icon(Icons.search),
+          ),
+          onTap: () {
+            if (itemNameController.text.isNotEmpty &&
+                selectedItemData == null) {
+              setState(() {
+                showItemDropdown = true;
+              });
+            }
+          },
+        ),
+
+        if (showItemDropdown && filteredItems.isNotEmpty)
+          Container(
+            margin: const EdgeInsets.only(top: 6, bottom: 10),
+            constraints: const BoxConstraints(maxHeight: 220),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.orange.shade300, width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.12),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              itemCount: filteredItems.length,
+              separatorBuilder:
+                  (context, index) =>
+                      Divider(height: 1, color: Colors.grey.shade200),
+              itemBuilder: (context, index) {
+                final item = filteredItems[index];
+                final String name = item['name'] ?? item['item_name'] ?? '';
+                final double p =
+                    ((item['amount'] ?? item['price'] ?? 0.0) as num)
+                        .toDouble();
+                final String category =
+                    (item['item_category'] ?? '').toString();
+                return ListTile(
+                  title: Text(
+                    name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
                     ),
                   ),
-                ),
-              ),
-          ],
-        ),
+                  subtitle: Text(
+                    'Price: GHS ${p.toStringAsFixed(2)}${category.isEmpty ? '' : ' • $category'}',
+                    style: TextStyle(color: Colors.grey[700], fontSize: 12),
+                  ),
+                  trailing: const Icon(
+                    Icons.arrow_forward_ios,
+                    size: 14,
+                    color: Colors.grey,
+                  ),
+                  onTap: () => _selectItem(item),
+                  dense: true,
+                );
+              },
+            ),
+          ),
+
         Gap(10.h),
 
         if (selectedItemData != null)
           Padding(
             padding: const EdgeInsets.only(bottom: 10.0),
             child: Text(
-              "Selected: ${selectedItemData!['name']}"
-              "${(selectedItemData!['item_category'] ?? '').toString().isEmpty ? '' : ' - ${selectedItemData!['item_category']}'}",
+              "Selected: $selectedItemName"
+              "${selectedItemCategory.isEmpty ? '' : ' - $selectedItemCategory'}",
               style: TextStyle(
                 color: Colors.green,
                 fontWeight: FontWeight.bold,
@@ -504,10 +726,50 @@ class _CreateInvoiceState extends State<CreateInvoice> {
             Gap(10.w),
             IconButton(
               onPressed: () => _addItemToList(),
-              icon: Icon(Icons.add),
+              icon: Icon(Icons.add_circle, color: Colors.orange[600], size: 36),
             ),
           ],
         ),
+
+        if (_currentItemTaxPreview != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.orange.shade200),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                    'VAT: GHS ${_currentItemTaxPreview!['_vat']}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                  Text(
+                    'Levies: GHS ${_currentItemTaxPreview!['_totalLevy']}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                  Text(
+                    'Total: GHS ${_currentItemTaxPreview!['_itemTotal']}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: Colors.deepOrange,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -528,7 +790,14 @@ class _CreateInvoiceState extends State<CreateInvoice> {
           separatorBuilder: (context, index) => SizedBox(height: 10),
           itemBuilder: (context, index) {
             final item = addedItems[index];
+            final String name = item['name'] ?? item['item_name'] ?? '';
             final String category = (item['item_category'] ?? '').toString();
+            final double q = ((item['quantity'] ?? 1) as num).toDouble();
+            final double p =
+                ((item['final_price'] ?? item['amount'] ?? item['price'] ?? 0.0)
+                        as num)
+                    .toDouble();
+
             return Container(
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -544,17 +813,17 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item['name'],
+                          name,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          "${item['quantity']} x ${item['final_price']}",
-                          style: TextStyle(color: Colors.grey),
+                          "$q x GHS ${p.toStringAsFixed(2)} = GHS ${(q * p).toStringAsFixed(2)}",
+                          style: TextStyle(color: Colors.grey[700]),
                         ),
                         Text(
                           "Category: ${category.isEmpty ? 'Standard' : category}",
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: 11,
                             color: Colors.blueGrey,
                           ),
                         ),
@@ -577,72 +846,88 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   Widget _buildClientSelection() {
     return Column(
       children: [
-        Stack(
-          children: [
-            TextFormField(
-              controller: clientNameController,
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.only(left: 20),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                hintText: "Client Name",
-                suffixIcon:
-                    clientNameController.text.isNotEmpty
-                        ? IconButton(
-                          onPressed: () {
-                            clientNameController.clear();
-                            clientTINController.clear();
-                            setState(() {
-                              showClientDropdown = false;
-                              selectedClientData = null;
-                            });
-                          },
-                          icon: Icon(Icons.clear),
-                        )
-                        : Icon(Icons.search),
-              ),
-              onTap: () {
-                if (clientNameController.text.isNotEmpty) {
-                  setState(() {
-                    showClientDropdown = true;
-                  });
-                }
-              },
-            ),
-            if (showClientDropdown && filteredClients.isNotEmpty)
-              Positioned(
-                top: 60,
-                left: 0,
-                right: 0,
-                child: Material(
-                  elevation: 4,
-                  borderRadius: BorderRadius.circular(10),
-                  child: Container(
-                    constraints: BoxConstraints(maxHeight: 200),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.white,
-                    ),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: filteredClients.length,
-                      itemBuilder: (context, index) {
-                        final client = filteredClients[index];
-                        return ListTile(
-                          title: Text(client['name']),
-                          subtitle: Text('TIN: ${client['tin']}'),
-                          onTap: () => _selectClient(client),
-                          dense: true,
-                        );
+        TextFormField(
+          controller: clientNameController,
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.only(left: 20),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            hintText: "Client Name",
+            suffixIcon:
+                clientNameController.text.isNotEmpty
+                    ? IconButton(
+                      onPressed: () {
+                        clientNameController.clear();
+                        clientTINController.clear();
+                        setState(() {
+                          showClientDropdown = false;
+                          selectedClientData = null;
+                        });
                       },
+                      icon: Icon(Icons.clear),
+                    )
+                    : Icon(Icons.search),
+          ),
+          onTap: () {
+            if (clientNameController.text.isNotEmpty &&
+                selectedClientData == null) {
+              setState(() {
+                showClientDropdown = true;
+              });
+            }
+          },
+        ),
+
+        if (showClientDropdown && filteredClients.isNotEmpty)
+          Container(
+            margin: const EdgeInsets.only(top: 6, bottom: 10),
+            constraints: const BoxConstraints(maxHeight: 220),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.teal.shade300, width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.12),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              itemCount: filteredClients.length,
+              separatorBuilder:
+                  (context, index) =>
+                      Divider(height: 1, color: Colors.grey.shade200),
+              itemBuilder: (context, index) {
+                final client = filteredClients[index];
+                final String name =
+                    client['name'] ?? client['client_name'] ?? '';
+                final String tin = client['tin'] ?? client['client_tin'] ?? '';
+                return ListTile(
+                  title: Text(
+                    name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
                     ),
                   ),
-                ),
-              ),
-          ],
-        ),
+                  subtitle: Text(
+                    'TIN: $tin',
+                    style: TextStyle(color: Colors.grey[700], fontSize: 12),
+                  ),
+                  trailing: const Icon(
+                    Icons.arrow_forward_ios,
+                    size: 14,
+                    color: Colors.grey,
+                  ),
+                  onTap: () => _selectClient(client),
+                  dense: true,
+                );
+              },
+            ),
+          ),
+
         SizedBox(height: 20),
 
         TextFormField(
@@ -826,14 +1111,16 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                               Row(
                                 children: [
                                   Expanded(
-                                    child: appInput(
-                                      placeholder: "Invoice Date",
-                                      textEditingController:
-                                          invoiceDateController,
-                                      textInputType: TextInputType.datetime,
-                                      onTap:
-                                          (value) =>
-                                              print('Invoice Date: $value'),
+                                    child: GestureDetector(
+                                      onTap: () => _selectInvoiceDate(context),
+                                      child: AbsorbPointer(
+                                        child: appInput(
+                                          placeholder: "Invoice Date",
+                                          textEditingController:
+                                              invoiceDateController,
+                                          textInputType: TextInputType.datetime,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   IconButton(
@@ -849,35 +1136,40 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                               Row(
                                 children: [
                                   Expanded(
-                                    child: appInput(
-                                      placeholder: "Invoice Time",
-                                      textEditingController:
-                                          invoiceTimeController,
-                                      onTap:
-                                          (value) =>
-                                              print('Invoice Time: $value'),
+                                    child: GestureDetector(
+                                      onTap: () => _selectInvoiceTime(context),
+                                      child: AbsorbPointer(
+                                        child: appInput(
+                                          placeholder: "Invoice Time",
+                                          textEditingController:
+                                              invoiceTimeController,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   IconButton(
                                     onPressed:
                                         () => _selectInvoiceTime(context),
-                                    icon: Icon(Icons.calendar_month, size: 30),
+                                    icon: Icon(Icons.access_time, size: 30),
                                   ),
                                 ],
                               ),
                               Gap(20.h),
 
-                              // Due Date (kept for internal/local tracking —
-                              // not part of the E-VAT payload)
+                              // Due Date
                               Row(
                                 children: [
                                   Expanded(
-                                    child: appInput(
-                                      placeholder: "Due Date",
-                                      textEditingController: dueDateController,
-                                      textInputType: TextInputType.datetime,
-                                      onTap:
-                                          (value) => print('Due Date: $value'),
+                                    child: GestureDetector(
+                                      onTap: () => _selectDueDate(context),
+                                      child: AbsorbPointer(
+                                        child: appInput(
+                                          placeholder: "Due Date",
+                                          textEditingController:
+                                              dueDateController,
+                                          textInputType: TextInputType.datetime,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   IconButton(
@@ -922,16 +1214,15 @@ class _CreateInvoiceState extends State<CreateInvoice> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   appParagraph(
-                                    title: "Prices include tax",
+                                    title: "Tax Inclusive?",
                                     fontSize: 16,
                                   ),
                                   Switch(
                                     value: isTaxInclusive,
                                     onChanged: (value) {
                                       setState(() {
-                                        print("Switch changed to: $value");
-
                                         isTaxInclusive = value;
+                                        _updateCurrentItemPreview();
                                         _calculateTotals();
                                       });
                                     },
@@ -1114,8 +1405,21 @@ class _CreateInvoiceState extends State<CreateInvoice> {
         itemPayloads.map((i) {
           final copy = Map<String, dynamic>.from(i);
           copy.remove('_vat');
+          copy.remove('_totalLevy');
+          copy.remove('_itemTotal');
           return copy;
         }).toList();
+
+    final date = selectedInvoiceDate ?? DateTime.now();
+    final time = selectedInvoiceTime ?? TimeOfDay.now();
+    final fullTransactionDateTime = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+      0,
+    );
 
     return {
       "flag": _convertFlagToEnum(selectedFlag!),
@@ -1128,7 +1432,9 @@ class _CreateInvoiceState extends State<CreateInvoice> {
               : (double.tryParse(exchangeRateController.text) ?? 1.0),
       "calculationType": calculationType,
       "saleType": selectedSaleType ?? "NORMAL",
-      "transactionDate": DateFormat('yyyy-MM-dd').format(selectedInvoiceDate!),
+      "transactionDate": DateFormat(
+        'yyyy-MM-dd HH:mm:ss',
+      ).format(fullTransactionDateTime),
       "businessPartnerName": clientNameController.text.trim(),
       "businessPartnerTin":
           clientTINController.text.trim().isEmpty

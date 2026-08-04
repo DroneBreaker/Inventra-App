@@ -50,12 +50,16 @@ class _AllItemsPageState extends State<AllItemsPage> {
                     columns: const [
                       DataColumn2(label: Text('Item Code'), size: ColumnSize.S),
                       DataColumn2(label: Text('Item Name'), size: ColumnSize.M),
+                      DataColumn2(
+                        label: Text('Description'),
+                        size: ColumnSize.L,
+                      ),
                       DataColumn2(label: Text('Price'), numeric: true),
                       DataColumn2(
-                        label: Text('Tax Category'),
+                        label: Text('Item Category'),
                         size: ColumnSize.S,
                       ),
-                      DataColumn(label: Text('Taxable')),
+                      DataColumn2(label: Text('Taxable')),
                     ],
                     source: ItemDataSource(_items),
                   ),
@@ -73,13 +77,15 @@ class ItemDataSource extends DataTableSource {
   @override
   DataRow? getRow(int index) {
     if (index >= _data.length) return null;
-    final client = _data[index];
+    final item = _data[index];
     return DataRow(
       cells: [
-        DataCell(Text(client['client_name'] ?? '')),
-        DataCell(Text(client['client_tin'] ?? '')),
-        DataCell(Text(client['client_email'] ?? '')),
-        DataCell(Text(client['client_phone'] ?? '')),
+        DataCell(Text(item['item_code'].toString() ?? '')),
+        DataCell(Text(item['item_name'].toString() ?? '')),
+        DataCell(Text(item['item_description'].toString() ?? '')),
+        DataCell(Text(item['price'].toString() ?? '')),
+        DataCell(Text(item['item_category'].toString() ?? '')),
+        DataCell(Text(item['is_taxable'] == true ? 'Yes' : 'No')),
       ],
     );
   }

@@ -24,6 +24,19 @@ func (s *ItemService) GetItems(companyTIN string) ([]models.Item, error) {
 	return items, nil
 }
 
+func (s *ItemService) SearchItems(query string, companyTIN string) ([]models.Item, error) {
+	var items []models.Item
+	db := s.DB.Where("company_tin = ?", companyTIN)
+
+	if query != "" {
+		like := "%" + query + "%"
+		db = db.Where("item_name LIKE ? OR item_code LIKE ?", like, like)
+	}
+
+	err := db.Limit(20).Find(&items).Error
+	return items, err
+}
+
 func (s *ItemService) CreateItem(item *models.Item) error {
 	item.ID = uuid.New().String()
 	return s.DB.Create(item).Error

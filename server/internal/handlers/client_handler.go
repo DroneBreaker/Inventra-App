@@ -61,7 +61,14 @@ func (h *ClientHandler) CreateClient(c *gin.Context) {
 
 func (h *ClientHandler) GetAllClients(c *gin.Context) {
 	clientType := c.Query("type") // e.g. ?type=Customer
-	clients, err := h.service.GetAllClients(clientType)
+
+	companyTIN, err := middleware.GetCompanyTIN(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	clients, err := h.service.GetAllClients(clientType, companyTIN)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":   "Could not get clients",
