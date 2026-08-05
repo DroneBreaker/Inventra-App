@@ -133,12 +133,7 @@ class _CreateInvoiceState extends State<CreateInvoice> {
   String? selectedCurrency;
 
   // Enhanced client management
-  List<Map<String, dynamic>> clients = [
-    {'name': 'John Doe', 'tin': 'TIN001'},
-    {'name': 'Jane Smith', 'tin': 'TIN002'},
-    {'name': 'Acme Corporation', 'tin': 'TIN003'},
-    {'name': 'Tech Solutions Ltd', 'tin': 'TIN004'},
-  ];
+  List<Map<String, dynamic>> clients = [];
   List<Map<String, dynamic>> _allClients = [];
   List<Map<String, dynamic>> _allItems = [];
   List<Map<String, dynamic>> filteredClients = [];
@@ -313,6 +308,9 @@ class _CreateInvoiceState extends State<CreateInvoice> {
 
       if (mounted) {
         final currentQuery = clientNameController.text.trim().toLowerCase();
+        print(
+          '[DEBUG] currentQuery="$currentQuery" selectedClientData=$selectedClientData _isSelectingClient=$_isSelectingClient',
+        );
         if (currentQuery.isNotEmpty && selectedClientData == null) {
           final combined = [...matches];
           for (var r in results) {
@@ -323,12 +321,10 @@ class _CreateInvoiceState extends State<CreateInvoice> {
               combined.add(r);
             }
           }
+          // print('[DEBUG] combined.length=${combined.length}, setting showClientDropdown=true');
           setState(() {
             filteredClients = combined;
             showClientDropdown = combined.isNotEmpty;
-
-            print("showClientDropdown = $showClientDropdown");
-            print("filteredClients = $filteredClients");
           });
         }
       }
